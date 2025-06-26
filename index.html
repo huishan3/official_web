@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melody Bean | 品味旋律，啜飲人生</title>
     
-    <!-- Placeholder Comments -->
-    <!-- Chosen Palette: Warm Neutrals & Natural Accents (淺米白, 柔和木質棕, 深咖啡文字, 橄欖綠點綴) -->
-    <!-- Application Structure Plan: A narrative flow starting with brand introduction, moving to interactive product discovery (Flavor Guide), followed by brand depth (Story, Artisans), practical information (Knowledge, Events, FAQ), and ending with community community engagement (Reviews) and a clear call-to-action (Contact Form). This structure guides the user from initial attraction to deep engagement and finally to potential contact, optimizing for marketing marketing goals. -->
-    <!-- Visualization & Content Choices: Interactive Flavor Radar (Chart.js) to visually communicate complex flavor profiles. Accordion (HTML/JS) for FAQ to present dense information cleanly. Inquiry Form (HTML/JS) to provide a low-friction contact method. All choices adhere to the NO SVG/Mermaid rule, focusing on dynamic, canvas-based, or pure HTML/CSS solutions. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -125,12 +119,10 @@
                 <a href="#faq" class="hover:text-primary transition-colors">常見問題</a>
                 <a href="#contact" class="px-4 py-2 rounded-full btn-primary">聯絡我們</a>
             </div>
-            <!-- Mobile Menu Button will be added if needed -->
-        </div>
+            </div>
     </nav>
 
     <main>
-        <!-- Hero Section -->
         <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative" style="background-image: url('./image/image_2.jpg');">
             <div class="absolute inset-0 bg-black/40"></div>
             <div class="relative text-center z-10 p-6 fade-in-up">
@@ -139,7 +131,6 @@
             </div>
         </section>
 
-        <!-- Flavor Guide Section -->
         <section id="flavor-guide" class="py-20 bg-white/50">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="fade-in-up">
@@ -150,13 +141,11 @@
                     <div class="w-full md:w-1/2">
                         <label for="flavor-select" class="block text-left mb-2 font-semibold">選擇一款咖啡豆來查看風味圖譜：</label>
                         <select id="flavor-select" class="w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
-                            <!-- Options will be populated by JS -->
-                        </select>
+                            </select>
                         <div id="lifestyle-suggestion" class="mt-6 text-left p-4 bg-green-50 rounded-lg border border-accent text-gray-700">
                             <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
                             <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
                         </div>
-                        <!-- New div to display detailed bean info -->
                         <div id="bean-details-display" class="mt-6 text-left p-4 bg-blue-50 rounded-lg border border-blue-300 text-gray-700 hidden">
                             <h4 class="font-bold font-serif text-lg text-blue-700 mb-2">品項詳細資訊</h4>
                             <div class="grid grid-cols-2 gap-2 text-sm">
@@ -180,7 +169,6 @@
             </div>
         </section>
 
-        <!-- Story & Artisan Section -->
         <section id="story" class="py-20">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
@@ -194,7 +182,6 @@
                         <span>2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</span>
                     </p>
                     <div class="mt-8 text-center">
-                        <!-- Placeholder for video or more imagery -->
                         <div class="relative w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
                             <i class="fas fa-play-circle text-6xl text-gray-500 opacity-75"></i>
                             <p class="absolute text-gray-700 text-sm mt-2">（未來將在此處加入品牌故事影片）</p>
@@ -217,7 +204,6 @@
             </div>
         </section>
 
-        <!-- Knowledge Section -->
         <section id="knowledge" class="py-20 bg-white/50">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
@@ -244,17 +230,14 @@
             </div>
         </section>
 
-        <!-- Special Offers Section -->
         <section id="offers" class="py-20">
             <div class="max-w-4xl mx-auto px-6 text-center">
                 <div class="fade-in-up">
                     <h2 class="text-4xl font-serif section-title">最新優惠與活動</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">不定期推出精選特價，讓您以更優惠的價格品嚐我們的精品咖啡。</p>
                     <div id="special-offers-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Special offers will be rendered here -->
-                    </div>
+                        </div>
                     <div class="mt-10">
-                        <!-- Removed link to #products as that section is gone -->
                         <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
                             <i class="fas fa-tags mr-2"></i> 探索更多咖啡風味
                         </a>
@@ -263,27 +246,23 @@
             </div>
         </section>
         
-        <!-- FAQ Section -->
         <section id="faq" class="py-20 bg-white/50">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-serif section-title">常見問題</h2>
                 </div>
                 <div id="faq-container" class="space-y-4 fade-in-up">
-                    <!-- FAQ items will be rendered here -->
-                </div>
+                    </div>
             </div>
         </section>
         
-        <!-- Reviews Section -->
         <section id="review" class="py-20">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-serif section-title">顧客的溫馨回饋</h2>
                 </div>
                 <div id="review-list" class="space-y-6 fade-in-up">
-                    <!-- Reviews will be rendered here -->
-                </div>
+                    </div>
                  <div class="mt-12 card p-8 fade-in-up">
                     <h3 class="text-2xl font-serif mb-4 text-center">分享您的品飲心得</h3>
                     <form id="review-form">
@@ -305,7 +284,6 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
         <section id="contact" class="py-20 bg-white/50">
             <div class="max-w-4xl mx-auto px-6 text-center">
                  <div class="fade-in-up">
@@ -353,7 +331,6 @@
         </div>
     </footer>
 
-    <!-- Script Block 1: Global Constants & Data Variables -->
     <script>
         // These constants and variables need to be globally accessible across all script blocks.
         const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
@@ -389,7 +366,6 @@
         ];
     </script>
 
-    <!-- Script Block 2: Core Data Loading & Central Control (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -493,7 +469,6 @@
         })();
     </script>
 
-    <!-- Script Block 3: Product & Offer Rendering Functions (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -545,7 +520,6 @@
         })();
     </script>
 
-    <!-- Script Block 4: FAQ & Review Rendering Functions (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -641,7 +615,6 @@
         })();
     </script>
 
-    <!-- Script Block 5: Flavor Guide Logic (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -824,7 +797,6 @@
         })();
     </script>
 
-    <!-- Script Block 6: Event Listeners & Initialization (using IIFE) -->
     <script>
         'use strict';
         (function() {
