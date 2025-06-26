@@ -101,6 +101,17 @@
             font-weight: bold;
             font-size: 1.2em;
         }
+        /* Custom styles for error messages */
+        .error-message {
+            color: #ef4444; /* Tailwind red-500 */
+            text-align: center;
+            padding: 1rem;
+            border: 1px solid #fca5a5; /* Tailwind red-300 */
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -108,7 +119,7 @@
         <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
             <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
             <div class="hidden md:flex items-center space-x-6 text-lg">
-                <!-- Removed link to #products -->
+                <a href="#products" class="hover:text-primary transition-colors">咖啡豆鑑賞</a>
                 <a href="#flavor-guide" class="hover:text-primary transition-colors">風味探索</a>
                 <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
                 <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
@@ -129,8 +140,34 @@
             </div>
         </section>
 
-        <!-- Product Section Removed -->
-        <!-- The entire <section id="products"> block has been removed from here. -->
+        <!-- Products Section -->
+        <section id="products" class="py-20">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">咖啡豆鑑賞</h2>
+                    <p class="mt-4 text-lg text-gray-600">探索由我們精心烘焙，來自世界各地的風味樂章。</p>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 fade-in-up">
+                    <input class="w-full md:w-1/2 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="search-input" placeholder="搜尋咖啡名稱、風味、國家或品種..." type="text"/>
+                    <select class="w-full md:w-1/4 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="filter-select">
+                        <option value="">所有品項</option>
+                        <option value="GEISHA 水洗">GEISHA 水洗</option>
+                        <option value="Heirloom">Heirloom</option>
+                        <option value="GEISHA">GEISHA (中淺焙)</option> 
+                        <option value="Geisha（藝妓）">哥斯大黎加 藝妓</option> 
+                        <option value="淺焙">淺焙類</option>
+                        <option value="中淺焙">中淺焙類</option>
+                        <option value="中焙">中焙類</option>
+                        <option value="中深焙">中深焙類</option>
+                        <option value="深焙">深焙類</option>
+                    </select>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-list">
+                    <!-- Product cards will be rendered here -->
+                </div>
+            </div>
+        </section>
 
         <!-- Flavor Guide Section -->
         <section id="flavor-guide" class="py-20 bg-white/50">
@@ -166,7 +203,7 @@
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
                     <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
                     <p class="text-gray-700 leading-relaxed space-y-4">
-                        <span>� 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
+                        <span>🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
                         <span>☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</span>
                         <span>2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</span>
                     </p>
@@ -231,9 +268,8 @@
                         <!-- Special offers will be rendered here -->
                     </div>
                     <div class="mt-10">
-                        <!-- Removed link to #products, updated to point to #flavor-guide or just a general button if no specific section -->
-                        <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
-                            <i class="fas fa-tags mr-2"></i> 查看風味探索
+                        <a href="#products" class="px-8 py-3 rounded-full btn-primary inline-block">
+                            <i class="fas fa-tags mr-2"></i> 查看所有咖啡豆
                         </a>
                     </div>
                 </div>
@@ -273,7 +309,7 @@
                                 <option value="⭐️⭐️⭐️">⭐️⭐️⭐️</option>
                             </select>
                         </div>
-                        <textarea class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="review-content" placeholder="在這裡寫下您的評論..." required rows="4"></textarea>
+                        <textarea class="p-3 w-full border border-gray-300 rounded-md mb-4" id="review-content" placeholder="在這裡寫下您的評論..." required rows="4"></textarea>
                         <div class="text-center mt-6">
                             <button type="submit" class="px-8 py-3 rounded-full btn-secondary">送出評論</button>
                         </div>
@@ -330,29 +366,28 @@
         </div>
     </footer>
 
+    <!-- Script Block 1: Global Constants & Data Variables -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        // --- Constants & Local Storage Keys ---
+        // These constants and variables need to be globally accessible across all script blocks.
         const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
         const SPECIAL_OFFERS_KEY = 'melodySpecialOffers';
         const REVIEWS_KEY = 'melodyReviews';
 
-        // --- Global Data Variables (using let for reassignability) ---
         let coffeeBeans = []; 
         let specialOffers = [];
         let reviews = [];
+        let radarChart; // Chart.js instance, needs global access for update functions
 
-        // --- Default Data (Hardcoded for manual management if localStorage is empty) ---
+        // Default data - serves as fallback if localStorage is empty/invalid
         const defaultCoffeeBeans = [
-            { id: 1, name: '衣索比亞 GEISHA 水洗 (114g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬、百香果', image: 'https://placehold.co/400x250/b58863/FFFFFF?text=衣索比亞+GEISHA+水洗', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。', salePrice: 280, expiryDate: '2025/10/12' },
-            { id: 2, name: '衣索比亞 Heirloom 雙重厭氧水洗 (227g)', flavor: '茉莉、橙花、蜂蜜、水蜜桃', image: 'https://placehold.co/400x250/3f2e2e/FFFFFF?text=衣索比亞+Heirloom+雙重厭氧', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。', salePrice: 600, expiryDate: '2025/10/28' },
-            { id: 3, name: '衣索比亞 Heirloom 雙重厭氧水洗 (227g) - 批次2', flavor: '茉莉、橙花、蜂蜜、水蜜桃', image: 'https://placehold.co/400x250/6b8e23/FFFFFF?text=衣索比亞+Heirloom+批次2', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。', salePrice: 600, expiryDate: '2025/10/31' },
-            { id: 4, name: '衣索比亞 GEISHA 中淺焙 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/a07654/FFFFFF?text=衣索比亞+GEISHA+中淺焙', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。', salePrice: 540, expiryDate: '2025/11/01' },
-            { id: 5, name: '衣索比亞 GEISHA 水洗 高海拔 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/b58863/FFFFFF?text=衣索比亞+GEISHA+高海拔', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。', salePrice: 540, expiryDate: '2025/11/01' },
-            { id: 6, name: '衣索比亞 綜合批次 淺焙 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/3f2e2e/FFFFFF?text=衣索比亞+綜合淺焙', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。', salePrice: 540, expiryDate: '2025/11/01' }, 
-            { id: 7, name: '哥斯大黎加 Geisha 白蜜 (114g) - 聖伊西多羅', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', image: 'https://placehold.co/400x250/6b8e23/FFFFFF?text=哥斯大黎加+藝妓', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。', salePrice: 800, expiryDate: '2025/08/15' }, 
-            { id: 8, name: '哥斯大黎加 藝妓 淺焙 (227g)', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', image: 'https://placehold.co/400x250/a07654/FFFFFF?text=哥斯大黎加+藝妓+淺焙', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。', salePrice: 1800, expiryDate: '2025/08/15' }
+            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025/10/12', price: 280, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
+            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025/10/28', price: 600, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
+            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025/10/31', price: 600, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
+            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
+            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'medium', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
+            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'light', image: './image/image_6.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
+            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025/08/15', price: 800, category: 'light', image: './image/image_7.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
+            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025/08/15', price: 1800, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
         ];
 
         const defaultSpecialOffers = [
@@ -365,353 +400,586 @@
             { q: '網站上的商品如何訂購？', a: '本網站目前僅供商品與品牌展示。若您對任何商品有興趣或需要訂購，歡迎直接致電 03-4081932 與我們聯繫，我們將有專人為您服務。' },
             { q: '樂海樂器咖啡的營業時間是？', a: '我們的營業時間為週一至週六，早上9:00至晚間9:00。週日為公休日。歡迎您隨時來店裡坐坐，喝杯咖啡，聊聊音樂。' }
         ];
+    </script>
 
-        // --- DOM Elements ---
-        // productList, searchInput, filterSelect are no longer used for rendering products directly
-        const specialOffersList = document.getElementById('special-offers-list');
-        const faqContainer = document.getElementById('faq-container');
-        const reviewList = document.getElementById('review-list');
-        const flavorSelect = document.getElementById('flavor-select');
-        const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-        const reviewForm = document.getElementById('review-form');
-        const inquiryForm = document.getElementById('inquiry-form');
+    <!-- Script Block 2: Core Data Loading & Central Control (using IIFE) -->
+    <script>
+        'use strict';
+        (function() {
+            // Get DOM elements needed by this script block, and potentially passed to rendering functions.
+            // These are local to this IIFE.
+            const productList = document.getElementById('product-list');
+            const specialOffersList = document.getElementById('special-offers-list');
+            const faqContainer = document.getElementById('faq-container');
+            const reviewList = document.getElementById('review-list');
+            const flavorSelect = document.getElementById('flavor-select');
+            const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
 
-        let radarChart; // Chart.js instance
-
-        /**
-         * Loads data from localStorage or uses default data if localStorage is empty/invalid.
-         * Then, triggers all necessary rendering functions.
-         */
-        function loadAndRenderAllData() {
-            console.log('--- Starting loadAndRenderAllData (Frontend Display - No Products Section) ---');
-            
-            // Load Coffee Beans: Prioritize localStorage, fallback to defaults
-            let storedCoffeeBeans = JSON.parse(localStorage.getItem(COFFEE_BEANS_KEY));
-            if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
-                coffeeBeans = storedCoffeeBeans;
-                console.log('Loaded coffee beans from localStorage:', coffeeBeans);
-            } else {
-                coffeeBeans = defaultCoffeeBeans;
-                console.log('localStorage for coffee beans empty or invalid, using default data:', coffeeBeans);
-            }
-
-            // Load Special Offers: Prioritize localStorage, fallback to defaults
-            let storedSpecialOffers = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
-            if (Array.isArray(storedSpecialOffers) && storedSpecialOffers.length > 0) {
-                specialOffers = storedSpecialOffers;
-                console.log('Loaded special offers from localStorage:', specialOffers);
-            } else {
-                specialOffers = defaultSpecialOffers;
-                console.log('localStorage for special offers empty or invalid, using default data:', specialOffers);
-            }
-
-            // Load Reviews (always from localStorage for user-submitted content)
-            reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
-            console.log('Loaded reviews (from localStorage):', reviews);
-
-            // --- Render all sections after data is loaded ---
-            // renderProducts(); // Removed as product section is no longer present
-            renderSpecialOffers();
-            renderFaqs(); 
-            renderReviews(); 
-            updateFlavorGuideSelect(); // Populates select and initializes chart
-            
-            console.log('--- Finished loadAndRenderAllData (Frontend Display - No Products Section) ---');
-        }
-
-        /**
-         * Renders the list of special offers.
-         */
-        function renderSpecialOffers() {
-            if (!specialOffersList) {
-                console.error('Error: specialOffersList element not found!');
-                return;
-            }
-            console.log('Rendering special offers. specialOffers length:', specialOffers.length);
-            specialOffersList.innerHTML = ''; // Clear existing content
-            if (specialOffers.length === 0) {
-                specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
-                console.log('No special offers to render.');
-            } else {
-                specialOffers.forEach(offer => {
-                    const offerCard = document.createElement('div');
-                    offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
-                    offerCard.innerHTML = `
-                        <img src="${offer.image}" alt="${offer.name}" class="w-full h-40 object-cover rounded-md mb-4">
-                        <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
-                        <p class="text-gray-600 mb-3">${offer.description}</p>
-                        <div class="mt-auto">
-                            <span class="offer-price-old">NT$${offer.originalPrice}</span>
-                            <span class="offer-price-new">NT$${offer.specialPrice}</span>
-                        </div>
-                    `;
-                    specialOffersList.appendChild(offerCard);
-                });
-                console.log(`Rendered ${specialOffers.length} offer cards.`);
-            }
-        }
-
-        /**
-         * Renders the FAQ items and attaches accordion functionality.
-         */
-        function renderFaqs() {
-            if (!faqContainer) {
-                console.error('Error: faqContainer element not found!');
-                return;
-            }
-            console.log('Rendering FAQs. faqs length:', faqs.length);
-            faqContainer.innerHTML = ''; // Clear existing content before re-rendering
-            faqs.forEach(faq => {
-                const item = document.createElement('div');
-                item.className = 'card';
-                item.innerHTML = `
-                    <button class="accordion-button w-full text-left p-4 text-lg font-semibold">
-                        ${faq.q}
-                    </button>
-                    <div class="accordion-content">
-                        <p class="p-4 pt-0 text-gray-700">${faq.a}</p>
-                    </div>
-                `;
-                faqContainer.appendChild(item);
-            });
-            // Re-attach accordion event listeners after rendering
-            const newFaqButtons = document.querySelectorAll('.accordion-button');
-            newFaqButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    button.classList.toggle('open');
-                    const content = button.nextElementSibling;
-                    if (content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
+            /**
+             * Loads data from localStorage or uses default data if localStorage is empty/invalid.
+             * Then, triggers all necessary rendering functions. Exposed globally.
+             */
+            window.loadAndRenderAllData = function() {
+                console.log('--- Starting loadAndRenderAllData (Frontend Display - Enhanced Isolation) ---');
+                try {
+                    // Load Coffee Beans: Prioritize localStorage, fallback to defaults
+                    let storedCoffeeBeans = null;
+                    try {
+                        const coffeeBeansJson = localStorage.getItem(COFFEE_BEANS_KEY);
+                        if (coffeeBeansJson) {
+                            storedCoffeeBeans = JSON.parse(coffeeBeansJson);
+                            console.log('Attempted to parse coffee beans from localStorage. Result:', storedCoffeeBeans);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing stored coffee beans from localStorage. Falling back to default data.', e);
+                        // Fallback to default if parsing fails
                     }
-                });
-            });
-            console.log(`Rendered ${faqs.length} FAQ items.`);
-        }
+                    if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
+                        // Ensure loaded data has all expected fields, merge with default template if necessary
+                        // This helps if backend saves old schema or misses fields.
+                        coffeeBeans = storedCoffeeBeans.map(bean => ({
+                            ...defaultCoffeeBeans[0], // Use a template from default to ensure all keys exist
+                            ...bean // Overlay existing values from localStorage
+                        }));
+                        console.log('Successfully loaded and merged coffee beans from localStorage:', coffeeBeans);
+                    } else {
+                        coffeeBeans = [...defaultCoffeeBeans]; // Use spread to avoid modifying default array directly
+                        localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(defaultCoffeeBeans)); // Always re-save defaults if localStorage is empty/invalid
+                        console.log('localStorage for coffee beans was empty or invalid. Using and re-saving default data:', coffeeBeans);
+                    }
 
-        /**
-         * Renders the customer reviews.
-         */
-        function renderReviews() {
-            if (!reviewList) {
-                console.error('Error: reviewList element not found!');
-                return;
-            }
-            reviewList.innerHTML = '';
-            // 如果 reviews 為空，顯示提示訊息
-            if (reviews.length === 0) {
-                reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
-                console.log('No reviews to render.');
-            } else {
-                reviews.forEach(review => {
-                    const item = document.createElement('div');
-                    item.className = 'card p-6';
-                    item.innerHTML = `
-                        <div class="flex items-center mb-2">
-                            <span class="font-semibold text-lg mr-2">${review.name}</span>
-                            <span class="text-yellow-500">${review.rating}</span>
-                        </div>
-                        <p class="text-gray-700">${review.content}</p>
-                    `;
-                    reviewList.appendChild(item);
-                });
-                console.log(`Rendered ${reviews.length} review items.`);
-            }
-        }
-        
-        /**
-         * Populates the flavor guide select box and initializes/updates the radar chart.
-         */
-        function updateFlavorGuideSelect() {
-            if (!flavorSelect) {
-                console.error('Error: flavorSelect element not found!');
-                return;
-            }
-            console.log('Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
+                    // Load Special Offers: Prioritize localStorage, fallback to defaults
+                    let storedSpecialOffers = null;
+                    try {
+                        const specialOffersJson = localStorage.getItem(SPECIAL_OFFERS_KEY);
+                        if (specialOffersJson) {
+                            storedSpecialOffers = JSON.parse(specialOffersJson);
+                            console.log('Attempted to parse special offers from localStorage. Result:', storedSpecialOffers);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing stored special offers from localStorage. Falling back to default data.', e);
+                        // Fallback to default if parsing fails
+                    }
+                    if (Array.isArray(storedSpecialOffers) && storedSpecialOffers.length > 0) {
+                        specialOffers = storedSpecialOffers;
+                        console.log('Successfully loaded special offers from localStorage:', specialOffers);
+                    } else {
+                        specialOffers = defaultSpecialOffers;
+                        localStorage.setItem(SPECIAL_OFFERS_KEY, JSON.stringify(defaultSpecialOffers)); // Always re-save defaults if localStorage is empty/invalid
+                        console.log('localStorage for special offers was empty or invalid. Using and re-saving default data:', specialOffers);
+                    }
 
-            // Re-populate options based on potentially updated coffeeBeans
-            flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
-            coffeeBeans.forEach(bean => {
-                const option = document.createElement('option');
-                option.value = bean.id;
-                option.textContent = bean.name;
-                flavorSelect.appendChild(option);
-            });
+                    // Load Reviews (always from localStorage for user-submitted content)
+                    let storedReviews = null;
+                    try {
+                        const reviewsJson = localStorage.getItem(REVIEWS_KEY);
+                        if (reviewsJson) {
+                            storedReviews = JSON.parse(reviewsJson);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing stored reviews from localStorage:', e);
+                    }
+                    reviews = Array.isArray(storedReviews) ? storedReviews : [];
+                    console.log('Loaded reviews (from localStorage):', reviews);
 
-            const ctx = document.getElementById('flavorRadarChart')?.getContext('2d');
-            if (ctx) {
-                // Destroy old chart if it exists to prevent reinitialization issues
-                if (radarChart) {
-                    radarChart.destroy();
-                    console.log('Destroyed existing radar chart.');
+                    // --- Trigger rendering for all sections ---
+                    window.renderProducts(); // Call globally exposed render functions
+                    window.renderSpecialOffers();
+                    window.renderFaqs(); 
+                    window.renderReviews(); 
+                    window.updateFlavorGuideSelect();
+                    
+                } catch (error) {
+                    console.error('An unhandled error occurred during loadAndRenderAllData:', error);
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        mainContent.innerHTML = `
+                            <div class="error-message p-8 my-20">
+                                <h1>載入網站內容時發生嚴重錯誤。</h1>
+                                <p>請檢查您的瀏覽器控制台以獲取詳細信息。</p>
+                            </div>
+                        `;
+                    }
                 }
-                radarChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['酸度', '醇厚度', '甜度', '香氣', '餘韻'],
-                        datasets: [{
-                            label: '風味圖譜',
-                            data: [0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(181, 136, 99, 0.2)',
-                            borderColor: 'rgba(181, 136, 99, 1)',
-                            pointBackgroundColor: 'rgba(181, 136, 99, 1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            r: {
-                                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                                pointLabels: { font: { size: 14, family: "'Noto Sans TC', sans-serif" } },
-                                suggestedMin: 0,
-                                suggestedMax: 5,
-                                ticks: {
-                                    stepSize: 1,
-                                    backdropColor: 'transparent'
+                console.log('--- Finished loadAndRenderAllData (Frontend Display - Enhanced Isolation) ---');
+            };
+        })();
+    </script>
+
+    <!-- Script Block 3: Product & Offer Rendering Functions (using IIFE) -->
+    <script>
+        'use strict';
+        (function() {
+            const productList = document.getElementById('product-list');
+            const searchInput = document.getElementById('search-input');
+            const filterSelect = document.getElementById('filter-select');
+
+            /**
+             * Renders the product list, applying search and filter conditions. Exposed globally.
+             */
+            window.renderProducts = function() {
+                try {
+                    if (!productList) {
+                        console.error('Error: productList element not found!');
+                        return;
+                    }
+                    
+                    console.log('Rendering products. Current coffeeBeans length:', coffeeBeans.length);
+                    const keyword = (searchInput ? searchInput.value : '').toLowerCase();
+                    const filter = (filterSelect ? filterSelect.value : '').toLowerCase();
+
+                    // Ensure coffeeBeans is an array before filtering
+                    const filteredBeans = Array.isArray(coffeeBeans) ? coffeeBeans.filter(bean => {
+                        const matchesKeyword = (bean.name && bean.name.toLowerCase().includes(keyword)) || 
+                                               (bean.flavor && bean.flavor.toLowerCase().includes(keyword)) ||
+                                               (bean.country && bean.country.toLowerCase().includes(keyword)) ||
+                                               (bean.variety && bean.variety.toLowerCase().includes(keyword));
+
+                        const matchesFilter = filter ? 
+                                                ((bean.variety && bean.variety.toLowerCase().includes(filter)) || 
+                                                (bean.roast && bean.roast.toLowerCase().includes(filter))) : // Filter by variety OR roast
+                                                true; 
+                        return matchesKeyword && matchesFilter;
+                    }) : [];
+
+                    productList.innerHTML = ''; // Clear existing content
+
+                    if (filteredBeans.length === 0) {
+                        productList.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有咖啡豆產品符合您的篩選條件。</p>';
+                        console.log('No coffee beans to render after filtering.');
+                    } else {
+                        filteredBeans.forEach(bean => {
+                            const card = document.createElement('div');
+                            card.className = 'card fade-in-up';
+                            card.innerHTML = `
+                                <img src="${bean.image}" alt="${bean.name} 圖片載入失敗" class="w-full h-36 object-cover rounded-t-lg" 
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ctext x=\\'50%\\\' y=\\'50%\\\' font-family=\\'sans-serif\\' font-size=\\'10\\' fill=\\'%23333\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E'; this.style.objectFit='contain';">
+                                <div class="p-4">
+                                    <h3 class="text-xl font-serif mb-2">${bean.name}</h3>
+                                    <p class="text-gray-600 text-sm mb-2">國家: ${bean.country || 'N/A'} | 品種: ${bean.variety || 'N/A'}</p>
+                                    <p class="text-gray-600 text-sm mb-2">烘焙度: ${bean.roast || 'N/A'} | 重量: ${bean.weight || 'N/A'}</p>
+                                    <p class="text-gray-600">風味：${bean.flavor || 'N/A'}</p>
+                                    <p class="text-sm text-gray-500">售價: NT$${bean.price || '---'} (期限: ${bean.expiryDate || '---'})</p> 
+                                </div>
+                            `;
+                            productList.appendChild(card);
+                        });
+                        console.log(`Rendered ${filteredBeans.length} product cards.`);
+                    }
+                } catch (error) {
+                    console.error('Error rendering products:', error);
+                    if (productList) {
+                        productList.innerHTML = '<div class="error-message col-span-full">載入咖啡豆產品時發生錯誤。</div>';
+                    }
+                }
+            };
+
+            /**
+             * Renders the list of special offers. Exposed globally.
+             */
+            window.renderSpecialOffers = function() {
+                try {
+                    const specialOffersList = document.getElementById('special-offers-list'); // Get element locally
+                    if (!specialOffersList) {
+                        console.error('Error: specialOffersList element not found!');
+                        return;
+                    }
+                    console.log('Rendering special offers. specialOffers length:', specialOffers.length);
+                    specialOffersList.innerHTML = ''; // Clear existing content
+                    if (Array.isArray(specialOffers) && specialOffers.length === 0) {
+                        specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
+                        console.log('No special offers to render.');
+                    } else {
+                        specialOffers.forEach(offer => {
+                            const offerCard = document.createElement('div');
+                            offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
+                            offerCard.innerHTML = `
+                                <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ctext x=\\'50%\\\' y=\\'50%\\\' font-family=\\'sans-serif\\' font-size=\\'10\\' fill=\\'%23333\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E'; this.style.objectFit='contain';">
+                                <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
+                                <p class="text-gray-600 mb-3">${offer.description}</p>
+                                <div class="mt-auto">
+                                    <span class="offer-price-old">NT$${offer.originalPrice}</span>
+                                    <span class="offer-price-new">NT$${offer.specialPrice}</span>
+                                </div>
+                            `;
+                            specialOffersList.appendChild(offerCard);
+                        });
+                        console.log(`Rendered ${specialOffers.length} offer cards.`);
+                    }
+                } catch (error) {
+                    console.error('Error rendering special offers:', error);
+                    const specialOffersList = document.getElementById('special-offers-list');
+                    if (specialOffersList) {
+                        specialOffersList.innerHTML = '<div class="error-message col-span-full">載入優惠活動時發生錯誤。</div>';
+                    }
+                }
+            };
+        })();
+    </script>
+
+    <!-- Script Block 4: FAQ & Review Rendering Functions (using IIFE) -->
+    <script>
+        'use strict';
+        (function() {
+            const faqContainer = document.getElementById('faq-container');
+            const reviewList = document.getElementById('review-list');
+
+            /**
+             * Renders the FAQ items and attaches accordion functionality. Exposed globally.
+             */
+            window.renderFaqs = function() {
+                try {
+                    if (!faqContainer) {
+                        console.error('Error: faqContainer element not found!');
+                        return;
+                    }
+                    console.log('Rendering FAQs. faqs length:', faqs.length);
+                    faqContainer.innerHTML = ''; // Clear existing content before re-rendering
+                    if (Array.isArray(faqs) && faqs.length === 0) {
+                         faqContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有常見問題。</p>';
+                    } else {
+                        faqs.forEach(faq => {
+                            const item = document.createElement('div');
+                            item.className = 'card';
+                            item.innerHTML = `
+                                <button class="accordion-button w-full text-left p-4 text-lg font-semibold">
+                                    ${faq.q}
+                                </button>
+                                <div class="accordion-content">
+                                    <p class="p-4 pt-0 text-gray-700">${faq.a}</p>
+                                </div>
+                            `;
+                            faqContainer.appendChild(item);
+                        });
+                    }
+                    // Re-attach accordion event listeners after rendering
+                    const newFaqButtons = document.querySelectorAll('.accordion-button');
+                    newFaqButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            button.classList.toggle('open');
+                            const content = button.nextElementSibling;
+                            if (content.style.maxHeight) {
+                                content.style.maxHeight = null;
+                            } else {
+                                content.style.maxHeight = content.scrollHeight + 'px';
+                            }
+                        });
+                    });
+                    console.log(`Rendered ${faqs.length} FAQ items.`);
+                } catch (error) {
+                    console.error('Error rendering FAQs:', error);
+                    if (faqContainer) {
+                        faqContainer.innerHTML = '<div class="error-message">載入常見問題時發生錯誤。</div>';
+                    }
+                }
+            };
+
+            /**
+             * Renders the customer reviews. Exposed globally.
+             */
+            window.renderReviews = function() {
+                try {
+                    if (!reviewList) {
+                        console.error('Error: reviewList element not found!');
+                        return;
+                    }
+                    reviewList.innerHTML = '';
+                    // 如果 reviews 為空，顯示提示訊息
+                    if (Array.isArray(reviews) && reviews.length === 0) {
+                        reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
+                        console.log('No reviews to render.');
+                    } else {
+                        reviews.forEach(review => {
+                            const item = document.createElement('div');
+                            item.className = 'card p-6';
+                            item.innerHTML = `
+                                <div class="flex items-center mb-2">
+                                    <span class="font-semibold text-lg mr-2">${review.name}</span>
+                                    <span class="text-yellow-500">${review.rating}</span>
+                                </div>
+                                <p class="text-gray-700">${review.content}</p>
+                            `;
+                            reviewList.appendChild(item);
+                        });
+                        console.log(`Rendered ${reviews.length} review items.`);
+                    }
+                } catch (error) {
+                    console.error('Error rendering reviews:', error);
+                    if (reviewList) {
+                        reviewList.innerHTML = '<div class="error-message">載入顧客回饋時發生錯誤。</div>';
+                    }
+                }
+            };
+        })();
+    </script>
+
+    <!-- Script Block 5: Flavor Guide Logic (using IIFE) -->
+    <script>
+        'use strict';
+        (function() {
+            const flavorSelect = document.getElementById('flavor-select');
+            const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
+
+            /**
+             * Populates the flavor guide select box and initializes/updates the radar chart. Exposed globally.
+             */
+            window.updateFlavorGuideSelect = function() {
+                try {
+                    if (!flavorSelect) {
+                        console.error('Error: flavorSelect element not found!');
+                        return;
+                    }
+                    console.log('Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
+
+                    // Re-populate options based on potentially updated coffeeBeans
+                    flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
+                    if (Array.isArray(coffeeBeans)) {
+                        coffeeBeans.forEach(bean => {
+                            const option = document.createElement('option');
+                            option.value = bean.id;
+                            option.textContent = bean.name;
+                            flavorSelect.appendChild(option);
+                        });
+                    }
+
+                    const ctx = document.getElementById('flavorRadarChart')?.getContext('2d');
+                    if (ctx) {
+                        // Destroy old chart if it exists to prevent reinitialization issues
+                        if (radarChart) { // radarChart is a global variable
+                            radarChart.destroy();
+                            console.log('Destroyed existing radar chart.');
+                        }
+                        radarChart = new Chart(ctx, {
+                            type: 'radar',
+                            data: {
+                                labels: ['酸度', '醇厚度', '甜度', '香氣', '餘韻'],
+                                datasets: [{
+                                    label: '風味圖譜',
+                                    data: [0, 0, 0, 0, 0],
+                                    backgroundColor: 'rgba(181, 136, 99, 0.2)',
+                                    borderColor: 'rgba(181, 136, 99, 1)',
+                                    pointBackgroundColor: 'rgba(181, 136, 99, 1)',
+                                    pointBorderColor: '#fff',
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    r: {
+                                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                        pointLabels: { font: { size: 14, family: "'Noto Sans TC', sans-serif" } },
+                                        suggestedMin: 0,
+                                        suggestedMax: 5,
+                                        ticks: {
+                                            stepSize: 1,
+                                            backdropColor: 'transparent'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
                                 }
                             }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
+                        });
+                        console.log('New radar chart created.');
+                    } else {
+                        console.error('Error: flavorRadarChart canvas context not found!');
+                    }
+
+                    // Remove and re-add event listener to prevent duplicates
+                    flavorSelect.removeEventListener('change', window.handleFlavorSelectChange); 
+                    flavorSelect.addEventListener('change', window.handleFlavorSelectChange);
+
+                    // Trigger change to load the first item's data or display message if no data
+                    if(Array.isArray(coffeeBeans) && coffeeBeans.length > 0) {
+                        flavorSelect.value = coffeeBeans[0].id; // Set first item as default selected
+                        flavorSelect.dispatchEvent(new Event('change'));
+                        console.log('Flavor select initialized with first coffee bean.');
+                    } else {
+                        if(lifestyleSuggestionP) {
+                            lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
+                            console.log('No coffee beans, setting flavor guide message.');
                         }
                     }
+                } catch (error) {
+                    console.error('Error updating flavor guide:', error);
+                    if (flavorSelect) {
+                        flavorSelect.innerHTML = '<option value="" disabled selected>載入風味指南時發生錯誤。</option>';
+                    }
+                    if (lifestyleSuggestionP) {
+                        lifestyleSuggestionP.textContent = '風味指南載入失敗，請檢查數據。';
+                        lifestyleSuggestionP.classList.add('error-message');
+                    }
+                }
+            };
+
+            /**
+             * Handles the change event for the flavor select dropdown.
+             * Updates the radar chart and lifestyle suggestion based on the selected coffee bean. Exposed globally.
+             */
+            window.handleFlavorSelectChange = function(e) {
+                try {
+                    const selectedBean = Array.isArray(coffeeBeans) ? coffeeBeans.find(b => b.id == e.target.value) : undefined;
+                    if (selectedBean && radarChart) {
+                        // Ensure flavorProfile exists and is an object before accessing its values
+                        const flavorData = selectedBean.flavorProfile && typeof selectedBean.flavorProfile === 'object' 
+                                            ? Object.values(selectedBean.flavorProfile) 
+                                            : [0, 0, 0, 0, 0]; // Default to zeros if missing or invalid
+
+                        radarChart.data.datasets[0].data = flavorData;
+                        radarChart.data.datasets[0].label = selectedBean.name;
+                        radarChart.update();
+                        if(lifestyleSuggestionP) {
+                            lifestyleSuggestionP.textContent = selectedBean.lifestyle || '無生活提案。'; // Provide fallback
+                            lifestyleSuggestionP.classList.remove('error-message');
+                        }
+                        console.log('Flavor select changed. Updated radar chart and lifestyle suggestion for:', selectedBean.name);
+                    } else if (!selectedBean) {
+                        console.warn('Selected bean not found for ID:', e.target.value);
+                        if (lifestyleSuggestionP) {
+                            lifestyleSuggestionP.textContent = '無法找到選定的咖啡豆風味數據。';
+                            lifestyleSuggestionP.classList.add('error-message');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error handling flavor select change:', error);
+                    if (lifestyleSuggestionP) {
+                        lifestyleSuggestionP.textContent = '載入選定咖啡豆風味時發生錯誤。';
+                        lifestyleSuggestionP.classList.add('error-message');
+                    }
+                }
+            };
+        })();
+    </script>
+
+    <!-- Script Block 6: Event Listeners & Initialization (using IIFE) -->
+    <script>
+        'use strict';
+        (function() {
+            const reviewForm = document.getElementById('review-form');
+            const inquiryForm = document.getElementById('inquiry-form');
+            const searchInput = document.getElementById('search-input'); // Re-get here for this IIFE's scope
+            const filterSelect = document.getElementById('filter-select'); // Re-get here for this IIFE's scope
+
+
+            // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
+            window.addEventListener('storage', (event) => {
+                if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
+                    console.log(`localStorage key '${event.key}' changed. Reloading data.`);
+                    window.loadAndRenderAllData(); // Call globally exposed function
+                }
+            });
+
+            // --- Review Form Submission ---
+            if(reviewForm) {
+                reviewForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    try {
+                        const newReview = {
+                            name: document.getElementById('reviewer-name').value,
+                            rating: document.getElementById('review-rating').value,
+                            content: document.getElementById('review-content').value,
+                        };
+                        // Basic validation
+                        if (!newReview.name || !newReview.rating || !newReview.content) {
+                            alert('請填寫所有評論欄位。');
+                            return;
+                        }
+
+                        reviews.push(newReview);
+                        localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
+                        window.renderReviews(); // Call globally exposed function
+                        reviewForm.reset();
+                        alert('感謝您的評論！');
+                        console.log('New review submitted:', newReview);
+                    }
+                    catch (error) {
+                        console.error('Error submitting review:', error);
+                        alert('提交評論時發生錯誤，請稍後再試。');
+                    }
                 });
-                console.log('New radar chart created.');
+                console.log('Review form event listener attached.');
             } else {
-                console.error('Error: flavorRadarChart canvas context not found!');
+                console.error('Error: Review form element not found!');
             }
+            
+            // --- Inquiry Form Submission ---
+            if(inquiryForm) {
+                inquiryForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    try {
+                        const name = document.getElementById('inquiry-name').value;
+                        const email = document.getElementById('inquiry-email').value;
+                        const message = document.getElementById('inquiry-message').value;
+                        
+                        // Check if email field is valid according to HTML5 validation
+                        const emailInput = document.getElementById('inquiry-email');
+                        if (!emailInput.checkValidity()) {
+                            alert('請輸入有效的電子郵件地址。');
+                            return;
+                        }
+                        if (!name || !email || !message) {
+                            alert('請填寫所有聯絡資訊欄位。');
+                            return;
+                        }
 
-            // Remove and re-add event listener to prevent duplicates
-            flavorSelect.removeEventListener('change', handleFlavorSelectChange); 
-            flavorSelect.addEventListener('change', handleFlavorSelectChange);
+                        const subject = encodeURIComponent(`來自網站的詢問 - ${name}`);
+                        const body = encodeURIComponent(`發件人姓名: ${name}\n發件人電子郵件: ${email}\n\n訊息內容:\n${message}`);
+                        
+                        const mailtoLink = `mailto:melodybean33427@gmail.com?subject=${subject}&body=${body}`;
+                        window.location.href = mailtoLink;
 
-            // Trigger change to load the first item's data or display message if no data
-            if(coffeeBeans.length > 0) {
-                flavorSelect.value = coffeeBeans[0].id; // Set first item as default selected
-                flavorSelect.dispatchEvent(new Event('change'));
-                console.log('Flavor select initialized with first coffee bean.');
+                        alert('您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。');
+                        inquiryForm.reset();
+                        console.log('Inquiry form submitted for:', name);
+                    } catch (error) {
+                        console.error('Error submitting inquiry form:', error);
+                        alert('提交詢問時發生錯誤，請稍後再試。');
+                    }
+                });
+                console.log('Inquiry form event listener attached.');
             } else {
-                if(lifestyleSuggestionP) {
-                    lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
-                    console.log('No coffee beans, setting flavor guide message.');
-                }
+                console.error('Error: Inquiry form element not found!');
             }
-        }
 
-        /**
-         * Handles the change event for the flavor select dropdown.
-         * Updates the radar chart and lifestyle suggestion based on the selected coffee bean.
-         */
-        function handleFlavorSelectChange(e) {
-            const selectedBean = coffeeBeans.find(b => b.id == e.target.value);
-            if (selectedBean && radarChart) {
-                radarChart.data.datasets[0].data = Object.values(selectedBean.flavorProfile);
-                radarChart.data.datasets[0].label = selectedBean.name;
-                radarChart.update();
-                if(lifestyleSuggestionP) {
-                    lifestyleSuggestionP.textContent = selectedBean.lifestyle;
-                }
-                console.log('Flavor select changed. Updated radar chart and lifestyle suggestion for:', selectedBean.name);
-            }
-        }
+            // --- Scroll Animation Observer ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
 
-        // --- Event Listeners for Search and Filter ---
-        // Removed as product section and its filters are no longer present
-        // if (searchInput && filterSelect) {
-        //     searchInput.addEventListener('input', renderProducts); 
-        //     filterSelect.addEventListener('change', renderProducts); 
-        //     console.log('Search and filter event listeners attached.');
-        // } else {
-        //     console.error('Error: Search input or filter select elements not found!');
-        // }
-
-        // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
-        window.addEventListener('storage', (event) => {
-            if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
-                console.log(`localStorage key '${event.key}' changed. Reloading data.`);
-                loadAndRenderAllData(); 
-            }
-        });
-
-        // --- Review Form Submission ---
-        if(reviewForm) {
-            reviewForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newReview = {
-                    name: document.getElementById('reviewer-name').value,
-                    rating: document.getElementById('review-rating').value,
-                    content: document.getElementById('review-content').value,
-                };
-                reviews.push(newReview);
-                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
-                renderReviews();
-                reviewForm.reset();
-                alert('感謝您的評論！');
-                console.log('New review submitted:', newReview);
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
             });
-            console.log('Review form event listener attached.');
-        } else {
-            console.error('Error: Review form element not found!');
-        }
-        
-        // --- Inquiry Form Submission ---
-        if(inquiryForm) {
-            inquiryForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('inquiry-name').value;
-                const email = document.getElementById('inquiry-email').value;
-                const message = document.getElementById('inquiry-message').value;
-                
-                // Check if email field is valid according to HTML5 validation
-                const emailInput = document.getElementById('inquiry-email');
-                if (!emailInput.checkValidity()) {
-                    alert('請輸入有效的電子郵件地址。');
-                    return;
-                }
+            console.log('Scroll animation observer set up.');
 
-                const subject = encodeURIComponent(`來自網站的詢問 - ${name}`);
-                const body = encodeURIComponent(`發件人姓名: ${name}\n發件人電子郵件: ${email}\n\n訊息內容:\n${message}`);
-                
-                // Construct mailto link
-                const mailtoLink = `mailto:melodybean33427@gmail.com?subject=${subject}&body=${body}`;
-                
-                // Attempt to open email client
-                window.location.href = mailtoLink;
-
-                alert('您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。');
-                inquiryForm.reset();
-                console.log('Inquiry form submitted for:', name);
-            });
-            console.log('Inquiry form event listener attached.');
-        } else {
-            console.error('Error: Inquiry form element not found!');
-        }
-
-        // --- Scroll Animation Observer ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
+            // --- Event Listeners for Search and Filter ---
+            // These event listeners need to be attached after DOM is fully loaded and elements exist.
+            document.addEventListener('DOMContentLoaded', () => { 
+                if (searchInput && filterSelect) {
+                    searchInput.addEventListener('input', window.renderProducts); 
+                    filterSelect.addEventListener('change', window.renderProducts); 
+                    console.log('Search and filter event listeners attached.');
+                } else {
+                    console.warn('Search input or filter select elements not found on DOM load. Check HTML structure.');
                 }
             });
-        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.fade-in-up').forEach(el => {
-            observer.observe(el);
-        });
-        console.log('Scroll animation observer set up.');
-
-        // --- Initial load of all data and render on page load ---
-        loadAndRenderAllData();
-    });
+            // --- Initial load of all data and render on page load ---
+            // This needs to run once the DOM is fully loaded.
+            document.addEventListener('DOMContentLoaded', () => {
+                window.loadAndRenderAllData();
+            });
+        })();
     </script>
 </body>
 </html>
-�
