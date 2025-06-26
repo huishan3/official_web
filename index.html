@@ -46,12 +46,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-        .card {
-            background-color: var(--color-surface);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -112,6 +106,12 @@
             margin-top: 1rem;
             font-weight: 500;
         }
+        /* Adjusted card style for bean details in flavor guide */
+        .card {
+            background-color: var(--color-surface);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
@@ -119,7 +119,6 @@
         <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
             <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
             <div class="hidden md:flex items-center space-x-6 text-lg">
-                <a href="#products" class="hover:text-primary transition-colors">咖啡豆鑑賞</a>
                 <a href="#flavor-guide" class="hover:text-primary transition-colors">風味探索</a>
                 <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
                 <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
@@ -140,35 +139,6 @@
             </div>
         </section>
 
-        <!-- Products Section -->
-        <section id="products" class="py-20">
-            <div class="max-w-6xl mx-auto px-6">
-                <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">咖啡豆鑑賞</h2>
-                    <p class="mt-4 text-lg text-gray-600">探索由我們精心烘焙，來自世界各地的風味樂章。</p>
-                </div>
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 fade-in-up">
-                    <input class="w-full md:w-1/2 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="search-input" placeholder="搜尋咖啡名稱、風味、國家或品種..." type="text"/>
-                    <select class="w-full md:w-1/4 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="filter-select">
-                        <option value="">所有品項</option>
-                        <option value="GEISHA 水洗">GEISHA 水洗</option>
-                        <option value="Heirloom">Heirloom</option>
-                        <option value="GEISHA">GEISHA (中淺焙)</option> 
-                        <option value="Geisha（藝妓）">哥斯大黎加 藝妓</option> 
-                        <option value="淺焙">淺焙類</option>
-                        <option value="中淺焙">中淺焙類</option>
-                        <option value="中焙">中焙類</option>
-                        <option value="中深焙">中深焙類</option>
-                        <option value="深焙">深焙類</option>
-                    </select>
-                </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-list">
-                    <!-- Product cards will be rendered here -->
-                </div>
-            </div>
-        </section>
-
         <!-- Flavor Guide Section -->
         <section id="flavor-guide" class="py-20 bg-white/50">
             <div class="max-w-6xl mx-auto px-6 text-center">
@@ -185,6 +155,22 @@
                         <div id="lifestyle-suggestion" class="mt-6 text-left p-4 bg-green-50 rounded-lg border border-accent text-gray-700">
                             <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
                             <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
+                        </div>
+                        <!-- New div to display detailed bean info -->
+                        <div id="bean-details-display" class="mt-6 text-left p-4 bg-blue-50 rounded-lg border border-blue-300 text-gray-700 hidden">
+                            <h4 class="font-bold font-serif text-lg text-blue-700 mb-2">品項詳細資訊</h4>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <p><span class="font-semibold">名稱:</span> <span id="detail-name"></span></p>
+                                <p><span class="font-semibold">國家:</span> <span id="detail-country"></span></p>
+                                <p><span class="font-semibold">品種:</span> <span id="detail-variety"></span></p>
+                                <p><span class="font-semibold">烘焙度:</span> <span id="detail-roast"></span></p>
+                                <p><span class="font-semibold">重量:</span> <span id="detail-weight"></span></p>
+                                <p><span class="font-semibold">期限:</span> <span id="detail-expiry"></span></p>
+                                <p class="col-span-2"><span class="font-semibold">風味:</span> <span id="detail-flavor"></span></p>
+                                <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
+                            </div>
+                            <img id="detail-image" src="" alt="咖啡豆圖片" class="w-24 h-24 object-cover rounded-md mt-4 mx-auto" 
+                                onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
                         </div>
                     </div>
                     <div class="w-full md:w-1/2">
@@ -268,8 +254,9 @@
                         <!-- Special offers will be rendered here -->
                     </div>
                     <div class="mt-10">
-                        <a href="#products" class="px-8 py-3 rounded-full btn-primary inline-block">
-                            <i class="fas fa-tags mr-2"></i> 查看所有咖啡豆
+                        <!-- Removed link to #products as that section is gone -->
+                        <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
+                            <i class="fas fa-tags mr-2"></i> 探索更多咖啡風味
                         </a>
                     </div>
                 </div>
@@ -408,7 +395,7 @@
         (function() {
             // Get DOM elements needed by this script block, and potentially passed to rendering functions.
             // These are local to this IIFE.
-            const productList = document.getElementById('product-list');
+            // Removed productList reference as #products section is gone
             const specialOffersList = document.getElementById('special-offers-list');
             const faqContainer = document.getElementById('faq-container');
             const reviewList = document.getElementById('review-list');
@@ -483,7 +470,7 @@
                     console.log('Loaded reviews (from localStorage):', reviews);
 
                     // --- Trigger rendering for all sections ---
-                    window.renderProducts(); // Call globally exposed render functions
+                    // window.renderProducts(); // Removed as #products section is gone
                     window.renderSpecialOffers();
                     window.renderFaqs(); 
                     window.renderReviews(); 
@@ -510,69 +497,9 @@
     <script>
         'use strict';
         (function() {
-            const productList = document.getElementById('product-list');
-            const searchInput = document.getElementById('search-input');
-            const filterSelect = document.getElementById('filter-select');
-
-            /**
-             * Renders the product list, applying search and filter conditions. Exposed globally.
-             */
-            window.renderProducts = function() {
-                try {
-                    if (!productList) {
-                        console.error('Error: productList element not found!');
-                        return;
-                    }
-                    
-                    console.log('Rendering products. Current coffeeBeans length:', coffeeBeans.length);
-                    const keyword = (searchInput ? searchInput.value : '').toLowerCase();
-                    const filter = (filterSelect ? filterSelect.value : '').toLowerCase();
-
-                    // Ensure coffeeBeans is an array before filtering
-                    const filteredBeans = Array.isArray(coffeeBeans) ? coffeeBeans.filter(bean => {
-                        const matchesKeyword = (bean.name && bean.name.toLowerCase().includes(keyword)) || 
-                                               (bean.flavor && bean.flavor.toLowerCase().includes(keyword)) ||
-                                               (bean.country && bean.country.toLowerCase().includes(keyword)) ||
-                                               (bean.variety && bean.variety.toLowerCase().includes(keyword));
-
-                        const matchesFilter = filter ? 
-                                                ((bean.variety && bean.variety.toLowerCase().includes(filter)) || 
-                                                (bean.roast && bean.roast.toLowerCase().includes(filter))) : // Filter by variety OR roast
-                                                true; 
-                        return matchesKeyword && matchesFilter;
-                    }) : [];
-
-                    productList.innerHTML = ''; // Clear existing content
-
-                    if (filteredBeans.length === 0) {
-                        productList.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有咖啡豆產品符合您的篩選條件。</p>';
-                        console.log('No coffee beans to render after filtering.');
-                    } else {
-                        filteredBeans.forEach(bean => {
-                            const card = document.createElement('div');
-                            card.className = 'card fade-in-up';
-                            card.innerHTML = `
-                                <img src="${bean.image}" alt="${bean.name} 圖片載入失敗" class="w-full h-36 object-cover rounded-t-lg" 
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ctext x=\\'50%\\\' y=\\'50%\\\' font-family=\\'sans-serif\\' font-size=\\'10\\' fill=\\'%23333\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E'; this.style.objectFit='contain';">
-                                <div class="p-4">
-                                    <h3 class="text-xl font-serif mb-2">${bean.name}</h3>
-                                    <p class="text-gray-600 text-sm mb-2">國家: ${bean.country || 'N/A'} | 品種: ${bean.variety || 'N/A'}</p>
-                                    <p class="text-gray-600 text-sm mb-2">烘焙度: ${bean.roast || 'N/A'} | 重量: ${bean.weight || 'N/A'}</p>
-                                    <p class="text-gray-600">風味：${bean.flavor || 'N/A'}</p>
-                                    <p class="text-sm text-gray-500">售價: NT$${bean.price || '---'} (期限: ${bean.expiryDate || '---'})</p> 
-                                </div>
-                            `;
-                            productList.appendChild(card);
-                        });
-                        console.log(`Rendered ${filteredBeans.length} product cards.`);
-                    }
-                } catch (error) {
-                    console.error('Error rendering products:', error);
-                    if (productList) {
-                        productList.innerHTML = '<div class="error-message col-span-full">載入咖啡豆產品時發生錯誤。</div>';
-                    }
-                }
-            };
+            // Removed productList, searchInput, filterSelect references as #products section is gone
+            // window.renderProducts function is no longer needed here as the section is removed
+            // If any other section *depended* on renderProducts, its logic would need to be moved or re-implemented.
 
             /**
              * Renders the list of special offers. Exposed globally.
@@ -595,7 +522,7 @@
                             offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
                             offerCard.innerHTML = `
                                 <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'%3E%3Ctext x=\\'50%\\\' y=\\'50%\\\' font-family=\\'sans-serif\\' font-size=\\'10\\' fill=\\'%23333\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3E圖片載入失敗%3C/text%3E%3C/svg%3E'; this.style.objectFit='contain';">
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
                                 <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
                                 <p class="text-gray-600 mb-3">${offer.description}</p>
                                 <div class="mt-auto">
@@ -720,6 +647,17 @@
         (function() {
             const flavorSelect = document.getElementById('flavor-select');
             const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
+            // Get references to new detail display elements
+            const beanDetailsDisplay = document.getElementById('bean-details-display');
+            const detailName = document.getElementById('detail-name');
+            const detailCountry = document.getElementById('detail-country');
+            const detailVariety = document.getElementById('detail-variety');
+            const detailRoast = document.getElementById('detail-roast');
+            const detailWeight = document.getElementById('detail-weight');
+            const detailExpiry = document.getElementById('detail-expiry');
+            const detailFlavor = document.getElementById('detail-flavor');
+            const detailPrice = document.getElementById('detail-price');
+            const detailImage = document.getElementById('detail-image');
 
             /**
              * Populates the flavor guide select box and initializes/updates the radar chart. Exposed globally.
@@ -805,6 +743,9 @@
                             lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
                             console.log('No coffee beans, setting flavor guide message.');
                         }
+                        if (beanDetailsDisplay) {
+                            beanDetailsDisplay.classList.add('hidden'); // Hide details if no beans
+                        }
                     }
                 } catch (error) {
                     console.error('Error updating flavor guide:', error);
@@ -815,18 +756,21 @@
                         lifestyleSuggestionP.textContent = '風味指南載入失敗，請檢查數據。';
                         lifestyleSuggestionP.classList.add('error-message');
                     }
+                    if (beanDetailsDisplay) {
+                        beanDetailsDisplay.classList.add('hidden');
+                    }
                 }
             };
 
             /**
              * Handles the change event for the flavor select dropdown.
-             * Updates the radar chart and lifestyle suggestion based on the selected coffee bean. Exposed globally.
+             * Updates the radar chart, lifestyle suggestion, and bean details based on the selected coffee bean. Exposed globally.
              */
             window.handleFlavorSelectChange = function(e) {
                 try {
                     const selectedBean = Array.isArray(coffeeBeans) ? coffeeBeans.find(b => b.id == e.target.value) : undefined;
                     if (selectedBean && radarChart) {
-                        // Ensure flavorProfile exists and is an object before accessing its values
+                        // Update radar chart
                         const flavorData = selectedBean.flavorProfile && typeof selectedBean.flavorProfile === 'object' 
                                             ? Object.values(selectedBean.flavorProfile) 
                                             : [0, 0, 0, 0, 0]; // Default to zeros if missing or invalid
@@ -834,16 +778,36 @@
                         radarChart.data.datasets[0].data = flavorData;
                         radarChart.data.datasets[0].label = selectedBean.name;
                         radarChart.update();
+                        
+                        // Update lifestyle suggestion
                         if(lifestyleSuggestionP) {
                             lifestyleSuggestionP.textContent = selectedBean.lifestyle || '無生活提案。'; // Provide fallback
                             lifestyleSuggestionP.classList.remove('error-message');
                         }
-                        console.log('Flavor select changed. Updated radar chart and lifestyle suggestion for:', selectedBean.name);
+
+                        // Update bean details display
+                        if (beanDetailsDisplay) {
+                            detailName.textContent = selectedBean.name || 'N/A';
+                            detailCountry.textContent = selectedBean.country || 'N/A';
+                            detailVariety.textContent = selectedBean.variety || 'N/A';
+                            detailRoast.textContent = selectedBean.roast || 'N/A';
+                            detailWeight.textContent = selectedBean.weight || 'N/A';
+                            detailExpiry.textContent = selectedBean.expiryDate || 'N/A';
+                            detailFlavor.textContent = selectedBean.flavor || 'N/A';
+                            detailPrice.textContent = selectedBean.price || '---';
+                            detailImage.src = selectedBean.image || ''; // Image URL
+                            // Show the details block
+                            beanDetailsDisplay.classList.remove('hidden');
+                        }
+                        console.log('Flavor select changed. Updated radar chart, lifestyle suggestion, and bean details for:', selectedBean.name);
                     } else if (!selectedBean) {
                         console.warn('Selected bean not found for ID:', e.target.value);
                         if (lifestyleSuggestionP) {
                             lifestyleSuggestionP.textContent = '無法找到選定的咖啡豆風味數據。';
                             lifestyleSuggestionP.classList.add('error-message');
+                        }
+                        if (beanDetailsDisplay) {
+                            beanDetailsDisplay.classList.add('hidden'); // Hide details if no bean selected or found
                         }
                     }
                 } catch (error) {
@@ -851,6 +815,9 @@
                     if (lifestyleSuggestionP) {
                         lifestyleSuggestionP.textContent = '載入選定咖啡豆風味時發生錯誤。';
                         lifestyleSuggestionP.classList.add('error-message');
+                    }
+                    if (beanDetailsDisplay) {
+                        beanDetailsDisplay.classList.add('hidden');
                     }
                 }
             };
@@ -863,8 +830,7 @@
         (function() {
             const reviewForm = document.getElementById('review-form');
             const inquiryForm = document.getElementById('inquiry-form');
-            const searchInput = document.getElementById('search-input'); // Re-get here for this IIFE's scope
-            const filterSelect = document.getElementById('filter-select'); // Re-get here for this IIFE's scope
+            // Removed searchInput and filterSelect references as #products section is gone
 
 
             // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
@@ -965,13 +931,7 @@
             // --- Event Listeners for Search and Filter ---
             // These event listeners need to be attached after DOM is fully loaded and elements exist.
             document.addEventListener('DOMContentLoaded', () => { 
-                if (searchInput && filterSelect) {
-                    searchInput.addEventListener('input', window.renderProducts); 
-                    filterSelect.addEventListener('change', window.renderProducts); 
-                    console.log('Search and filter event listeners attached.');
-                } else {
-                    console.warn('Search input or filter select elements not found on DOM load. Check HTML structure.');
-                }
+                // Removed event listeners for searchInput and filterSelect as the product section is removed
             });
 
             // --- Initial load of all data and render on page load ---
