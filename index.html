@@ -108,7 +108,8 @@
         <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
             <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
             <div class="hidden md:flex items-center space-x-6 text-lg">
-                <a href="#products" class="hover:text-primary transition-colors">咖啡豆鑑賞</a>
+                <!-- Removed link to #products -->
+                <a href="#flavor-guide" class="hover:text-primary transition-colors">風味探索</a>
                 <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
                 <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
                 <a href="#faq" class="hover:text-primary transition-colors">常見問題</a>
@@ -128,28 +129,8 @@
             </div>
         </section>
 
-        <!-- Products Section -->
-        <section id="products" class="py-20">
-            <div class="max-w-6xl mx-auto px-6">
-                <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">咖啡豆鑑賞</h2>
-                    <p class="mt-4 text-lg text-gray-600">探索由我們精心烘焙，來自世界各地的風味樂章。</p>
-                </div>
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 fade-in-up">
-                    <input class="w-full md:w-1/2 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="search-input" placeholder="搜尋咖啡名稱..." type="text"/>
-                    <select class="w-full md:w-1/4 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="filter-select">
-                        <option value="">所有品項</option>
-                        <option value="GEISHA">GEISHA</option>
-                        <option value="Heirloom">Heirloom</option>
-                        <option value="Geisha 白蜜">Geisha 白蜜</option>
-                    </select>
-                </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-list">
-                    <!-- Product cards will be rendered here -->
-                </div>
-            </div>
-        </section>
+        <!-- Product Section Removed -->
+        <!-- The entire <section id="products"> block has been removed from here. -->
 
         <!-- Flavor Guide Section -->
         <section id="flavor-guide" class="py-20 bg-white/50">
@@ -185,7 +166,7 @@
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
                     <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
                     <p class="text-gray-700 leading-relaxed space-y-4">
-                        <span>🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
+                        <span>� 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
                         <span>☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</span>
                         <span>2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</span>
                     </p>
@@ -250,8 +231,9 @@
                         <!-- Special offers will be rendered here -->
                     </div>
                     <div class="mt-10">
-                        <a href="#products" class="px-8 py-3 rounded-full btn-primary inline-block">
-                            <i class="fas fa-tags mr-2"></i> 查看所有咖啡豆
+                        <!-- Removed link to #products, updated to point to #flavor-guide or just a general button if no specific section -->
+                        <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
+                            <i class="fas fa-tags mr-2"></i> 查看風味探索
                         </a>
                     </div>
                 </div>
@@ -361,8 +343,7 @@
         let specialOffers = [];
         let reviews = [];
 
-        // --- Default Data (Hardcoded for manual management) ---
-        // These serve as initial data if localStorage is empty or you clear it.
+        // --- Default Data (Hardcoded for manual management if localStorage is empty) ---
         const defaultCoffeeBeans = [
             { id: 1, name: '衣索比亞 GEISHA 水洗 (114g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬、百香果', image: 'https://placehold.co/400x250/b58863/FFFFFF?text=衣索比亞+GEISHA+水洗', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。', salePrice: 280, expiryDate: '2025/10/12' },
             { id: 2, name: '衣索比亞 Heirloom 雙重厭氧水洗 (227g)', flavor: '茉莉、橙花、蜂蜜、水蜜桃', image: 'https://placehold.co/400x250/3f2e2e/FFFFFF?text=衣索比亞+Heirloom+雙重厭氧', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。', salePrice: 600, expiryDate: '2025/10/28' },
@@ -386,14 +367,12 @@
         ];
 
         // --- DOM Elements ---
-        const productList = document.getElementById('product-list');
+        // productList, searchInput, filterSelect are no longer used for rendering products directly
         const specialOffersList = document.getElementById('special-offers-list');
         const faqContainer = document.getElementById('faq-container');
         const reviewList = document.getElementById('review-list');
         const flavorSelect = document.getElementById('flavor-select');
         const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-        const searchInput = document.getElementById('search-input');
-        const filterSelect = document.getElementById('filter-select');
         const reviewForm = document.getElementById('review-form');
         const inquiryForm = document.getElementById('inquiry-form');
 
@@ -404,7 +383,7 @@
          * Then, triggers all necessary rendering functions.
          */
         function loadAndRenderAllData() {
-            console.log('--- Starting loadAndRenderAllData (Frontend Display) ---');
+            console.log('--- Starting loadAndRenderAllData (Frontend Display - No Products Section) ---');
             
             // Load Coffee Beans: Prioritize localStorage, fallback to defaults
             let storedCoffeeBeans = JSON.parse(localStorage.getItem(COFFEE_BEANS_KEY));
@@ -431,57 +410,13 @@
             console.log('Loaded reviews (from localStorage):', reviews);
 
             // --- Render all sections after data is loaded ---
-            renderProducts(); // Handles initial display and filtering
+            // renderProducts(); // Removed as product section is no longer present
             renderSpecialOffers();
             renderFaqs(); 
             renderReviews(); 
             updateFlavorGuideSelect(); // Populates select and initializes chart
             
-            console.log('--- Finished loadAndRenderAllData (Frontend Display) ---');
-        }
-
-        /**
-         * Renders the product list, applying search and filter conditions.
-         */
-        function renderProducts() {
-            if (!productList) {
-                console.error('Error: productList element not found!');
-                return;
-            }
-            
-            console.log('Rendering products. Current coffeeBeans length:', coffeeBeans.length);
-            const keyword = (searchInput?.value || '').toLowerCase();
-            const filter = (filterSelect?.value || '').toLowerCase();
-
-            const filteredBeans = coffeeBeans.filter(bean => {
-                const matchesKeyword = bean.name.toLowerCase().includes(keyword) || bean.flavor.toLowerCase().includes(keyword);
-                // The filter should ideally match against a 'type' or 'category' property.
-                // For simplicity, it currently checks if the filter string is part of the name or flavor.
-                const matchesFilter = filter ? bean.name.toLowerCase().includes(filter) || (bean.flavor && bean.flavor.toLowerCase().includes(filter)) : true;
-                return matchesKeyword && matchesFilter;
-            });
-
-            productList.innerHTML = ''; // Clear existing content
-
-            if (filteredBeans.length === 0) {
-                productList.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有咖啡豆產品符合您的篩選條件。</p>';
-                console.log('No coffee beans to render after filtering.');
-            } else {
-                filteredBeans.forEach(bean => {
-                    const card = document.createElement('div');
-                    card.className = 'card fade-in-up';
-                    card.innerHTML = `
-                        <img src="${bean.image}" alt="${bean.name}" class="w-full h-48 object-cover rounded-t-lg">
-                        <div class="p-6">
-                            <h3 class="text-xl font-serif mb-2">${bean.name}</h3>
-                            <p class="text-gray-600">風味：${bean.flavor}</p>
-                            <p class="text-sm text-gray-500">售價: NT$${bean.salePrice || '---'} (期限: ${bean.expiryDate || '---'})</p>
-                        </div>
-                    `;
-                    productList.appendChild(card);
-                });
-                console.log(`Rendered ${filteredBeans.length} product cards.`);
-            }
+            console.log('--- Finished loadAndRenderAllData (Frontend Display - No Products Section) ---');
         }
 
         /**
@@ -687,16 +622,16 @@
         }
 
         // --- Event Listeners for Search and Filter ---
-        if (searchInput && filterSelect) {
-            searchInput.addEventListener('input', renderProducts); 
-            filterSelect.addEventListener('change', renderProducts); 
-            console.log('Search and filter event listeners attached.');
-        } else {
-            console.error('Error: Search input or filter select elements not found!');
-        }
+        // Removed as product section and its filters are no longer present
+        // if (searchInput && filterSelect) {
+        //     searchInput.addEventListener('input', renderProducts); 
+        //     filterSelect.addEventListener('change', renderProducts); 
+        //     console.log('Search and filter event listeners attached.');
+        // } else {
+        //     console.error('Error: Search input or filter select elements not found!');
+        // }
 
         // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
-        // This is crucial for the frontend to react to changes from the admin panel
         window.addEventListener('storage', (event) => {
             if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
                 console.log(`localStorage key '${event.key}' changed. Reloading data.`);
@@ -779,3 +714,4 @@
     </script>
 </body>
 </html>
+�
