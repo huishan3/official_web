@@ -1,1421 +1,781 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Melody Beans</title>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melody Bean | 品味旋律，啜飲人生</title>
+    
+    <!-- Placeholder Comments -->
+    <!-- Chosen Palette: Warm Neutrals & Natural Accents (淺米白, 柔和木質棕, 深咖啡文字, 橄欖綠點綴) -->
+    <!-- Application Structure Plan: A narrative flow starting with brand introduction, moving to interactive product discovery (Flavor Guide), followed by brand depth (Story, Artisans), practical information (Knowledge, Events, FAQ), and ending with community community engagement (Reviews) and a clear call-to-action (Contact Form). This structure guides the user from initial attraction to deep engagement and finally to potential contact, optimizing for marketing marketing goals. -->
+    <!-- Visualization & Content Choices: Interactive Flavor Radar (Chart.js) to visually communicate complex flavor profiles. Accordion (HTML/JS) for FAQ to present dense information cleanly. Inquiry Form (HTML/JS) to provide a low-friction contact method. All choices adhere to the NO SVG/Mermaid rule, focusing on dynamic, canvas-based, or pure HTML/CSS solutions. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-      /* Define 標楷體 as a web font */
-      @font-face {
-        font-family: 'BiaoKaiTiWeb'; /* This is the name you'll use in your CSS */
-        src: url('./fonts/BiaoKaiTi.woff2') format('woff2'), /* Path to your WOFF2 font file */
-             url('./fonts/BiaoKaiTi.woff') format('woff'),    /* Path to your WOFF font file */
-             url('./fonts/DFKai-SB.ttf') format('truetype'); /* Fallback to TTF if needed, ensure path is correct */
-        font-weight: normal; /* 標楷體 typically has one weight */
-        font-style: normal;
-        font-display: swap; /* Very important: Shows fallback text while font loads */
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-      body {
-        /* Set the body font to your custom web font first, then system fallbacks */
-        font-family: 'BiaoKaiTiWeb', 'DFKai-SB', '標楷體', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-        background-color: #fdfaf5;
-        background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-        background-size: cover;
-        background-attachment: fixed;
-        color: #3f2e2e;
-      }
-      .staff-lines {
-        background-image: linear-gradient(to bottom, transparent 18%, #ccc 18%, #ccc 19%, transparent 19%, transparent 38%, #ccc 38%, #ccc 39%, transparent 39%, transparent 58%, #ccc 58%, #ccc 59%, transparent 59%, transparent 78%, #ccc 78%, #ccc 79%, transparent 79%);
-        background-size: 100% 100px;
-        background-repeat: repeat-y;
-        opacity: 0.05;
-      }
-      .floating-note {
-        position: absolute;
-        animation: floatNote 6s ease-in-out infinite;
-        font-size: 1.5rem;
-        color: #b58863;
-        opacity: 0;
-      }
-      @keyframes floatNote {
-        0% { transform: translateY(20px); opacity: 0; }
-        50% { opacity: 0.6; }
-        100% { transform: translateY(-100px); opacity: 0; }
-      }
-      .fade-up {
-        opacity: 0;
-        transform: translateY(60px);
-        transition: opacity 1.2s ease-out, transform 1.2s ease-out;
-      }
-      .fade-up.active {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .floating-cart {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background-color: #b58863;
-        color: white;
-        border-radius: 9999px;
-        padding: 16px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        cursor: pointer;
-        font-size: 1.5rem;
-        z-index: 1000;
-        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Added opacity for smooth hide/show */
-      }
-      .floating-cart:hover {
-        transform: scale(1.1);
-      }
-      /* 浮動購物車彈跳動畫 */
-      @keyframes pop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-      }
-      .animate-pop {
-        animation: pop 0.3s ease-out;
-      }
-
-      .ornate-box {
-        border: 2px solid #b58863;
-        border-radius: 1rem;
-        background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); /* 卡片內部維持木紋 */
-        background-size: cover;
-        padding: 1rem;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* 添加陰影過渡 */
-      }
-      .ornate-box:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* 懸停時陰影變大變深 */
-      }
-      /* Custom styles for table cells */
-      .cart-table td {
-        padding: 8px; /* Add some padding */
-        vertical-align: middle; /* Align content vertically */
-      }
-      /* Checkout Modal Background Blur */
-      #checkoutModal, #memberModal {
-        backdrop-filter: blur(5px); /* Add this for blur effect on the background */
-      }
-      /* 導航連結 Hover 效果 */
-      .navbar-link-hover:hover {
-        color: #b58863; /* 改變文字顏色 */
-        transition: color 0.3s ease-in-out; /* 平滑過渡 */
-      }
-      /* 按鈕點擊效果 */
-      .btn-press:active {
-        transform: translateY(1px); /* 輕微下壓 */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 陰影變小 */
-      }
-
-      /* 首頁背景樣式 */
-      #home {
-        background-image: url('./image/image_2.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        min-height: 100vh; /* 調整為視窗高度 */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* 背景疊層 */
-      #home::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.4);
-        z-index: 1;
-      }
-
-      #home > * {
-        position: relative;
-        z-index: 2;
-      }
-
-      /* 調整staff-lines透明度以適應深色背景 */
-      #home .staff-lines {
-        opacity: 0.15;
-        background-image: linear-gradient(to bottom, transparent 18%, rgba(255, 255, 255, 0.3) 18%, rgba(255, 255, 255, 0.3) 19%, transparent 19%, transparent 38%, rgba(255, 255, 255, 0.3) 38%, rgba(255, 255, 255, 0.3) 39%, transparent 39%, transparent 58%, rgba(255, 255, 255, 0.3) 58%, rgba(255, 255, 255, 0.3) 59%, transparent 59%, transparent 78%, rgba(255, 255, 255, 0.3) 78%, rgba(255, 255, 255, 0.3) 79%, transparent 79%);
-      }
-      /* 調整浮動音符的顏色以適應深色背景 */
-      #home .floating-note {
-          color: #f0e68c;
-      }
-
-      /* 為響應式設計調整主要內容區塊的內邊距 */
-      @media (max-width: 767px) { /* Small screens (mobile) */
-        .px-6 {
-          padding-left: 1rem; /* px-4 = 16px */
-          padding-right: 1rem;
+        :root {
+            --color-bg: #fdfaf5; /* 溫暖米白 */
+            --color-surface: #ffffff;
+            --color-primary: #b58863; /* 柔和木質棕 */
+            --color-secondary: #3f2e2e; /* 深咖啡文字 */
+            --color-accent: #6b8e23; /* 橄欖綠 */
         }
-        .text-5xl { /* 針對小螢幕調整標題大小 */
-          font-size: 2.5rem; /* 約 40px */
+        html {
+            scroll-behavior: smooth;
         }
-        .text-xl { /* 針對小螢幕調整副標題大小 */
-          font-size: 1.125rem; /* 約 18px */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-secondary);
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            background-attachment: fixed;
         }
-      }
-
-      @media (min-width: 768px) and (max-width: 1023px) { /* Medium screens (tablet) */
-        .px-6 {
-          padding-left: 1.5rem; /* px-6 = 24px */
-          padding-right: 1.5rem;
+        h1, h2, h3, h4, .font-serif {
+            font-family: 'Playfair Display', serif;
         }
-        .text-5xl {
-          font-size: 3.5rem; /* 約 56px */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .text-xl {
-          font-size: 1.25rem; /* 約 20px */
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-      }
-
-      @media (min-width: 1024px) { /* Large screens (desktop) */
-        .px-6 {
-          padding-left: 1.5rem; /* px-6 = 24px */
-          padding-right: 1.5rem;
+        .card {
+            background-color: var(--color-surface);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        .text-5xl {
-          font-size: 4rem; /* 64px */
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        .text-xl {
-          font-size: 1.5rem; /* 24px */
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            transition: background-color 0.3s;
         }
-      }
-
+        .btn-primary:hover {
+            background-color: #a07654;
+        }
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a4444;
+        }
+        .accordion-button::after {
+            content: '\f078'; /* Font Awesome down arrow */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            float: right;
+            transition: transform 0.3s;
+        }
+        .accordion-button.open::after {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .section-title {
+            color: var(--color-primary);
+        }
+        .offer-price-old {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9em;
+            margin-right: 8px;
+        }
+        .offer-price-new {
+            color: #d9534f; /* Red for new price */
+            font-weight: bold;
+            font-size: 1.2em;
+        }
     </style>
-  </head>
-  <body class="text-[#3f2e2e]">
-    <nav class="bg-[#f5efe6] shadow-md sticky top-0 z-50 fade-up">
-      <div class="max-w-[1200px] mx-auto flex justify-between items-center py-4 px-6">
-        <div class="flex items-center">
-            <img src="./image/image_2.png" alt="Melody Beans Logo" class="h-10 mr-3" />
-            <h1 class="text-2xl font-bold">🎼 Melody Beans</h1>
+</head>
+<body>
+    <nav class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
+            <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
+            <div class="hidden md:flex items-center space-x-6 text-lg">
+                <a href="#products" class="hover:text-primary transition-colors">咖啡豆鑑賞</a>
+                <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
+                <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
+                <a href="#faq" class="hover:text-primary transition-colors">常見問題</a>
+                <a href="#contact" class="px-4 py-2 rounded-full btn-primary">聯絡我們</a>
+            </div>
+            <!-- Mobile Menu Button will be added if needed -->
         </div>
-        <button id="menu-button" class="md:hidden text-2xl px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#b58863] rounded">
-          ☰
-        </button>
-        <ul id="navbar-links" class="hidden md:flex gap-6 text-lg">
-          <li><a href="#home" class="hover:underline navbar-link-hover" onclick="closeMenu()">首頁</a></li>
-          <li><a href="#products" class="hover:underline navbar-link-hover" onclick="closeMenu()">商品</a></li>
-          <li><a href="#education" class="hover:underline navbar-link-hover" onclick="closeMenu()">咖啡知識</a></li>
-          <li><a href="#cart" class="hover:underline navbar-link-hover" onclick="closeMenu()">購物車</a></li>
-          <li><a href="#review" class="hover:underline navbar-link-hover" onclick="closeMenu()">評論</a></li>
-          <li><a href="#about" class="hover:underline navbar-link-hover" onclick="closeMenu()">關於我們</a></li>
-          <li><a href="#" class="hover:underline navbar-link-hover" onclick="openMemberModal(); return false;" id="memberLink">會員登入/註冊</a></li>
-        </ul>
-        <button class="ml-4 text-sm underline hidden md:block">EN</button> </div>
-      <div id="mobile-menu" class="hidden md:hidden bg-[#f5efe6] pb-4 px-6">
-        <ul class="flex flex-col gap-2 text-lg">
-          <li><a href="#home" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">首頁</a></li>
-          <li><a href="#products" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">商品</a></li>
-          <li><a href="#education" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">咖啡知識</a></li>
-          <li><a href="#cart" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">購物車</a></li>
-          <li><a href="#review" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">評論</a></li>
-          <li><a href="#about" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="closeMenu()">關於我們</a></li>
-          <li><a href="#" class="block py-2 hover:bg-[#eae0d5] rounded" onclick="openMemberModal(); closeMenu(); return false;">會員登入/註冊</a></li>
-        </ul>
-        <button class="mt-4 text-sm underline block mx-auto">EN</button>
-      </div>
     </nav>
 
-    <section id="home" class="fade-up">
-      <div class="staff-lines absolute inset-0"></div>
-      <div class="floating-note" style="top:65%;left:10%">𝄞</div>
-      <div class="floating-note" style="top:75%;left:80%">♩</div>
-      <div class="floating-note" style="top:70%;left:20%">♪</div>
-      <div class="floating-note" style="top:80%;left:60%">♬</div>
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative" style="background-image: url('./image/image_2.jpg');">
+            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="relative text-center z-10 p-6 fade-in-up">
+                <h1 class="text-5xl md:text-7xl font-serif mb-4 text-shadow-soft">品味旋律，啜飲人生</h1>
+                <p class="text-xl md:text-2xl max-w-2xl mx-auto">在 Melody Bean，每一顆咖啡豆都承載著一段故事與一首旋律，我們邀請您一同放慢腳步，感受生活中的溫暖與美好。</p>
+            </div>
+        </section>
 
-      <div class="max-w-[800px] px-6 z-10 flex flex-col justify-center items-center text-center">
-        <h2 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 drop-shadow">讓每一杯咖啡☕都有旋律🎵</h2>
-        <p class="text-xl md:text-2xl lg:text-3xl text-white font-medium">結合咖啡的香與音樂的韻，啟動生活靈感。</p>
-      </div>
-    </section>
+        <!-- Products Section -->
+        <section id="products" class="py-20">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">咖啡豆鑑賞</h2>
+                    <p class="mt-4 text-lg text-gray-600">探索由我們精心烘焙，來自世界各地的風味樂章。</p>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 fade-in-up">
+                    <input class="w-full md:w-1/2 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="search-input" placeholder="搜尋咖啡名稱..." type="text"/>
+                    <select class="w-full md:w-1/4 p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="filter-select">
+                        <option value="">所有品項</option>
+                        <option value="GEISHA">GEISHA</option>
+                        <option value="Heirloom">Heirloom</option>
+                        <option value="Geisha 白蜜">Geisha 白蜜</option>
+                    </select>
+                </div>
 
-    <section id="products" class="py-16 fade-up">
-      <div class="max-w-[1200px] mx-auto px-6">
-        <h2 class="text-3xl mb-6 text-center">🎵 精選咖啡豆</h2>
-        <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <div class="flex items-center w-full sm:w-auto">
-            <label for="category" class="mr-2 font-bold">分類：</label>
-            <select id="category" class="p-2 border rounded bg-[#fffdf8] shadow-md hover:border-[#b58863] focus:outline-none w-full sm:w-auto">
-              <option value="all">全部</option>
-              <option value="light">淺焙</option>
-              <option value="medium">中焙</option>
-              <option value="dark">深焙</option>
-            </select>
-          </div>
-          <div class="flex items-center w-full sm:w-auto">
-            <label for="product-search" class="sr-only">搜尋商品</label>
-            <input type="text" id="product-search" placeholder="搜尋商品名稱或風味..." class="p-2 border rounded w-full bg-[#fffdf8] shadow-md hover:border-[#b58863] focus:outline-none" />
-          </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="product-list">
+                    <!-- Product cards will be rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Flavor Guide Section -->
+        <section id="flavor-guide" class="py-20 bg-white/50">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">風味探索指南</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">不知道如何選擇？讓我們為您視覺化每一款咖啡的獨特個性。</p>
+                </div>
+                <div class="flex flex-col md:flex-row items-center gap-8 fade-in-up">
+                    <div class="w-full md:w-1/2">
+                        <label for="flavor-select" class="block text-left mb-2 font-semibold">選擇一款咖啡豆來查看風味圖譜：</label>
+                        <select id="flavor-select" class="w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                            <!-- Options will be populated by JS -->
+                        </select>
+                        <div id="lifestyle-suggestion" class="mt-6 text-left p-4 bg-green-50 rounded-lg border border-accent text-gray-700">
+                            <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
+                            <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <canvas id="flavorRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Story & Artisan Section -->
+        <section id="story" class="py-20">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">我們的故事</h2>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
+                    <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
+                    <p class="text-gray-700 leading-relaxed space-y-4">
+                        <span>🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
+                        <span>☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</span>
+                        <span>2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</span>
+                    </p>
+                    <div class="mt-8 text-center">
+                        <!-- Placeholder for video or more imagery -->
+                        <div class="relative w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
+                            <i class="fas fa-play-circle text-6xl text-gray-500 opacity-75"></i>
+                            <p class="absolute text-gray-700 text-sm mt-2">（未來將在此處加入品牌故事影片）</p>
+                            <img src="https://placehold.co/600x300/e0e0e0/555555?text=品牌故事影片預覽" alt="品牌故事影片預覽" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-16 text-center fade-in-up">
+                    <h3 class="text-3xl font-serif section-title mb-8">幕後職人</h3>
+                    <div class="card p-8 flex flex-col md:flex-row items-center gap-8">
+                        <img src="https://placehold.co/150x150/a07654/FFFFFF?text=職人" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
+                        <div class="text-left">
+                            <h4 class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
+                            <p class="text-lg text-primary mt-1">陳師傅</p>
+                            <p class="mt-4 text-gray-600">擁有超過20年的樂器製作工藝背景，將對精準與和諧的追求，完美轉化為對咖啡烘焙的熱情。對他而言，每一條烘焙曲線，都像是在譜寫一首動人的樂曲。</p>
+                            <p class="mt-2 text-gray-700">由陳師傅親自烘培，確保每一顆豆子都能展現其最佳風味。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Knowledge Section -->
+        <section id="knowledge" class="py-20 bg-white/50">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">線上咖啡小學堂</h2>
+                    <p class="mt-4 text-lg text-gray-600">一些關於咖啡的趣聞與知識，希望能豐富您的咖啡生活。</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card p-6 fade-in-up group">
+                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">手沖咖啡新手入門</h3>
+                        <p class="text-gray-600">想在家享受一杯完美的手沖咖啡嗎？從磨豆、水溫到注水技巧，我們為您整理了幾個關鍵步驟，讓您輕鬆上手。</p>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                    </div>
+                    <div class="card p-6 fade-in-up group" style="transition-delay: 100ms;">
+                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">如何保存咖啡豆？</h3>
+                        <p class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。</p>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                    </div>
+                    <div class="card p-6 fade-in-up group" style="transition-delay: 200ms;">
+                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">音樂與咖啡的完美結合</h3>
+                        <p class="text-gray-600">您知道嗎？聆聽不同類型的音樂，可能會影響您對咖啡風味的感受。下次品嚐時，不妨試著搭配一首古典樂或爵士樂吧！</p>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Special Offers Section -->
+        <section id="offers" class="py-20">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">最新優惠與活動</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">不定期推出精選特價，讓您以更優惠的價格品嚐我們的精品咖啡。</p>
+                    <div id="special-offers-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Special offers will be rendered here -->
+                    </div>
+                    <div class="mt-10">
+                        <a href="#products" class="px-8 py-3 rounded-full btn-primary inline-block">
+                            <i class="fas fa-tags mr-2"></i> 查看所有咖啡豆
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 bg-white/50">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">常見問題</h2>
+                </div>
+                <div id="faq-container" class="space-y-4 fade-in-up">
+                    <!-- FAQ items will be rendered here -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Reviews Section -->
+        <section id="review" class="py-20">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">顧客的溫馨回饋</h2>
+                </div>
+                <div id="review-list" class="space-y-6 fade-in-up">
+                    <!-- Reviews will be rendered here -->
+                </div>
+                 <div class="mt-12 card p-8 fade-in-up">
+                    <h3 class="text-2xl font-serif mb-4 text-center">分享您的品飲心得</h3>
+                    <form id="review-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <input type="text" id="reviewer-name" placeholder="您的暱稱" class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" required>
+                            <select class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="review-rating" required>
+                                <option value="" disabled selected>您會給幾顆星？</option>
+                                <option value="⭐️⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️⭐️</option>
+                                <option value="⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️</option>
+                                <option value="⭐️⭐️⭐️">⭐️⭐️⭐️</option>
+                            </select>
+                        </div>
+                        <textarea class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="review-content" placeholder="在這裡寫下您的評論..." required rows="4"></textarea>
+                        <div class="text-center mt-6">
+                            <button type="submit" class="px-8 py-3 rounded-full btn-secondary">送出評論</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-white/50">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                 <div class="fade-in-up">
+                    <h2 class="text-4xl font-serif section-title">聯絡我們</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題、課程詢問或商品訂購需求，都歡迎隨時與我們聯繫！</p>
+                </div>
+                <div class="card p-8 fade-in-up">
+                    <div class="md:flex md:justify-around md:items-start">
+                        <div class="mb-8 md:mb-0">
+                            <h3 class="text-2xl font-serif mb-4">店家資訊</h3>
+                            <div class="space-y-2 text-lg">
+                                <p><i class="fa-solid fa-store text-primary mr-2"></i> 樂海樂器咖啡</p>
+                                <p><i class="fa-solid fa-phone text-primary mr-2"></i> 03-4081932</p>
+                                <p><i class="fa-solid fa-location-dot text-primary mr-2"></i> 桃園市中壢區中正路4段141號</p>
+                            </div>
+                            <div class="mt-6">
+                                <a href="tel:03-4081932" class="inline-block px-6 py-3 rounded-full btn-primary text-lg">
+                                    <i class="fa-solid fa-phone mr-2"></i> 立即致電訂購
+                                </a>
+                            </div>
+                        </div>
+                         <div class="md:w-1/2">
+                            <h3 class="text-2xl font-serif mb-4">線上詢問</h3>
+                             <form id="inquiry-form">
+                                 <input type="text" id="inquiry-name" placeholder="您的姓名" class="p-3 w-full border border-gray-300 rounded-md mb-4" required>
+                                 <input type="email" id="inquiry-email" placeholder="您的電子郵件" class="p-3 w-full border border-gray-300 rounded-md mb-4" required>
+                                 <textarea class="p-3 w-full border border-gray-300 rounded-md mb-4" id="inquiry-message" placeholder="您的訊息..." required rows="5"></textarea>
+                                 <button type="submit" class="px-8 py-3 rounded-full btn-secondary">送出訊息</button>
+                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-secondary text-white">
+        <div class="max-w-6xl mx-auto py-8 px-6 text-center">
+            <div class="mb-4">
+                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-facebook-square"></i></a>
+                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-line"></i></a>
+            </div>
+            <p>&copy; 2025 Melody Bean. 品味旋律，啜飲人生。 | 樂海樂器咖啡 版權所有.</p>
         </div>
-        <div id="product-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </div>
-    </section>
-
-    <!-- 新增咖啡教育內容區塊 -->
-    <section id="education" class="py-16 bg-[#fdfaf5] fade-up">
-      <div class="max-w-[1000px] mx-auto px-6">
-        <h2 class="text-3xl mb-8 text-center text-[#b58863]">📚 咖啡知識殿堂</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <!-- 咖啡文章區塊 -->
-          <div class="ornate-box p-6">
-            <h3 class="text-2xl font-bold mb-4">深入了解咖啡處理法</h3>
-            
-            <div class="mb-6">
-              <h4 class="text-xl font-semibold mb-2">☀️ 日曬法（Natural Process）</h4>
-              <p class="mb-1">想像把新鮮的咖啡果實鋪在陽光下曬乾，像曬葡萄變葡萄乾。這就是日曬法。咖啡果實在曬乾的過程中，果肉的糖分會慢慢滲進豆子裡，讓它變得甜甜的，像是水果乾的感覺。</p>
-              <p class="font-bold">📌 風味特色：</p>
-              <ul class="list-disc list-inside ml-4 mb-2 text-sm">
-                <li>香氣奔放、甜感明顯、常有莓果或葡萄乾的味道。</li>
-              </ul>
-              <p class="font-bold">📌 適合喜歡：</p>
-              <ul class="list-disc list-inside ml-4 mb-4 text-sm">
-                <li>果香調、熱情奔放風味的你。</li>
-              </ul>
-            </div>
-
-            <div class="mb-6">
-              <h4 class="text-xl font-semibold mb-2">💧 水洗法（Washed Process）</h4>
-              <p class="mb-1">水洗法像是幫咖啡果實洗香香——把果肉用水沖掉，留下純淨的豆子。這種方式讓豆子的本質被保留下來，像是聽一首沒有伴奏的純淨旋律。</p>
-              <p class="font-bold">📌 風味特色：</p>
-              <ul class="list-disc list-inside ml-4 mb-2 text-sm">
-                <li>乾淨、明亮、酸值清晰、口感輕盈。</li>
-              </ul>
-              <p class="font-bold">📌 適合喜歡：</p>
-              <ul class="list-disc list-inside ml-4 mb-4 text-sm">
-                <li>茶感、清新、精緻風味的你。</li>
-              </ul>
-            </div>
-
-            <div class="mb-6">
-              <h4 class="text-xl font-semibold mb-2">🍯 蜜處理法（Honey Process）</h4>
-              <p class="mb-1">蜜處理不是加蜂蜜，而是讓咖啡果肉的「黏黏果膠層」保留在豆子上曬乾，像是一層自然糖漿。這就像是把日曬的甜感和水洗的清爽融合在一起，達到剛剛好的甜美平衡。</p>
-              <p class="font-bold">📌 風味特色：</p>
-              <ul class="list-disc list-inside ml-4 mb-2 text-sm">
-                <li>甜中帶酸、柔和圓潤、常有蜂蜜、水果、太妃糖的味道。</li>
-              </ul>
-              <p class="font-bold">📌 適合喜歡：</p>
-              <ul class="list-disc list-inside ml-4 mb-4 text-sm">
-                <li>平衡感、圓滑口感的你。</li>
-              </ul>
-            </div>
-
-            <div class="mb-6">
-              <h4 class="text-xl font-semibold mb-2">🌌 厭氧發酵（Anaerobic Fermentation）</h4>
-              <p class="mb-1">這是咖啡界的實驗室風味。咖啡果實被放進密閉容器中，不讓氧氣進來，像是「閉門造車」般發酵。這種方式可以創造出很特別的香氣和層次，有時像酒、有時像香料。</p>
-              <p class="font-bold">📌 風味特色：</p>
-              <ul class="list-disc list-inside ml-4 mb-2 text-sm">
-                <li>香氣奔放、口感層次豐富，帶有酒香、發酵感。</li>
-              </ul>
-              <p class="font-bold">📌 適合喜歡：</p>
-              <ul class="list-disc list-inside ml-4 mb-4 text-sm">
-                <li>獨特、冒險、不一樣風味體驗的你。</li>
-              </ul>
-            </div>
-
-          </div>
-
-          <!-- 咖啡影片與保存方式區塊 -->
-          <div class="ornate-box p-6">
-            <h3 class="text-2xl font-bold mb-4">專業沖煮與保存</h3>
-            <p class="mb-4">學會正確的沖煮技巧和保存方式，讓您的每一杯咖啡都能達到最佳風味。</p>
-            
-            <div class="mb-6">
-              <h4 class="text-xl font-semibold mb-2">推薦沖煮影片：</h4>
-              <div class="aspect-video bg-gray-200 rounded overflow-hidden">
-                <!-- 嵌入 YouTube 影片或使用佔位圖 -->
-                <iframe 
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen
-                  class="w-full h-full"
-                  title="如何手沖咖啡 - 示範影片">
-                </iframe>
-                <p class="text-center text-sm text-gray-600 mt-2">（此為示範影片，實際將嵌入相關教學影片）</p>
-              </div>
-            </div>
-
-            <div>
-              <h4 class="text-xl font-semibold mb-2">咖啡豆保存方式：</h4>
-              <ul class="list-disc list-inside space-y-2">
-                <li>密封保存：使用不透光、密封性好的容器。</li>
-                <li>避光避濕：避免陽光直射和潮濕環境。</li>
-                <li>避免異味：遠離有強烈氣味的物品。</li>
-                <li>適溫存放：建議存放在陰涼乾燥處，無需冷藏或冷凍（除非長時間保存）。</li>
-                <li>最佳賞味期：咖啡豆開封後，建議在一個月內飲用完畢以保持最佳風味。</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="cart" class="py-16 bg-[#fff9f0] fade-up">
-      <div class="max-w-[900px] mx-auto px-6">
-        <h2 class="text-2xl mb-4">🛒 購物車</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full border text-left cart-table">
-            <thead>
-              <tr class="bg-[#f5efe6]">
-                <th class="p-2 border whitespace-nowrap">商品</th>
-                <th class="p-2 border whitespace-nowrap">數量</th>
-                <th class="p-2 border whitespace-nowrap">單價</th>
-                <th class="p-2 border whitespace-nowrap">小計</th>
-              </tr>
-            </thead>
-            <tbody id="cart-body"></tbody>
-          </table>
-        </div>
-        <p class="text-right mt-4 font-bold">總金額：<span id="total-amount">NT$0</span></p>
-        <p class="text-sm text-red-600 text-right mt-2 font-bold">※ 本網站所有商品不提供退換貨服務。</p>
-        <div class="text-right mt-4">
-          <button onclick="checkout()" class="bg-[#3f2e2e] text-white px-6 py-2 rounded btn-press">結帳</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="review" class="bg-[#fdfaf5] py-16 fade-up">
-      <div class="max-w-[600px] mx-auto px-6">
-        <h2 class="text-2xl mb-6 text-center">留下您的評論</h2>
-        <form class="grid gap-4" onsubmit="submitReview(event)">
-          <input id="reviewer" type="text" placeholder="您的名稱" class="p-3 border rounded" required />
-          <textarea id="review-content" rows="4" placeholder="您的評論內容..." class="p-3 border rounded" required></textarea>
-          <select id="review-rating" class="p-3 border rounded" required>
-            <option value="" disabled selected>給我們幾顆星？</option>
-            <option value="⭐️⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️⭐️</option>
-            <option value="⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️</option>
-            <option value="⭐️⭐️⭐️">⭐️⭐️⭐️</option>
-            <option value="⭐️⭐️">⭐️⭐️</option>
-            <option value="⭐️">⭐️</option>
-          </select> 
-          <button type="submit" class="bg-[#3f2e2e] text-white px-6 py-2 rounded btn-press">送出評論</button>
-        </form>
-        <div id="review-list" class="mt-6 space-y-4"></div>
-      </div>
-    </section>
-
-    <section id="about" class="bg-[#fffdf8] py-16 fade-up">
-      <div class="max-w-[1000px] mx-auto px-6 text-center">
-        <h2 class="text-3xl mb-4">關於 Melody Beans</h2>
-        <p class="mb-4">我們是一家結合音樂靈感與手工咖啡的品牌，每款豆子皆源自一段旋律，希望每一口都讓你想起一首歌。</p>
-        <p class="mb-1">📞 電話：03-4081932</p>
-        <p class="mb-1">🏠 地址：桃園市中壢區中正路4段141號</p>
-      </div>
-    </section>
-
-    <footer class="text-center py-6 bg-[#f5efe6] text-sm text-[#3f2e2e]">
-      © 2025 Melody Beans. 品味旋律，啜飲人生。
     </footer>
 
-    <div id="floatingCart" class="floating-cart" onclick="toggleCartPanel(); renderCartPanel()">
-      🛒
-      <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
-    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-    <div id="cartPanel" class="fixed top-0 right-0 w-full md:w-[300px] h-full bg-[#fff9f0] shadow-lg p-4 transform translate-x-full transition-transform duration-300 z-[9999] overflow-y-auto">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">🛍️ 購物清單</h2>
-        <button onclick="toggleCartPanel()" class="text-xl font-bold text-[#b58863]">✕</button>
-      </div>
-      <div id="cartPanelBody" class="space-y-4 text-sm">
-        </div>
-      <div class="mt-4 text-right font-bold">總金額：<span id="panelTotal">NT$0</span></div>
-      <div class="mt-2 text-right">
-        <button onclick="checkout()" class="bg-[#3f2e2e] text-white px-4 py-2 rounded btn-press">結帳</button>
-      </div>
-    </div> 
+        // --- Constants & Local Storage Keys ---
+        const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
+        const SPECIAL_OFFERS_KEY = 'melodySpecialOffers';
+        const REVIEWS_KEY = 'melodyReviews';
 
-    <!-- 會員登入/註冊模態框 -->
-    <div id="memberModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[10001] hidden">
-      <div class="bg-[#fff9f0] p-8 rounded-lg shadow-2xl w-full max-w-sm relative ornate-box transform scale-95 opacity-0 transition-all duration-300 mx-4" id="memberModalContent">
-        <button onclick="closeMemberModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold">✕</button>
-        <h2 class="text-2xl font-bold mb-6 text-center text-[#b58863]">會員登入 / 註冊</h2>
-        
-        <div id="loginSection">
-          <form id="loginForm" class="grid gap-4">
-            <div>
-              <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">電子郵件</label>
-              <input type="email" id="loginEmail" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入您的電子郵件" required>
-            </div>
-            <div>
-              <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
-              <input type="password" id="loginPassword" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入密碼" required>
-            </div>
-            <button type="submit" class="bg-[#b58863] text-white px-6 py-3 rounded-md hover:bg-[#a07a5c] transition-colors duration-300 text-lg font-semibold btn-press">登入</button>
-          </form>
-          <p class="text-center mt-4">還沒有帳號？<button onclick="showRegisterForm()" class="text-blue-600 hover:underline">立即註冊</button></p>
-        </div>
+        // --- Global Data Variables (using let for reassignability) ---
+        let coffeeBeans = []; 
+        let specialOffers = [];
+        let reviews = [];
 
-        <div id="registerSection" class="hidden">
-          <form id="registerForm" class="grid gap-4">
-            <div>
-              <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">電子郵件</label>
-              <input type="email" id="registerEmail" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入您的 Gmail 帳號" required pattern=".+@gmail\.com$" title="請輸入有效的 Gmail 帳號 (例如: example@gmail.com)">
-            </div>
-            <div>
-              <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
-              <input type="password" id="registerPassword" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="設定密碼 (至少6位)" required minlength="6">
-            </div>
-            <button type="submit" class="bg-[#3f2e2e] text-white px-6 py-3 rounded-md hover:bg-[#5a4444] transition-colors duration-300 text-lg font-semibold btn-press">註冊</button>
-          </form>
-          <p class="text-center mt-4">已有帳號？<button onclick="showLoginForm()" class="text-blue-600 hover:underline">返回登入</button></p>
-        </div>
+        // --- Default Data (Hardcoded for manual management) ---
+        // These serve as initial data if localStorage is empty or you clear it.
+        const defaultCoffeeBeans = [
+            { id: 1, name: '衣索比亞 GEISHA 水洗 (114g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬、百香果', image: 'https://placehold.co/400x250/b58863/FFFFFF?text=衣索比亞+GEISHA+水洗', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。', salePrice: 280, expiryDate: '2025/10/12' },
+            { id: 2, name: '衣索比亞 Heirloom 雙重厭氧水洗 (227g)', flavor: '茉莉、橙花、蜂蜜、水蜜桃', image: 'https://placehold.co/400x250/3f2e2e/FFFFFF?text=衣索比亞+Heirloom+雙重厭氧', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。', salePrice: 600, expiryDate: '2025/10/28' },
+            { id: 3, name: '衣索比亞 Heirloom 雙重厭氧水洗 (227g) - 批次2', flavor: '茉莉、橙花、蜂蜜、水蜜桃', image: 'https://placehold.co/400x250/6b8e23/FFFFFF?text=衣索比亞+Heirloom+批次2', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。', salePrice: 600, expiryDate: '2025/10/31' },
+            { id: 4, name: '衣索比亞 GEISHA 中淺焙 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/a07654/FFFFFF?text=衣索比亞+GEISHA+中淺焙', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。', salePrice: 540, expiryDate: '2025/11/01' },
+            { id: 5, name: '衣索比亞 GEISHA 水洗 高海拔 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/b58863/FFFFFF?text=衣索比亞+GEISHA+高海拔', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。', salePrice: 540, expiryDate: '2025/11/01' },
+            { id: 6, name: '衣索比亞 綜合批次 淺焙 (227g)', flavor: '接骨木花、茉莉花、橙花、白玫瑰、百合花、蘋果、野莓果醬、檸檬', image: 'https://placehold.co/400x250/3f2e2e/FFFFFF?text=衣索比亞+綜合淺焙', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。', salePrice: 540, expiryDate: '2025/11/01' }, 
+            { id: 7, name: '哥斯大黎加 Geisha 白蜜 (114g) - 聖伊西多羅', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', image: 'https://placehold.co/400x250/6b8e23/FFFFFF?text=哥斯大黎加+藝妓', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。', salePrice: 800, expiryDate: '2025/08/15' }, 
+            { id: 8, name: '哥斯大黎加 藝妓 淺焙 (227g)', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', image: 'https://placehold.co/400x250/a07654/FFFFFF?text=哥斯大黎加+藝妓+淺焙', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。', salePrice: 1800, expiryDate: '2025/08/15' }
+        ];
 
-        <div id="memberInfo" class="hidden text-center py-4">
-          <h3 class="text-xl font-bold mb-4">會員資訊</h3>
-          <p class="mb-2">歡迎，<strong id="loggedInUserEmail"></strong>！</p>
-          <button onclick="viewPurchaseHistory()" class="bg-[#b58863] text-white px-4 py-2 rounded-md hover:bg-[#a07a5c] transition-colors duration-300 btn-press">查看購買紀錄</button>
-          <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors duration-300 ml-2 btn-press">登出</button>
-        </div>
+        const defaultSpecialOffers = [
+            { id: 101, name: '本月特選：精品咖啡豆組合', description: '嚴選三款不同風味的精品咖啡豆，一次滿足您的味蕾探險。', originalPrice: 1200, specialPrice: 990, image: 'https://placehold.co/400x250/b58863/FFFFFF?text=咖啡組合' }
+        ];
 
-        <div id="purchaseHistorySection" class="hidden mt-6">
-            <h4 class="text-xl font-semibold mb-3">您的購買紀錄</h4>
-            <div id="purchaseHistoryList" class="space-y-3 max-h-60 overflow-y-auto">
-                <!-- 購買紀錄將動態載入這裡 -->
-            </div>
-            <button onclick="hidePurchaseHistory()" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors duration-300 btn-press">返回會員中心</button>
-        </div>
+        const faqs = [
+            { q: '如何保存咖啡豆？', a: '為保持最佳風味，請將咖啡豆存放在不透光、密封的容器中，並置於陰涼乾燥處。建議在開封後一個月內飲用完畢。' },
+            { q: '不同烘焙度有什麼差異？', a: '淺焙通常更能展現咖啡豆原有的花果酸質；中焙則達到酸、甜、苦的平衡；深焙會帶來更濃郁的焦糖、巧克力風味，酸度較低。' },
+            { q: '網站上的商品如何訂購？', a: '本網站目前僅供商品與品牌展示。若您對任何商品有興趣或需要訂購，歡迎直接致電 03-4081932 與我們聯繫，我們將有專人為您服務。' },
+            { q: '樂海樂器咖啡的營業時間是？', a: '我們的營業時間為週一至週六，早上9:00至晚間9:00。週日為公休日。歡迎您隨時來店裡坐坐，喝杯咖啡，聊聊音樂。' }
+        ];
 
-      </div>
-    </div>
+        // --- DOM Elements ---
+        const productList = document.getElementById('product-list');
+        const specialOffersList = document.getElementById('special-offers-list');
+        const faqContainer = document.getElementById('faq-container');
+        const reviewList = document.getElementById('review-list');
+        const flavorSelect = document.getElementById('flavor-select');
+        const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
+        const searchInput = document.getElementById('search-input');
+        const filterSelect = document.getElementById('filter-select');
+        const reviewForm = document.getElementById('review-form');
+        const inquiryForm = document.getElementById('inquiry-form');
 
+        let radarChart; // Chart.js instance
 
-    <div id="checkoutModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[10000] hidden">
-      <div class="bg-[#fff9f0] p-8 rounded-lg shadow-2xl w-full max-w-lg relative ornate-box transform scale-95 opacity-0 transition-all duration-300 mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto" id="checkoutModalContent">
-        <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold">✕</button>
-        
-        <h2 class="text-2xl font-bold mb-6 text-center text-[#b58863]">訂單確認與結帳</h2>
-        
-        <div id="orderSummary" class="mb-6 border-b border-gray-300 pb-4">
-          <h3 class="text-xl font-semibold mb-3">您的訂單</h3>
-          <div id="modalCartItems" class="space-y-1 text-sm max-h-40 overflow-y-auto pr-2"> 
-            </div>
-          <p class="text-right font-bold text-lg mt-4">小計：<span id="modalSubTotalAmount">NT$0</span></p>
-          <p class="text-right text-sm text-gray-600">運費：NT$<span id="shippingFee">60</span></p>
-          <p class="text-right font-bold text-xl mt-2">總金額：<span id="modalTotalAmount">NT$0</span></p>
-        </div>
+        /**
+         * Loads data from localStorage or uses default data if localStorage is empty/invalid.
+         * Then, triggers all necessary rendering functions.
+         */
+        function loadAndRenderAllData() {
+            console.log('--- Starting loadAndRenderAllData (Frontend Display) ---');
+            
+            // Load Coffee Beans: Prioritize localStorage, fallback to defaults
+            let storedCoffeeBeans = JSON.parse(localStorage.getItem(COFFEE_BEANS_KEY));
+            if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
+                coffeeBeans = storedCoffeeBeans;
+                console.log('Loaded coffee beans from localStorage:', coffeeBeans);
+            } else {
+                coffeeBeans = defaultCoffeeBeans;
+                console.log('localStorage for coffee beans empty or invalid, using default data:', coffeeBeans);
+            }
 
-        <form id="checkoutForm" class="grid grid-cols-1 gap-4">
-          <p class="text-sm text-red-600 font-bold">※ 本網站所有商品不提供退換貨服務。請您確認後再下單。</p>
-          <div>
-            <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">收件人姓名</label>
-            <input type="text" id="customerName" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入您的姓名" required>
-          </div>
-          <div>
-            <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">聯絡電話</label>
-            <input type="tel" id="customerPhone" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入聯絡電話" required>
-          </div>
-          <div>
-            <label for="customerAddress" class="block text-sm font-medium text-gray-700 mb-1">收件地址</label>
-            <textarea id="customerAddress" rows="3" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="請輸入收件地址" required></textarea>
-          </div>
+            // Load Special Offers: Prioritize localStorage, fallback to defaults
+            let storedSpecialOffers = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
+            if (Array.isArray(storedSpecialOffers) && storedSpecialOffers.length > 0) {
+                specialOffers = storedSpecialOffers;
+                console.log('Loaded special offers from localStorage:', specialOffers);
+            } else {
+                specialOffers = defaultSpecialOffers;
+                console.log('localStorage for special offers empty or invalid, using default data:', specialOffers);
+            }
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">付款方式</label>
-            <div class="flex flex-col gap-2">
-              <label class="inline-flex items-center">
-                <input type="radio" name="paymentMethod" value="cashOnDelivery" class="form-radio text-[#b58863]" checked onchange="toggleCreditCardFields(this)">
-                <span class="ml-2">貨到付款</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input type="radio" name="paymentMethod" value="creditCard" class="form-radio text-[#b58863]" onchange="toggleCreditCardFields(this)">
-                <span class="ml-2">信用卡 (此為模擬，無實際扣款)</span>
-              </label>
-            </div>
-            <div id="creditCardFields" class="mt-4 grid grid-cols-1 gap-3 hidden">
-                <div>
-                    <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">信用卡號</label>
-                    <input type="text" id="cardNumber" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="XXXX XXXX XXXX XXXX" pattern="\d{16}" title="請輸入16位數字信用卡號" disabled>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">有效期 (MM/YY)</label>
-                        <input type="text" id="expiryDate" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/\d{2}" title="請輸入MM/YY格式，例如01/25" disabled>
-                    </div>
-                    <div>
-                        <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                        <input type="text" id="cvv" class="p-3 border rounded-md w-full focus:ring-[#b58863] focus:border-[#b58863]" placeholder="XXX" pattern="\d{3,4}" title="請輸入3或4位數字" disabled>
-                    </div>
-                </div>
-            </div>
-          </div>
+            // Load Reviews (always from localStorage for user-submitted content)
+            reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+            console.log('Loaded reviews (from localStorage):', reviews);
 
-          <div class="mt-2">
-            <h4 class="text-sm font-medium text-gray-700 mb-1">配送時間</h4>
-            <p class="text-sm text-gray-600">訂單確認後約 3-5 個工作天送達 (不含例假日)。</p>
-          </div>
-
-          <button type="submit" class="bg-[#3f2e2e] text-white px-6 py-3 rounded-md hover:bg-[#5a4444] transition-colors duration-300 text-lg font-semibold btn-press">確認下單</button>
-        </form>
-
-        <div id="thankYouMessage" class="text-center py-8 hidden">
-          <h3 class="text-3xl font-bold text-[#b58863] mb-4">� 訂單已成立！感謝您的購買！ 🎉</h3>
-          <p class="text-lg mb-2">您的訂單號碼為：<strong id="finalOrderId" class="text-[#3f2e2e]"></strong></p>
-          <p class="text-md text-gray-700">我們將盡快為您處理訂單，請留意電話或信件通知。</p>
-          <button onclick="closeCheckoutModal(true)" class="mt-8 bg-[#b58863] text-white px-8 py-3 rounded-md hover:bg-[#a07a5c] transition-colors duration-300 text-lg btn-press">繼續購物</button>
-        </div>
-
-      </div>
-    </div>
-  </body>
-</html>
-
-<script>
-  // Global cart object
-  let cart = {};
-  // Review functions (add localStorage for persistence)
-  let reviews = [];
-
-  // Variables for floating cart visibility
-  let lastScrollY = 0;
-  const floatingCart = document.getElementById('floatingCart');
-
-  // 會員相關變數
-  let loggedInUser = null; // 儲存當前登入的使用者資訊
-  let users = {}; // 模擬使用者資料庫 { email: { password, purchaseHistory: [], browsingHistory: [], loginCount } }
-  const SHIPPING_FEE = 60; // 運費
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const fadeSections = document.querySelectorAll('.fade-up');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          observer.unobserve(entry.target);
+            // --- Render all sections after data is loaded ---
+            renderProducts(); // Handles initial display and filtering
+            renderSpecialOffers();
+            renderFaqs(); 
+            renderReviews(); 
+            updateFlavorGuideSelect(); // Populates select and initializes chart
+            
+            console.log('--- Finished loadAndRenderAllData (Frontend Display) ---');
         }
-      });
-    }, { threshold: 0.1 });
-    fadeSections.forEach(section => observer.observe(section));
 
-    loadCart(); // Load cart from localStorage on page load
-    loadUsers(); // 加載使用者資料
-    checkLoginStatus(); // 檢查登入狀態
-    updateCartBadge(); // 初始化購物車徽章數量
-    renderProducts(); // Initial render of products
-    renderCart(); // Initial render of main cart
-    renderCartPanel(); // Initial render of side cart panel
-
-    // Language button alert
-    const langBtn = document.querySelector('button.underline');
-    if (langBtn) {
-      langBtn.addEventListener('click', () => {
-        alert('目前僅提供繁體中文，English version 敬請期待！');
-      });
-    }
-
-    // Category filter event listener
-    const categoryFilter = document.getElementById('category');
-    if (categoryFilter) {
-      categoryFilter.addEventListener('change', () => renderProducts()); // 篩選時重新渲染商品
-    }
-
-    // Product search event listener
-    const productSearchInput = document.getElementById('product-search');
-    if (productSearchInput) {
-        productSearchInput.addEventListener('input', () => renderProducts()); // 搜尋時重新渲染商品
-    }
-
-    // Checkout Form Submission Listener
-    const checkoutForm = document.getElementById('checkoutForm');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // 阻止表單預設提交行為
-
-            const customerName = document.getElementById('customerName').value;
-            const customerPhone = document.getElementById('customerPhone').value;
-            const customerAddress = document.getElementById('customerAddress').value;
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-            // 簡單的表單驗證
-            if (!customerName || !customerPhone || !customerAddress) {
-                alert('請填寫所有必填資訊！');
+        /**
+         * Renders the product list, applying search and filter conditions.
+         */
+        function renderProducts() {
+            if (!productList) {
+                console.error('Error: productList element not found!');
                 return;
             }
+            
+            console.log('Rendering products. Current coffeeBeans length:', coffeeBeans.length);
+            const keyword = (searchInput?.value || '').toLowerCase();
+            const filter = (filterSelect?.value || '').toLowerCase();
 
-            // 如果選擇信用卡，也模擬檢查這些欄位是否填寫（儘管沒有實際驗證）
-            if (paymentMethod === 'creditCard') {
-                const cardNumber = document.getElementById('cardNumber').value;
-                const expiryDate = document.getElementById('expiryDate').value;
-                const cvv = document.getElementById('cvv').value;
-                if (!cardNumber || !expiryDate || !cvv) {
-                    alert('請填寫完整的信用卡資訊！');
-                    return;
+            const filteredBeans = coffeeBeans.filter(bean => {
+                const matchesKeyword = bean.name.toLowerCase().includes(keyword) || bean.flavor.toLowerCase().includes(keyword);
+                // The filter should ideally match against a 'type' or 'category' property.
+                // For simplicity, it currently checks if the filter string is part of the name or flavor.
+                const matchesFilter = filter ? bean.name.toLowerCase().includes(filter) || (bean.flavor && bean.flavor.toLowerCase().includes(filter)) : true;
+                return matchesKeyword && matchesFilter;
+            });
+
+            productList.innerHTML = ''; // Clear existing content
+
+            if (filteredBeans.length === 0) {
+                productList.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有咖啡豆產品符合您的篩選條件。</p>';
+                console.log('No coffee beans to render after filtering.');
+            } else {
+                filteredBeans.forEach(bean => {
+                    const card = document.createElement('div');
+                    card.className = 'card fade-in-up';
+                    card.innerHTML = `
+                        <img src="${bean.image}" alt="${bean.name}" class="w-full h-48 object-cover rounded-t-lg">
+                        <div class="p-6">
+                            <h3 class="text-xl font-serif mb-2">${bean.name}</h3>
+                            <p class="text-gray-600">風味：${bean.flavor}</p>
+                            <p class="text-sm text-gray-500">售價: NT$${bean.salePrice || '---'} (期限: ${bean.expiryDate || '---'})</p>
+                        </div>
+                    `;
+                    productList.appendChild(card);
+                });
+                console.log(`Rendered ${filteredBeans.length} product cards.`);
+            }
+        }
+
+        /**
+         * Renders the list of special offers.
+         */
+        function renderSpecialOffers() {
+            if (!specialOffersList) {
+                console.error('Error: specialOffersList element not found!');
+                return;
+            }
+            console.log('Rendering special offers. specialOffers length:', specialOffers.length);
+            specialOffersList.innerHTML = ''; // Clear existing content
+            if (specialOffers.length === 0) {
+                specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
+                console.log('No special offers to render.');
+            } else {
+                specialOffers.forEach(offer => {
+                    const offerCard = document.createElement('div');
+                    offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
+                    offerCard.innerHTML = `
+                        <img src="${offer.image}" alt="${offer.name}" class="w-full h-40 object-cover rounded-md mb-4">
+                        <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
+                        <p class="text-gray-600 mb-3">${offer.description}</p>
+                        <div class="mt-auto">
+                            <span class="offer-price-old">NT$${offer.originalPrice}</span>
+                            <span class="offer-price-new">NT$${offer.specialPrice}</span>
+                        </div>
+                    `;
+                    specialOffersList.appendChild(offerCard);
+                });
+                console.log(`Rendered ${specialOffers.length} offer cards.`);
+            }
+        }
+
+        /**
+         * Renders the FAQ items and attaches accordion functionality.
+         */
+        function renderFaqs() {
+            if (!faqContainer) {
+                console.error('Error: faqContainer element not found!');
+                return;
+            }
+            console.log('Rendering FAQs. faqs length:', faqs.length);
+            faqContainer.innerHTML = ''; // Clear existing content before re-rendering
+            faqs.forEach(faq => {
+                const item = document.createElement('div');
+                item.className = 'card';
+                item.innerHTML = `
+                    <button class="accordion-button w-full text-left p-4 text-lg font-semibold">
+                        ${faq.q}
+                    </button>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700">${faq.a}</p>
+                    </div>
+                `;
+                faqContainer.appendChild(item);
+            });
+            // Re-attach accordion event listeners after rendering
+            const newFaqButtons = document.querySelectorAll('.accordion-button');
+            newFaqButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('open');
+                    const content = button.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+            console.log(`Rendered ${faqs.length} FAQ items.`);
+        }
+
+        /**
+         * Renders the customer reviews.
+         */
+        function renderReviews() {
+            if (!reviewList) {
+                console.error('Error: reviewList element not found!');
+                return;
+            }
+            reviewList.innerHTML = '';
+            // 如果 reviews 為空，顯示提示訊息
+            if (reviews.length === 0) {
+                reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
+                console.log('No reviews to render.');
+            } else {
+                reviews.forEach(review => {
+                    const item = document.createElement('div');
+                    item.className = 'card p-6';
+                    item.innerHTML = `
+                        <div class="flex items-center mb-2">
+                            <span class="font-semibold text-lg mr-2">${review.name}</span>
+                            <span class="text-yellow-500">${review.rating}</span>
+                        </div>
+                        <p class="text-gray-700">${review.content}</p>
+                    `;
+                    reviewList.appendChild(item);
+                });
+                console.log(`Rendered ${reviews.length} review items.`);
+            }
+        }
+        
+        /**
+         * Populates the flavor guide select box and initializes/updates the radar chart.
+         */
+        function updateFlavorGuideSelect() {
+            if (!flavorSelect) {
+                console.error('Error: flavorSelect element not found!');
+                return;
+            }
+            console.log('Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
+
+            // Re-populate options based on potentially updated coffeeBeans
+            flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
+            coffeeBeans.forEach(bean => {
+                const option = document.createElement('option');
+                option.value = bean.id;
+                option.textContent = bean.name;
+                flavorSelect.appendChild(option);
+            });
+
+            const ctx = document.getElementById('flavorRadarChart')?.getContext('2d');
+            if (ctx) {
+                // Destroy old chart if it exists to prevent reinitialization issues
+                if (radarChart) {
+                    radarChart.destroy();
+                    console.log('Destroyed existing radar chart.');
+                }
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['酸度', '醇厚度', '甜度', '香氣', '餘韻'],
+                        datasets: [{
+                            label: '風味圖譜',
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(181, 136, 99, 0.2)',
+                            borderColor: 'rgba(181, 136, 99, 1)',
+                            pointBackgroundColor: 'rgba(181, 136, 99, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                pointLabels: { font: { size: 14, family: "'Noto Sans TC', sans-serif" } },
+                                suggestedMin: 0,
+                                suggestedMax: 5,
+                                ticks: {
+                                    stepSize: 1,
+                                    backdropColor: 'transparent'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                console.log('New radar chart created.');
+            } else {
+                console.error('Error: flavorRadarChart canvas context not found!');
+            }
+
+            // Remove and re-add event listener to prevent duplicates
+            flavorSelect.removeEventListener('change', handleFlavorSelectChange); 
+            flavorSelect.addEventListener('change', handleFlavorSelectChange);
+
+            // Trigger change to load the first item's data or display message if no data
+            if(coffeeBeans.length > 0) {
+                flavorSelect.value = coffeeBeans[0].id; // Set first item as default selected
+                flavorSelect.dispatchEvent(new Event('change'));
+                console.log('Flavor select initialized with first coffee bean.');
+            } else {
+                if(lifestyleSuggestionP) {
+                    lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
+                    console.log('No coffee beans, setting flavor guide message.');
                 }
             }
-            
-            const subTotal = calculateCartTotal();
-            const totalWithShipping = subTotal + SHIPPING_FEE;
+        }
 
-            const orderId = generateOrderId();
-            
-            // 模擬訂單提交到後端
-            const orderDetails = {
-                orderId: orderId,
-                customerInfo: {
-                    name: customerName,
-                    phone: customerPhone,
-                    address: customerAddress
-                },
-                items: JSON.parse(JSON.stringify(cart)), // 深拷貝購物車內容
-                subTotal: subTotal,
-                shippingFee: SHIPPING_FEE,
-                totalAmount: totalWithShipping,
-                paymentMethod: paymentMethod,
-                timestamp: new Date().toISOString()
-            };
-
-            console.log('模擬訂單已送出:', orderDetails);
-            
-            // 如果有會員登入，將訂單加入會員的購買紀錄
-            if (loggedInUser) {
-              users[loggedInUser.email].purchaseHistory.push(orderDetails);
-              saveUsers();
+        /**
+         * Handles the change event for the flavor select dropdown.
+         * Updates the radar chart and lifestyle suggestion based on the selected coffee bean.
+         */
+        function handleFlavorSelectChange(e) {
+            const selectedBean = coffeeBeans.find(b => b.id == e.target.value);
+            if (selectedBean && radarChart) {
+                radarChart.data.datasets[0].data = Object.values(selectedBean.flavorProfile);
+                radarChart.data.datasets[0].label = selectedBean.name;
+                radarChart.update();
+                if(lifestyleSuggestionP) {
+                    lifestyleSuggestionP.textContent = selectedBean.lifestyle;
+                }
+                console.log('Flavor select changed. Updated radar chart and lifestyle suggestion for:', selectedBean.name);
             }
+        }
 
-            // 在實際應用中，這裡會發送 AJAX 請求到後端 API
+        // --- Event Listeners for Search and Filter ---
+        if (searchInput && filterSelect) {
+            searchInput.addEventListener('input', renderProducts); 
+            filterSelect.addEventListener('change', renderProducts); 
+            console.log('Search and filter event listeners attached.');
+        } else {
+            console.error('Error: Search input or filter select elements not found!');
+        }
 
-            // 顯示感謝訊息
-            document.getElementById('checkoutForm').classList.add('hidden');
-            document.getElementById('orderSummary').classList.add('hidden');
-            document.getElementById('thankYouMessage').classList.remove('hidden');
-            document.getElementById('finalOrderId').textContent = orderId;
-
-            // 結帳成功後清空購物車（但由 closeModal 的 clearCartAfter 參數控制，此處不直接清空）
+        // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
+        // This is crucial for the frontend to react to changes from the admin panel
+        window.addEventListener('storage', (event) => {
+            if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
+                console.log(`localStorage key '${event.key}' changed. Reloading data.`);
+                loadAndRenderAllData(); 
+            }
         });
-    }
 
-    // Initial load of reviews
-    loadReviews();
-    renderReviews();
-
-    // Floating cart visibility on scroll
-    window.addEventListener('scroll', () => {
-        if (floatingCart) {
-            if (window.scrollY > lastScrollY && window.scrollY > 100) { // Scrolling down and past initial 100px
-                floatingCart.classList.add('hidden-scroll');
-            } else { // Scrolling up
-                floatingCart.classList.remove('hidden-scroll');
-            }
-            lastScrollY = window.scrollY;
+        // --- Review Form Submission ---
+        if(reviewForm) {
+            reviewForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newReview = {
+                    name: document.getElementById('reviewer-name').value,
+                    rating: document.getElementById('review-rating').value,
+                    content: document.getElementById('review-content').value,
+                };
+                reviews.push(newReview);
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
+                renderReviews();
+                reviewForm.reset();
+                alert('感謝您的評論！');
+                console.log('New review submitted:', newReview);
+            });
+            console.log('Review form event listener attached.');
+        } else {
+            console.error('Error: Review form element not found!');
         }
-    });
-
-    // 瀏覽紀錄：模擬點擊產品時記錄
-    document.getElementById('product-cards').addEventListener('click', (event) => {
-      const button = event.target.closest('button.btn-press');
-      if (button) {
-        const productName = button.getAttribute('onclick').match(/'([^']+)'/)[1];
-        if (loggedInUser && productName) {
-          const user = users[loggedInUser.email];
-          // 避免重複記錄連續點擊
-          if (user.browsingHistory.length === 0 || user.browsingHistory[user.browsingHistory.length - 1].productName !== productName) {
-            user.browsingHistory.push({ productName, timestamp: new Date().toISOString() });
-            saveUsers();
-          }
-        }
-      }
-    });
-
-    // 會員登入/註冊表單提交
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      if (users[email] && users[email].password === password) {
-        loggedInUser = { email: email };
-        users[email].loginCount = (users[email].loginCount || 0) + 1; // 增加登入次數
-        saveUsers();
-        saveLoginStatus();
-        updateMemberUI();
-        closeMemberModal();
-        alert('登入成功！');
-      } else {
-        alert('電子郵件或密碼錯誤。');
-      }
-    });
-
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('registerEmail').value;
-      const password = document.getElementById('registerPassword').value;
-
-      // 在這裡添加 Gmail 驗證
-      const gmailPattern = /.+@gmail\.com$/;
-      if (!gmailPattern.test(email)) {
-          alert('請輸入有效的 Gmail 帳號 (例如: example@gmail.com)！');
-          return;
-      }
-
-      if (users[email]) {
-        alert('此電子郵件已被註冊。');
-        return;
-      }
-
-      users[email] = {
-        password: password,
-        purchaseHistory: [],
-        browsingHistory: [],
-        loginCount: 0
-      };
-      saveUsers();
-      alert('註冊成功！請登入。');
-      showLoginForm();
-    });
-  });
-
-  // 購物車徽章更新函數
-  function updateCartBadge() {
-      const cartBadge = document.getElementById('cart-badge');
-      if (!cartBadge) return;
-      let totalItems = 0;
-      for (let item in cart) {
-          totalItems += cart[item].qty;
-      }
-      cartBadge.textContent = totalItems;
-      cartBadge.style.display = totalItems > 0 ? 'flex' : 'none'; // 有商品才顯示徽章
-  }
-
-  // 結帳彈窗相關函數
-  function openCheckoutModal() {
-    const modal = document.getElementById('checkoutModal');
-    const modalContent = document.getElementById('checkoutModalContent');
-    
-    if (Object.keys(cart).length === 0) {
-      alert('購物車是空的，請先加入商品！');
-      return;
-    }
-
-    // 渲染購物車內容到彈窗
-    const modalCartItems = document.getElementById('modalCartItems');
-    const modalSubTotalAmount = document.getElementById('modalSubTotalAmount');
-    const modalTotalAmount = document.getElementById('modalTotalAmount');
-    
-    modalCartItems.innerHTML = '';
-    let subTotal = 0;
-
-    for (let item in cart) {
-      const { qty, price } = cart[item];
-      const sub = qty * price;
-      subTotal += sub;
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'flex justify-between items-center';
-      itemDiv.innerHTML = `
-        <span>${item} x ${qty}</span>
-        <span>${formatPrice(sub)}</span>
-      `;
-      modalCartItems.appendChild(itemDiv);
-    }
-    modalSubTotalAmount.textContent = formatPrice(subTotal);
-    modalTotalAmount.textContent = formatPrice(subTotal + SHIPPING_FEE); // 加上運費
-
-    // 重置表單和隱藏感謝訊息
-    document.getElementById('checkoutForm').reset();
-    document.getElementById('checkoutForm').classList.remove('hidden');
-    document.getElementById('orderSummary').classList.remove('hidden');
-    document.getElementById('thankYouMessage').classList.add('hidden');
-    
-    // 預設將信用卡欄位隱藏並禁用
-    document.getElementById('creditCardFields').classList.add('hidden');
-    document.getElementById('cardNumber').disabled = true;
-    document.getElementById('expiryDate').disabled = true;
-    document.getElementById('cvv').disabled = true;
-
-    // 顯示模態框並觸發動畫
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-      modalContent.classList.remove('scale-95', 'opacity-0');
-      modalContent.classList.add('scale-100', 'opacity-100');
-    }, 10); // 小延遲確保過渡效果
-  }
-
-  function closeCheckoutModal(clearCartAfter = false) {
-    const modal = document.getElementById('checkoutModal');
-    const modalContent = document.getElementById('checkoutModalContent');
-    
-    modalContent.classList.remove('scale-100', 'opacity-100');
-    modalContent.classList.add('scale-95', 'opacity-0');
-
-    setTimeout(() => {
-      modal.classList.add('hidden');
-      if (clearCartAfter) {
-        cart = {};
-        saveCart();
-        renderCart();
-        renderCartPanel();
-        updateCartBadge(); // 清空購物車後更新徽章
-      }
-    }, 300); // 等待動畫結束後隱藏
-  }
-
-  // 修改原有的 checkout 函數，使其呼叫 openCheckoutModal
-  window.checkout = function() {
-    openCheckoutModal();
-  };
-
-  // 信用卡欄位顯示/隱藏控制
-  window.toggleCreditCardFields = function(radio) {
-      const creditCardFields = document.getElementById('creditCardFields');
-      const cardNumber = document.getElementById('cardNumber');
-      const expiryDate = document.getElementById('expiryDate');
-      const cvv = document.getElementById('cvv');
-
-      if (radio.value === 'creditCard') {
-          creditCardFields.classList.remove('hidden');
-          cardNumber.disabled = false;
-          expiryDate.disabled = false;
-          cvv.disabled = false;
-          // 可以選擇在這裡將這些欄位設為 required，如果要求用戶必須填寫
-          // cardNumber.required = true;
-          // expiryDate.required = true;
-          // cvv.required = true;
-      } else {
-          creditCardFields.classList.add('hidden');
-          cardNumber.disabled = true;
-          expiryDate.disabled = true;
-          cvv.disabled = true;
-          // cardNumber.required = false;
-          // expiryDate.required = false;
-          // cvv.required = false;
-      }
-  };
-
-
-  function toggleCartPanel() {
-    const panel = document.getElementById('cartPanel');
-    panel.classList.toggle('translate-x-full');
-
-    // 浮動購物車圖標點擊動畫
-    const floatingCart = document.getElementById('floatingCart');
-    floatingCart.classList.add('animate-pop'); // 添加一個臨時動畫類別
-    setTimeout(() => {
-        floatingCart.classList.remove('animate-pop'); // 移除類別以允許再次觸發
-    }, 300); // 動畫持續時間
-  }
-
-  function renderCartPanel() {
-    const panelBody = document.getElementById('cartPanelBody');
-    const panelTotal = document.getElementById('panelTotal');
-    if (!panelBody || !panelTotal) return; 
-
-    panelBody.innerHTML = '';
-    let total = 0;
-
-    for (let item in cart) {
-      const { qty, price } = cart[item];
-      const sub = qty * price;
-      total += sub;
-
-      const div = document.createElement('div');
-      div.className = 'border-b pb-2';
-      div.innerHTML = `
-        <div class="font-bold">${item}</div>
-        <div class="text-sm text-gray-500">單價：${formatPrice(price)}</div>
-        <div class="flex justify-between items-center mt-1">
-          <button onclick="updateQty('${item}', -1); renderCart(); renderCartPanel();" class="px-2 bg-gray-200 rounded">➖</button>
-          ${qty}
-          <button onclick="updateQty('${item}', 1); renderCart(); renderCartPanel();" class="px-2 bg-gray-200 rounded">➕</button>
-          <div class="text-right font-bold">${formatPrice(sub)}</div>
-        </div>
-      `;
-      panelBody.appendChild(div);
-    }
-    panelTotal.textContent = formatPrice(total);
-  }
-
-  const products = [
-    {
-      name: 'GEISHA 水洗（114g）',
-      country: '衣索比亞',
-      variety: 'GEISHA 水洗',
-      flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果',
-      roast: '淺焙',
-      weight: '114g',
-      expiry: '2025/10/12',
-      price: 280,
-      category: 'light',
-      image: './image/image_1.png' 
-    },
-    {
-      name: 'Heirloom 雙重厭氧（227g）- 批次A',
-      country: '衣索比亞',
-      variety: 'Heirloom',
-      flavor: '茉莉、橙花、蜂蜜、水蜜桃',
-      roast: '淺焙',
-      weight: '227g',
-      expiry: '2025/10/28',
-      price: 600,
-      category: 'light',
-      image: './image/image_2.png'
-    },
-    {
-      name: 'Heirloom 雙重厭氧（227g）- 批次B',
-      country: '衣索比亞',
-      variety: 'Heirloom',
-      flavor: '茉莉、橙花、蜂蜜、水蜜桃',
-      roast: '淺焙',
-      weight: '227g',
-      expiry: '2025/10/31',
-      price: 600,
-      category: 'light',
-      image: './image/image_3.png'
-    },
-    {
-      name: 'GEISHA（227g）中淺焙',
-      country: '衣索比亞',
-      variety: 'GEISHA',
-      flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬',
-      roast: '中淺焙',
-      weight: '227g',
-      expiry: '2025/11/01',
-      price: 540,
-      category: 'medium',
-      image: './image/image_4.png'
-    },
-    {
-      name: 'GEISHA 水洗（227g）2280m',
-      country: '衣索比亞',
-      variety: 'GEISHA 水洗',
-      flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬',
-      roast: '中淺焙',
-      weight: '227g',
-      expiry: '2025/11/01',
-      price: 540,
-      category: 'medium',
-      image: './image/image_5.png'
-    },
-    {
-      name: '衣索比亞 淺焙（227g）',
-      country: '衣索比亞',
-      variety: '',
-      flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬',
-      roast: '淺焙',
-      weight: '227g',
-      expiry: '2025/11/01',
-      price: 540,
-      category: 'light',
-      image: './image/image_6.png'
-    },
-    {
-      name: '哥斯大黎加 Geisha 白蜜（114g）',
-      country: '哥斯大黎加',
-      variety: 'Geisha（藝妓）',
-      flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜',
-      roast: '淺焙',
-      weight: '114g',
-      expiry: '2025/08/15',
-      price: 800,
-      category: 'light',
-      image: './image/image_7.png'
-    },
-    {
-      name: '哥斯大黎加 淺焙（227g）',
-      country: '哥斯大黎加',
-      variety: '',
-      flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜',
-      roast: '淺焙',
-      weight: '227g',
-      expiry: '2025/08/15',
-      price: 1800,
-      category: 'light',
-      image: './image/image_8.png'
-    }
-  ];
-
-  function renderProducts() {
-    const productContainer = document.getElementById('product-cards');
-    const categoryFilter = document.getElementById('category').value;
-    const searchTerm = document.getElementById('product-search').value.toLowerCase();
-    
-    if (!productContainer) return;
-    productContainer.innerHTML = '';
-
-    const filteredProducts = products.filter(p => {
-        const matchesCategory = categoryFilter === 'all' || p.category === categoryFilter;
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm) || 
-                              p.flavor.toLowerCase().includes(searchTerm) ||
-                              p.country.toLowerCase().includes(searchTerm);
-        return matchesCategory && matchesSearch;
-    });
-
-    if (filteredProducts.length === 0) {
-        productContainer.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">抱歉，沒有找到符合條件的商品。</p>';
-        return;
-    }
-
-    filteredProducts.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'ornate-box hover:scale-105 transition-transform duration-300';
-      card.innerHTML = `
-        <img src="${p.image}" alt="${p.name}" class="w-full h-48 object-cover rounded mb-3" />
-        <h3 class="text-xl font-bold mb-1">${p.name}</h3>
-        <p class="mb-1">國家：${p.country}｜品種：${p.variety}</p>
-        <p class="mb-1">風味：${p.flavor}</p>
-        <p class="mb-1">焙度：${p.roast}｜重量：${p.weight}</p>
-        <p class="mb-1">期限：${p.expiry}</p>
-        <p class="mb-2 font-bold">NT$${p.price}</p>
-        <button class="bg-[#3f2e2e] text-white px-4 py-2 rounded btn-press" onclick="addToCart('${p.name}', ${p.price})">加入購物車</button>
-      `;
-      productContainer.appendChild(card);
-    });
-  }
-
-  window.addToCart = function(name, price) {
-    if (!cart[name]) cart[name] = { qty: 0, price };
-    cart[name].qty++;
-    saveCart(); 
-    renderCart();
-    renderCartPanel(); 
-    updateCartBadge();
-    
-    const floatingCart = document.getElementById('floatingCart');
-    floatingCart.classList.add('animate-pop');
-    setTimeout(() => {
-        floatingCart.classList.remove('animate-pop');
-    }, 300); 
-  }
-
-  function formatPrice(n) {
-    return `NT$${n.toLocaleString('zh-Hant-TW')}`;
-  }
-
-  window.updateQty = function(name, delta) {
-    if (!cart[name]) return;
-    cart[name].qty += delta;
-    if (cart[name].qty <= 0) {
-      delete cart[name];
-    }
-    saveCart(); 
-    renderCart();
-    renderCartPanel(); 
-    updateCartBadge();
-  }
-
-  window.removeItem = function(name) {
-    delete cart[name];
-    saveCart(); 
-    renderCart();
-    renderCartPanel(); 
-    updateCartBadge();
-  }
-
-  function renderCart() {
-    const tbody = document.getElementById('cart-body');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    let total = 0;
-
-    for (let item in cart) {
-      const tr = document.createElement('tr');
-      const { qty, price } = cart[item];
-      const sub = qty * price;
-      total += sub;
-
-      tr.innerHTML = `
-        <td class="border p-2">${item}</td>
-        <td class="border p-2 flex items-center gap-2">
-          <button onclick="updateQty('${item}', -1)" class="px-2 bg-gray-200 rounded">➖</button>
-          ${qty}
-          <button onclick="updateQty('${item}', 1)" class="px-2 bg-gray-200 rounded">➕</button>
-        </td>
-        <td class="border p-2">${formatPrice(price)}</td>
-        <td class="border p-2 flex justify-between items-center">
-          ${formatPrice(sub)}
-          <button onclick="removeItem('${item}')" class="ml-4 text-red-500">🗑️</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    const totalElem = document.getElementById('total-amount');
-    if (totalElem) totalElem.textContent = formatPrice(total);
-  }
-
-  // Save cart to Local Storage
-  function saveCart() {
-    localStorage.setItem('melodyBeansCart', JSON.stringify(cart));
-    // 如果用戶已登入，也更新其購物車綁定
-    if (loggedInUser) {
-        users[loggedInUser.email].cart = JSON.parse(JSON.stringify(cart));
-        saveUsers();
-    }
-  }
-
-  // Load cart from Local Storage
-  function loadCart() {
-    const storedCart = localStorage.getItem('melodyBeansCart');
-    if (storedCart) {
-      cart = JSON.parse(storedCart);
-    }
-  }
-
-  // Review functions (add localStorage for persistence)
-  function loadReviews() {
-    const storedReviews = localStorage.getItem('melodyBeansReviews');
-    if (storedReviews) {
-      reviews = JSON.parse(storedReviews);
-    }
-  }
-
-  function saveReviews() {
-    localStorage.setItem('melodyBeansReviews', JSON.stringify(reviews));
-  }
-
-  window.submitReview = function(e) {
-    e.preventDefault();
-    const name = document.getElementById('reviewer').value;
-    const content = document.getElementById('review-content').value;
-    const rating = document.getElementById('review-rating').value;
-    
-    reviews.push({ name, content, rating, timestamp: new Date().toISOString() });
-    saveReviews();
-    renderReviews();
-    e.target.reset();
-  }
- 
-  function renderReviews() {
-    const reviewList = document.getElementById('review-list');
-    if (!reviewList) return;
-    reviewList.innerHTML = ''; 
-    reviews.slice().reverse().forEach(review => {
-      const div = document.createElement('div');
-      div.className = 'p-4 border rounded shadow bg-white'; 
-      div.innerHTML = `<strong>${review.name} ${review.rating}</strong><p class="mt-1">${review.content}</p>`;
-      reviewList.appendChild(div);
-    });
-  }
-  
-  function generateOrderId() {
-    const now = new Date();
-    return `ORD-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}`;
-  }
-
-  // 計算購物車總金額的輔助函數
-  function calculateCartTotal() {
-      let total = 0;
-      for (let item in cart) {
-          total += cart[item].qty * cart[item].price;
-      }
-      return total;
-  }
-
-  // Function to close mobile menu when a nav link is clicked
-  window.closeMenu = function() {
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-      mobileMenu.classList.add('hidden');
-    }
-  };
-
-  // Toggle mobile menu for the hamburger icon (on DOMContentLoaded)
-  document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.getElementById('menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (menuButton && mobileMenu) {
-      menuButton.addEventListener('click', function() {
-        mobileMenu.classList.toggle('hidden');
-      });
-    }
-  });
-
-  // 會員模態框相關函數
-  function openMemberModal() {
-    const modal = document.getElementById('memberModal');
-    const modalContent = document.getElementById('memberModalContent');
-    
-    // 重置為登入介面
-    showLoginForm();
-    hidePurchaseHistory();
-
-    // 顯示模態框並觸發動畫
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-      modalContent.classList.remove('scale-95', 'opacity-0');
-      modalContent.classList.add('scale-100', 'opacity-100');
-    }, 10);
-  }
-
-  function closeMemberModal() {
-    const modal = document.getElementById('memberModal');
-    const modalContent = document.getElementById('memberModalContent');
-    
-    modalContent.classList.remove('scale-100', 'opacity-100');
-    modalContent.classList.add('scale-95', 'opacity-0');
-
-    setTimeout(() => {
-      modal.classList.add('hidden');
-    }, 300);
-  }
-
-  function showLoginForm() {
-    document.getElementById('loginSection').classList.remove('hidden');
-    document.getElementById('registerSection').classList.add('hidden');
-    document.getElementById('memberInfo').classList.add('hidden');
-    document.getElementById('loginForm').reset(); // 清空表單
-  }
-
-  function showRegisterForm() {
-    document.getElementById('loginSection').classList.add('hidden');
-    document.getElementById('registerSection').classList.remove('hidden');
-    document.getElementById('memberInfo').classList.add('hidden');
-    document.getElementById('registerForm').reset(); // 清空表單
-  }
-
-  function updateMemberUI() {
-    const memberLink = document.getElementById('memberLink');
-    const loggedInUserEmail = document.getElementById('loggedInUserEmail');
-    const loginSection = document.getElementById('loginSection');
-    const registerSection = document.getElementById('registerSection');
-    const memberInfo = document.getElementById('memberInfo');
-
-    if (loggedInUser) {
-      memberLink.textContent = `歡迎 ${loggedInUser.email.split('@')[0]}！`;
-      memberLink.onclick = () => { openMemberModal(); return false; }; // 點擊顯示會員資訊
-      loggedInUserEmail.textContent = loggedInUser.email;
-      loginSection.classList.add('hidden');
-      registerSection.classList.add('hidden');
-      memberInfo.classList.remove('hidden');
-
-      // 檢查是否有儲存的購物車，並與會員購物車同步
-      const userCart = users[loggedInUser.email].cart || {};
-      if (Object.keys(userCart).length > 0 && Object.keys(cart).length === 0) {
-          cart = userCart;
-          saveCart(); // 更新本地儲存
-          renderCart();
-          renderCartPanel();
-          updateCartBadge();
-      } else if (Object.keys(cart).length > 0 && JSON.stringify(cart) !== JSON.stringify(userCart)) {
-          // 如果本地購物車有內容且與會員購物車不同，以本地為準並更新會員購物車
-          users[loggedInUser.email].cart = JSON.parse(JSON.stringify(cart));
-          saveUsers();
-      }
-      
-    } else {
-      memberLink.textContent = '會員登入/註冊';
-      memberLink.onclick = () => { openMemberModal(); return false; };
-      loggedInUserEmail.textContent = '';
-      loginSection.classList.remove('hidden');
-      registerSection.classList.add('hidden');
-      memberInfo.classList.add('hidden');
-      // 登出後，清空購物車，但保留本地 localStorage 的內容，下次登入前可恢復
-      // cart = {}; // 如果登出需要清空購物車，則啟用此行
-      // saveCart(); // 儲存清空後的購物車
-      // renderCart();
-      // renderCartPanel();
-      // updateCartBadge();
-    }
-  }
-
-  function saveUsers() {
-    localStorage.setItem('melodyBeansUsers', JSON.stringify(users));
-  }
-
-  function loadUsers() {
-    const storedUsers = localStorage.getItem('melodyBeansUsers');
-    if (storedUsers) {
-      users = JSON.parse(storedUsers);
-    }
-  }
-
-  function saveLoginStatus() {
-    if (loggedInUser) {
-      sessionStorage.setItem('melodyBeansLoggedInUser', JSON.stringify(loggedInUser));
-    } else {
-      sessionStorage.removeItem('melodyBeansLoggedInUser');
-    }
-  }
-
-  function checkLoginStatus() {
-    const storedLogin = sessionStorage.getItem('melodyBeansLoggedInUser');
-    if (storedLogin) {
-      loggedInUser = JSON.parse(storedLogin);
-      updateMemberUI();
-    }
-  }
-
-  window.logout = function() {
-    loggedInUser = null;
-    saveLoginStatus();
-    updateMemberUI();
-    closeMemberModal();
-    alert('您已登出！');
-  }
-
-  window.viewPurchaseHistory = function() {
-    if (!loggedInUser) {
-      alert('請先登入以查看購買紀錄。');
-      return;
-    }
-
-    const historyList = document.getElementById('purchaseHistoryList');
-    historyList.innerHTML = '';
-    const user = users[loggedInUser.email];
-
-    if (user && user.purchaseHistory.length > 0) {
-      user.purchaseHistory.slice().reverse().forEach(order => {
-        const orderDiv = document.createElement('div');
-        orderDiv.className = 'border p-3 rounded-md bg-white shadow-sm';
         
-        let itemsHtml = '';
-        for (const itemName in order.items) {
-            const item = order.items[itemName];
-            itemsHtml += `<li>${itemName} x ${item.qty} (NT$${item.price})</li>`;
+        // --- Inquiry Form Submission ---
+        if(inquiryForm) {
+            inquiryForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('inquiry-name').value;
+                const email = document.getElementById('inquiry-email').value;
+                const message = document.getElementById('inquiry-message').value;
+                
+                // Check if email field is valid according to HTML5 validation
+                const emailInput = document.getElementById('inquiry-email');
+                if (!emailInput.checkValidity()) {
+                    alert('請輸入有效的電子郵件地址。');
+                    return;
+                }
+
+                const subject = encodeURIComponent(`來自網站的詢問 - ${name}`);
+                const body = encodeURIComponent(`發件人姓名: ${name}\n發件人電子郵件: ${email}\n\n訊息內容:\n${message}`);
+                
+                // Construct mailto link
+                const mailtoLink = `mailto:melodybean33427@gmail.com?subject=${subject}&body=${body}`;
+                
+                // Attempt to open email client
+                window.location.href = mailtoLink;
+
+                alert('您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。');
+                inquiryForm.reset();
+                console.log('Inquiry form submitted for:', name);
+            });
+            console.log('Inquiry form event listener attached.');
+        } else {
+            console.error('Error: Inquiry form element not found!');
         }
 
-        orderDiv.innerHTML = `
-          <p class="font-bold">訂單號碼: ${order.orderId}</p>
-          <p class="text-sm text-gray-600">日期: ${new Date(order.timestamp).toLocaleString()}</p>
-          <p class="mt-2 font-semibold">商品清單:</p>
-          <ul class="list-disc list-inside text-sm ml-4">${itemsHtml}</ul>
-          <p class="text-right font-semibold mt-2">總金額: ${formatPrice(order.totalAmount)}</p>
-          <p class="text-right text-xs text-gray-500">付款方式: ${order.paymentMethod === 'cashOnDelivery' ? '貨到付款' : '信用卡(模擬)'}</p>
-        `;
-        historyList.appendChild(orderDiv);
-      });
-    } else {
-      historyList.innerHTML = '<p class="text-center text-gray-600">您目前沒有任何購買紀錄。</p>';
-    }
+        // --- Scroll Animation Observer ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
 
-    document.getElementById('memberInfo').classList.add('hidden');
-    document.getElementById('purchaseHistorySection').classList.remove('hidden');
-  }
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+        console.log('Scroll animation observer set up.');
 
-  window.hidePurchaseHistory = function() {
-    document.getElementById('purchaseHistorySection').classList.add('hidden');
-    document.getElementById('memberInfo').classList.remove('hidden');
-  }
-
-  // 輔助函數：記錄瀏覽紀錄（可以放在 addToCart 或產品卡片點擊事件中）
-  function recordBrowsingHistory(productName) {
-    if (loggedInUser) {
-      const user = users[loggedInUser.email];
-      user.browsingHistory.push({ productName, timestamp: new Date().toISOString() });
-      saveUsers();
-      // console.log(`已記錄 ${loggedInUser.email} 瀏覽了 ${productName}`);
-    }
-  }
-
-</script>
-�
+        // --- Initial load of all data and render on page load ---
+        loadAndRenderAllData();
+    });
+    </script>
+</body>
+</html>
