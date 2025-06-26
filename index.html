@@ -331,6 +331,7 @@
         </div>
     </footer>
 
+    <!-- Script Block 1: Global Constants & Data Variables -->
     <script>
         // These constants and variables need to be globally accessible across all script blocks.
         const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
@@ -366,6 +367,7 @@
         ];
     </script>
 
+    <!-- Script Block 2: Core Data Loading & Central Control (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -383,7 +385,7 @@
              * Then, triggers all necessary rendering functions. Exposed globally.
              */
             window.loadAndRenderAllData = function() {
-                console.log('--- Starting loadAndRenderAllData (Frontend Display - Enhanced Isolation) ---');
+                console.log('--- Starting loadAndRenderAllData (Frontend Display) ---');
                 try {
                     // Load Coffee Beans: Prioritize localStorage, fallback to defaults
                     let storedCoffeeBeans = null;
@@ -391,7 +393,7 @@
                         const coffeeBeansJson = localStorage.getItem(COFFEE_BEANS_KEY);
                         if (coffeeBeansJson) {
                             storedCoffeeBeans = JSON.parse(coffeeBeansJson);
-                            console.log('Attempted to parse coffee beans from localStorage. Result:', storedCoffeeBeans);
+                            console.log('Parsed coffee beans from localStorage:', storedCoffeeBeans);
                         }
                     } catch (e) {
                         console.error('Error parsing stored coffee beans from localStorage. Falling back to default data.', e);
@@ -417,7 +419,7 @@
                         const specialOffersJson = localStorage.getItem(SPECIAL_OFFERS_KEY);
                         if (specialOffersJson) {
                             storedSpecialOffers = JSON.parse(specialOffersJson);
-                            console.log('Attempted to parse special offers from localStorage. Result:', storedSpecialOffers);
+                            console.log('Parsed special offers from localStorage:', storedSpecialOffers);
                         }
                     } catch (e) {
                         console.error('Error parsing stored special offers from localStorage. Falling back to default data.', e);
@@ -446,11 +448,12 @@
                     console.log('Loaded reviews (from localStorage):', reviews);
 
                     // --- Trigger rendering for all sections ---
-                    // window.renderProducts(); // Removed as #products section is gone
+                    console.log('Triggering render functions...');
                     window.renderSpecialOffers();
                     window.renderFaqs(); 
                     window.renderReviews(); 
                     window.updateFlavorGuideSelect();
+                    console.log('Render functions triggered.');
                     
                 } catch (error) {
                     console.error('An unhandled error occurred during loadAndRenderAllData:', error);
@@ -464,18 +467,15 @@
                         `;
                     }
                 }
-                console.log('--- Finished loadAndRenderAllData (Frontend Display - Enhanced Isolation) ---');
+                console.log('--- Finished loadAndRenderAllData (Frontend Display) ---');
             };
         })();
     </script>
 
+    <!-- Script Block 3: Product & Offer Rendering Functions (using IIFE) -->
     <script>
         'use strict';
         (function() {
-            // Removed productList, searchInput, filterSelect references as #products section is gone
-            // window.renderProducts function is no longer needed here as the section is removed
-            // If any other section *depended* on renderProducts, its logic would need to be moved or re-implemented.
-
             /**
              * Renders the list of special offers. Exposed globally.
              */
@@ -486,7 +486,7 @@
                         console.error('Error: specialOffersList element not found!');
                         return;
                     }
-                    console.log('Rendering special offers. specialOffers length:', specialOffers.length);
+                    console.log('Rendering special offers. Current specialOffers data:', specialOffers);
                     specialOffersList.innerHTML = ''; // Clear existing content
                     if (Array.isArray(specialOffers) && specialOffers.length === 0) {
                         specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
@@ -507,7 +507,7 @@
                             `;
                             specialOffersList.appendChild(offerCard);
                         });
-                        console.log(`Rendered ${specialOffers.length} offer cards.`);
+                        console.log(`Successfully rendered ${specialOffers.length} offer cards.`);
                     }
                 } catch (error) {
                     console.error('Error rendering special offers:', error);
@@ -520,6 +520,7 @@
         })();
     </script>
 
+    <!-- Script Block 4: FAQ & Review Rendering Functions (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -615,6 +616,7 @@
         })();
     </script>
 
+    <!-- Script Block 5: Flavor Guide Logic (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -797,6 +799,7 @@
         })();
     </script>
 
+    <!-- Script Block 6: Event Listeners & Initialization (using IIFE) -->
     <script>
         'use strict';
         (function() {
@@ -807,6 +810,9 @@
 
             // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
             window.addEventListener('storage', (event) => {
+                // Log the storage event to console
+                console.log('Storage event fired!', event.key, event.oldValue, event.newValue, event.url);
+
                 if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
                     console.log(`localStorage key '${event.key}' changed. Reloading data.`);
                     window.loadAndRenderAllData(); // Call globally exposed function
@@ -909,6 +915,7 @@
             // --- Initial load of all data and render on page load ---
             // This needs to run once the DOM is fully loaded.
             document.addEventListener('DOMContentLoaded', () => {
+                console.log('DOM Content Loaded. Initializing data and rendering.');
                 window.loadAndRenderAllData();
             });
         })();
