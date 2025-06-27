@@ -477,8 +477,9 @@
             { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-05', price: 580, stock: 0, category: 'light', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '高海拔的獨特風味，帶來更為清新的口感與芬芳。' }
         ];
 
+        // Changed default to be more distinct to aid in debugging if default is loaded.
         const defaultSpecialOffers = [
-            { id: 101, name: '本月特選：精品咖啡豆組合', description: '嚴選三款不同風味的精品咖啡豆，一次滿足您的味蕾探險。', originalPrice: 1200, specialPrice: 990, image: 'https://placehold.co/400x250/b58863/FFFFFF?text=咖啡組合' }
+            { id: 101, name: '預設優惠：系統初始體驗包', description: '這是系統預設的優惠，如果localStorage中沒有數據，將會顯示此優惠。', originalPrice: 500, specialPrice: 400, image: 'https://placehold.co/400x200/b58863/FFFFFF?text=Default+Offer' }
         ];
 
         const faqs = [
@@ -514,10 +515,12 @@
                         const coffeeBeansJson = localStorage.getItem(COFFEE_BEANS_KEY);
                         if (coffeeBeansJson) {
                             storedCoffeeBeans = JSON.parse(coffeeBeansJson);
-                            console.log('Parsed coffee beans from localStorage:', storedCoffeeBeans);
+                            console.log('[DEBUG] Parsed coffee beans from localStorage:', storedCoffeeBeans);
+                        } else {
+                            console.log('[DEBUG] localStorage for coffee beans is empty.');
                         }
                     } catch (e) {
-                        console.error('Error parsing stored coffee beans from localStorage. Falling back to default data.', e);
+                        console.error('[ERROR] Error parsing stored coffee beans from localStorage. Falling back to default data.', e);
                         // Fallback to default if parsing fails
                     }
                     if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
@@ -527,12 +530,13 @@
                             ...defaultCoffeeBeans[0], // Use a template from default to ensure all keys exist
                             ...bean // Overlay existing values from localStorage
                         }));
-                        console.log('Successfully loaded and merged coffee beans from localStorage:', coffeeBeans);
+                        console.log('[DEBUG] Successfully loaded and merged coffee beans from localStorage:', coffeeBeans);
                     } else {
                         coffeeBeans = [...defaultCoffeeBeans]; // Use spread to avoid modifying default array directly
                         localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(defaultCoffeeBeans)); // Always re-save defaults if localStorage is empty/invalid
-                        console.log('localStorage for coffee beans was empty or invalid. Using and re-saving default data:', coffeeBeans);
+                        console.log('[DEBUG] localStorage for coffee beans was empty or invalid. Using and re-saving default data:', coffeeBeans);
                     }
+                    console.log('[DEBUG] Coffee beans data after loading logic:', coffeeBeans); // Crucial log
 
                     // Load Special Offers: Prioritize localStorage, fallback to defaults
                     let storedSpecialOffers = null;
@@ -540,20 +544,23 @@
                         const specialOffersJson = localStorage.getItem(SPECIAL_OFFERS_KEY);
                         if (specialOffersJson) {
                             storedSpecialOffers = JSON.parse(specialOffersJson);
-                            console.log('Parsed special offers from localStorage:', storedSpecialOffers);
+                            console.log('[DEBUG] Parsed special offers from localStorage:', storedSpecialOffers);
+                        } else {
+                            console.log('[DEBUG] localStorage for special offers is empty.');
                         }
                     } catch (e) {
-                        console.error('Error parsing stored special offers from localStorage. Falling back to default data.', e);
+                        console.error('[ERROR] Error parsing stored special offers from localStorage. Falling back to default data.', e);
                         // Fallback to default if parsing fails
                     }
                     if (Array.isArray(storedSpecialOffers) && storedSpecialOffers.length > 0) {
                         specialOffers = storedSpecialOffers;
-                        console.log('Successfully loaded special offers from localStorage:', specialOffers);
+                        console.log('[DEBUG] Successfully loaded special offers from localStorage:', specialOffers);
                     } else {
-                        specialOffers = defaultSpecialOffers;
+                        specialOffers = [...defaultSpecialOffers]; // Use spread to avoid modifying default array directly
                         localStorage.setItem(SPECIAL_OFFERS_KEY, JSON.stringify(defaultSpecialOffers)); // Always re-save defaults if localStorage is empty/invalid
-                        console.log('localStorage for special offers was empty or invalid. Using and re-saving default data:', specialOffers);
+                        console.log('[DEBUG] localStorage for special offers was empty or invalid. Using and re-saving default data:', specialOffers);
                     }
+                    console.log('[DEBUG] Special offers data after loading logic:', specialOffers); // Crucial log
 
                     // Load Reviews (always from localStorage for user-submitted content)
                     let storedReviews = null;
@@ -563,21 +570,21 @@
                             storedReviews = JSON.parse(reviewsJson);
                         }
                     } catch (e) {
-                        console.error('Error parsing stored reviews from localStorage:', e);
+                        console.error('[ERROR] Error parsing stored reviews from localStorage:', e);
                     }
                     reviews = Array.isArray(storedReviews) ? storedReviews : [];
-                    console.log('Loaded reviews (from localStorage):', reviews);
+                    console.log('[DEBUG] Loaded reviews (from localStorage):', reviews);
 
                     // --- Trigger rendering for all sections ---
-                    console.log('Triggering render functions...');
+                    console.log('[DEBUG] Triggering render functions...');
                     window.renderSpecialOffers();
                     window.renderFaqs(); 
                     window.renderReviews(); 
                     window.updateFlavorGuideSelect();
-                    console.log('Render functions triggered.');
+                    console.log('[DEBUG] Render functions triggered.');
                     
                 } catch (error) {
-                    console.error('An unhandled error occurred during loadAndRenderAllData:', error);
+                    console.error('[CRITICAL ERROR] An unhandled error occurred during loadAndRenderAllData:', error);
                     const mainContent = document.querySelector('main');
                     if (mainContent) {
                         mainContent.innerHTML = `
@@ -604,18 +611,21 @@
                 try {
                     const specialOffersList = document.getElementById('special-offers-list'); // Get element locally
                     if (!specialOffersList) {
-                        console.error('Error: specialOffersList element not found!');
+                        console.error('[ERROR] specialOffersList element not found!');
                         return;
                     }
-                    console.log('Rendering special offers. Current specialOffers data:', specialOffers);
+                    console.log('[DEBUG] Rendering special offers. Current specialOffers data before clearing:', specialOffers);
+                    console.log('[DEBUG] Number of offers to render:', specialOffers.length);
                     specialOffersList.innerHTML = ''; // Clear existing content
                     if (Array.isArray(specialOffers) && specialOffers.length === 0) {
                         specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
-                        console.log('No special offers to render.');
+                        console.warn('[DEBUG] No special offers to render. Displaying "no offers" message.');
                     } else {
-                        specialOffers.forEach(offer => {
+                        specialOffers.forEach((offer, index) => {
+                            console.log(`[DEBUG] Rendering offer #${index + 1}:`, offer); // Log each offer being rendered
                             const offerCard = document.createElement('div');
                             offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
+                            // Using a more generic SVG placeholder for onerror
                             offerCard.innerHTML = `
                                 <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
                                      onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
@@ -628,10 +638,10 @@
                             `;
                             specialOffersList.appendChild(offerCard);
                         });
-                        console.log(`Successfully rendered ${specialOffers.length} offer cards.`);
+                        console.log(`[DEBUG] Successfully rendered ${specialOffers.length} offer cards.`);
                     }
                 } catch (error) {
-                    console.error('Error rendering special offers:', error);
+                    console.error('[ERROR] Error rendering special offers:', error);
                     const specialOffersList = document.getElementById('special-offers-list');
                     if (specialOffersList) {
                         specialOffersList.innerHTML = '<div class="error-message col-span-full">載入優惠活動時發生錯誤。</div>';
@@ -654,10 +664,10 @@
             window.renderFaqs = function() {
                 try {
                     if (!faqContainer) {
-                        console.error('Error: faqContainer element not found!');
+                        console.error('[ERROR] faqContainer element not found!');
                         return;
                     }
-                    console.log('Rendering FAQs. faqs length:', faqs.length);
+                    console.log('[DEBUG] Rendering FAQs. faqs length:', faqs.length);
                     faqContainer.innerHTML = ''; // Clear existing content before re-rendering
                     if (Array.isArray(faqs) && faqs.length === 0) {
                          faqContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有常見問題。</p>';
@@ -689,9 +699,9 @@
                             }
                         });
                     });
-                    console.log(`Rendered ${faqs.length} FAQ items.`);
+                    console.log(`[DEBUG] Rendered ${faqs.length} FAQ items.`);
                 } catch (error) {
-                    console.error('Error rendering FAQs:', error);
+                    console.error('[ERROR] Error rendering FAQs:', error);
                     if (faqContainer) {
                         faqContainer.innerHTML = '<div class="error-message">載入常見問題時發生錯誤。</div>';
                     }
@@ -704,14 +714,14 @@
             window.renderReviews = function() {
                 try {
                     if (!reviewList) {
-                        console.error('Error: reviewList element not found!');
+                        console.error('[ERROR] reviewList element not found!');
                         return;
                     }
                     reviewList.innerHTML = '';
                     // 如果 reviews 為空，顯示提示訊息
                     if (Array.isArray(reviews) && reviews.length === 0) {
                         reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
-                        console.log('No reviews to render.');
+                        console.log('[DEBUG] No reviews to render.');
                     } else {
                         reviews.forEach(review => {
                             const item = document.createElement('div');
@@ -725,10 +735,10 @@
                             `;
                             reviewList.appendChild(item);
                         });
-                        console.log(`Rendered ${reviews.length} review items.`);
+                        console.log(`[DEBUG] Rendered ${reviews.length} review items.`);
                     }
                 } catch (error) {
-                    console.error('Error rendering reviews:', error);
+                    console.error('[ERROR] Error rendering reviews:', error);
                     if (reviewList) {
                         reviewList.innerHTML = '<div class="error-message">載入顧客回饋時發生錯誤。</div>';
                     }
@@ -763,10 +773,10 @@
             window.updateFlavorGuideSelect = function() {
                 try {
                     if (!flavorSelect) {
-                        console.error('Error: flavorSelect element not found!');
+                        console.error('[ERROR] flavorSelect element not found!');
                         return;
                     }
-                    console.log('Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
+                    console.log('[DEBUG] Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
 
                     // Re-populate options based on potentially updated coffeeBeans
                     flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
@@ -784,7 +794,7 @@
                         // Destroy old chart if it exists to prevent reinitialization issues
                         if (radarChart) { // radarChart is a global variable
                             radarChart.destroy();
-                            console.log('Destroyed existing radar chart.');
+                            console.log('[DEBUG] Destroyed existing radar chart.');
                         }
                         radarChart = new Chart(ctx, {
                             type: 'radar',
@@ -822,9 +832,9 @@
                                 }
                             }
                         });
-                        console.log('New radar chart created.');
+                        console.log('[DEBUG] New radar chart created.');
                     } else {
-                        console.error('Error: flavorRadarChart canvas context not found!');
+                        console.error('[ERROR] flavorRadarChart canvas context not found!');
                     }
 
                     // Remove and re-add event listener to prevent duplicates
@@ -835,18 +845,18 @@
                     if(Array.isArray(coffeeBeans) && coffeeBeans.length > 0) {
                         flavorSelect.value = coffeeBeans[0].id; // Set first item as default selected
                         flavorSelect.dispatchEvent(new Event('change'));
-                        console.log('Flavor select initialized with first coffee bean.');
+                        console.log('[DEBUG] Flavor select initialized with first coffee bean.');
                     } else {
                         if(lifestyleSuggestionP) {
                             lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
-                            console.log('No coffee beans, setting flavor guide message.');
+                            console.log('[DEBUG] No coffee beans, setting flavor guide message.');
                         }
                         if (beanDetailsDisplay) {
                             beanDetailsDisplay.classList.add('hidden'); // Hide details if no beans
                         }
                     }
                 } catch (error) {
-                    console.error('Error updating flavor guide:', error);
+                    console.error('[ERROR] Error updating flavor guide:', error);
                     if (flavorSelect) {
                         flavorSelect.innerHTML = '<option value="" disabled selected>載入風味指南時發生錯誤。</option>';
                     }
@@ -911,9 +921,9 @@
                             // Show the details block
                             beanDetailsDisplay.classList.remove('hidden');
                         }
-                        console.log('Flavor select changed. Updated radar chart, lifestyle suggestion, and bean details for:', selectedBean.name);
+                        console.log('[DEBUG] Flavor select changed. Updated radar chart, lifestyle suggestion, and bean details for:', selectedBean.name);
                     } else if (!selectedBean) {
-                        console.warn('Selected bean not found for ID:', e.target.value);
+                        console.warn('[WARNING] Selected bean not found for ID:', e.target.value);
                         if (lifestyleSuggestionP) {
                             lifestyleSuggestionP.textContent = '無法找到選定的咖啡豆風味數據。';
                             lifestyleSuggestionP.classList.add('error-message');
@@ -923,7 +933,7 @@
                         }
                     }
                 } catch (error) {
-                    console.error('Error handling flavor select change:', error);
+                    console.error('[ERROR] Error handling flavor select change:', error);
                     if (lifestyleSuggestionP) {
                         lifestyleSuggestionP.textContent = '載入選定咖啡豆風味時發生錯誤。';
                         lifestyleSuggestionP.classList.add('error-message');
@@ -979,10 +989,10 @@
             // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
             window.addEventListener('storage', (event) => {
                 // Log the storage event to console
-                console.log('Storage event fired!', event.key, event.oldValue, event.newValue, event.url);
+                console.log('[DEBUG] Storage event fired!', event.key, event.oldValue, event.newValue, event.url);
 
                 if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
-                    console.log(`localStorage key '${event.key}' changed. Reloading data.`);
+                    console.log(`[DEBUG] localStorage key '${event.key}' changed. Reloading data.`);
                     window.loadAndRenderAllData(); // Call globally exposed function
                     // Optionally show a silent success message on frontend for data sync
                     // showFrontMessageModal('數據同步', '後台數據已更新！', 'success'); 
@@ -1013,16 +1023,16 @@
                         window.renderReviews(); // Call globally exposed function
                         reviewForm.reset();
                         showFrontMessageModal('感謝您', '您的評論已成功送出！', 'success');
-                        console.log('New review submitted:', newReview);
+                        console.log('[DEBUG] New review submitted:', newReview);
                     }
                     catch (error) {
-                        console.error('Error submitting review:', error);
+                        console.error('[ERROR] Error submitting review:', error);
                         showFrontMessageModal('提交錯誤', '提交評論時發生錯誤，請稍後再試。', 'error');
                     }
                 });
-                console.log('Review form event listener attached.');
+                console.log('[DEBUG] Review form event listener attached.');
             } else {
-                console.error('Error: Review form element not found!');
+                console.error('[ERROR] Review form element not found!');
             }
             
             // --- Inquiry Form Submission ---
@@ -1053,37 +1063,37 @@
 
                         showFrontMessageModal('訊息已準備', '您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。', 'info');
                         inquiryForm.reset();
-                        console.log('Inquiry form submitted for:', name);
+                        console.log('[DEBUG] Inquiry form submitted for:', name);
                     } catch (error) {
-                        console.error('Error submitting inquiry form:', error);
+                        console.error('[ERROR] Error submitting inquiry form:', error);
                         showFrontMessageModal('提交錯誤', '提交詢問時發生錯誤，請稍後再試。', 'error');
                     }
                 });
-                console.log('Inquiry form event listener attached.');
+                console.log('[DEBUG] Inquiry form event listener attached.');
             } else {
-                console.error('Error: Inquiry form element not found!');
+                console.error('[ERROR] Inquiry form element not found!');
             }
 
             // --- Refresh Offers Button Listener ---
             if (refreshOffersBtn) {
                 refreshOffersBtn.addEventListener('click', () => {
-                    console.log('Refresh Offers button clicked. Reloading all data.');
+                    console.log('[DEBUG] Refresh Offers button clicked. Reloading all data.');
                     window.loadAndRenderAllData(); // Re-fetch and re-render all data
                     showFrontMessageModal('更新成功', '優惠活動已重新整理！', 'success');
                 });
             } else {
-                console.error('Error: Refresh offers button not found!');
+                console.error('[ERROR] Refresh offers button not found!');
             }
 
             // --- Refresh Coffee Button Listener (NEW) ---
             if (refreshCoffeeBtn) {
                 refreshCoffeeBtn.addEventListener('click', () => {
-                    console.log('Refresh Coffee button clicked. Reloading all data.');
+                    console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
                     window.loadAndRenderAllData(); // Re-fetch and re-render all data
                     showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
                 });
             } else {
-                console.error('Error: Refresh coffee button not found!');
+                console.error('[ERROR] Refresh coffee button not found!');
             }
 
 
@@ -1100,7 +1110,7 @@
             document.querySelectorAll('.fade-in-up').forEach(el => {
                 observer.observe(el);
             });
-            console.log('Scroll animation observer set up.');
+            console.log('[DEBUG] Scroll animation observer set up.');
 
             // --- Event Listeners for Search and Filter ---
             // These event listeners need to be attached after DOM is fully loaded and elements exist.
@@ -1111,7 +1121,7 @@
             // --- Initial load of all data and render on page load ---
             // This needs to run once the DOM is fully loaded.
             document.addEventListener('DOMContentLoaded', () => {
-                console.log('DOM Content Loaded. Initializing data and rendering.');
+                console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
                 window.loadAndRenderAllData();
             });
         })();
