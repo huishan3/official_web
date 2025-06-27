@@ -146,6 +146,26 @@
         }
         .front-modal-success { color: var(--color-accent); } /* Green-ish */
         .front-modal-error { color: #ef4444; } /* Red */
+
+        /* Stock indicator styles */
+        .stock-indicator {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.85em;
+        }
+        .stock-in-stock {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Green-800 */
+        }
+        .stock-low-stock {
+            background-color: #fef3c7; /* Yellow-100 */
+            color: #92400e; /* Yellow-800 */
+        }
+        .stock-out-of-stock {
+            background-color: #fee2e2; /* Red-100 */
+            color: #991b1b; /* Red-800 */
+        }
     </style>
 </head>
 <body>
@@ -197,9 +217,15 @@
                                 <p><span class="font-semibold">重量:</span> <span id="detail-weight"></span></p>
                                 <p><span class="font-semibold">期限:</span> <span id="detail-expiry"></span></p>
                                 <p class="col-span-2"><span class="font-semibold">風味:</span> <span id="detail-flavor"></span></p>
+                                <p class="col-span-2"><span class="font-semibold">庫存:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p> <!-- NEW -->
                                 <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
                             </div>
                             <!-- Removed image from bean details display as requested -->
+                        </div>
+                        <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                            <button id="refresh-coffee-btn" class="px-8 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors inline-block">
+                                <i class="fas fa-sync-alt mr-2"></i> 重新整理咖啡豆資訊
+                            </button>
                         </div>
                     </div>
                     <div class="w-full md:w-1/2">
@@ -321,7 +347,7 @@
                     <h2 class="text-4xl font-serif section-title">最新優惠與活動</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">不定期推出精選特價，讓您以更優惠的價格品嚐我們的精品咖啡。</p>
                     <div id="special-offers-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        </div>
+                    </div>
                     <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
                         <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
                             <i class="fas fa-tags mr-2"></i> 探索更多咖啡風味
@@ -334,25 +360,25 @@
                 </div>
             </div>
         </section>
-        
+
         <section id="faq" class="py-20 bg-white/50">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-serif section-title">常見問題</h2>
                 </div>
                 <div id="faq-container" class="space-y-4 fade-in-up">
-                    </div>
+                </div>
             </div>
         </section>
-        
+
         <section id="review" class="py-20">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-serif section-title">顧客的溫馨回饋</h2>
                 </div>
                 <div id="review-list" class="space-y-6 fade-in-up">
-                    </div>
-                 <div class="mt-12 card p-8 fade-in-up">
+                </div>
+                <div class="mt-12 card p-8 fade-in-up">
                     <h3 class="text-2xl font-serif mb-4 text-center">分享您的品飲心得</h3>
                     <form id="review-form">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -444,14 +470,11 @@
 
         // Default data - serves as fallback if localStorage is empty/invalid
         const defaultCoffeeBeans = [
-            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
-            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
-            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
-            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
-            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'medium', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
-            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'light', image: './image/image_6.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
-            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025-08-15', price: 800, category: 'light', image: './image/image_7.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
-            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
+            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, stock: 10, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
+            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, stock: 5, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
+            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, stock: 8, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
+            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 12, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
+            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-05', price: 580, stock: 0, category: 'light', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '高海拔的獨特風味，帶來更為清新的口感與芬芳。' }
         ];
 
         const defaultSpecialOffers = [
@@ -730,6 +753,8 @@
             const detailExpiry = document.getElementById('detail-expiry');
             const detailFlavor = document.getElementById('detail-flavor');
             const detailPrice = document.getElementById('detail-price');
+            const detailStock = document.getElementById('detail-stock'); // NEW
+            const stockStatus = document.getElementById('stock-status'); // NEW
             // Removed detailImage as it's no longer needed
 
             /**
@@ -868,7 +893,21 @@
                             detailExpiry.textContent = selectedBean.expiryDate || 'N/A';
                             detailFlavor.textContent = selectedBean.flavor || 'N/A';
                             detailPrice.textContent = selectedBean.price || '---';
-                            // detailImage.src = selectedBean.image || ''; // Image URL - Removed as requested
+                            detailStock.textContent = selectedBean.stock || 0; // NEW
+                            
+                            // Update stock status
+                            stockStatus.className = 'stock-indicator'; // Reset classes
+                            if (selectedBean.stock === 0) {
+                                stockStatus.textContent = '已售罄';
+                                stockStatus.classList.add('stock-out-of-stock');
+                            } else if (selectedBean.stock > 0 && selectedBean.stock <= 5) {
+                                stockStatus.textContent = '庫存緊張';
+                                stockStatus.classList.add('stock-low-stock');
+                            } else {
+                                stockStatus.textContent = '有貨';
+                                stockStatus.classList.add('stock-in-stock');
+                            }
+
                             // Show the details block
                             beanDetailsDisplay.classList.remove('hidden');
                         }
@@ -903,7 +942,8 @@
         (function() {
             const reviewForm = document.getElementById('review-form');
             const inquiryForm = document.getElementById('inquiry-form');
-            const refreshOffersBtn = document.getElementById('refresh-offers-btn'); // New button reference
+            const refreshOffersBtn = document.getElementById('refresh-offers-btn'); 
+            const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn'); // NEW refresh button for coffee
 
             // --- Custom Frontend Message Modal Elements ---
             const frontMessageModal = document.getElementById('frontMessageModal');
@@ -944,6 +984,8 @@
                 if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
                     console.log(`localStorage key '${event.key}' changed. Reloading data.`);
                     window.loadAndRenderAllData(); // Call globally exposed function
+                    // Optionally show a silent success message on frontend for data sync
+                    // showFrontMessageModal('數據同步', '後台數據已更新！', 'success'); 
                 }
             });
 
@@ -953,15 +995,18 @@
                     e.preventDefault();
                     try {
                         const newReview = {
-                            name: document.getElementById('reviewer-name').value,
+                            name: document.getElementById('reviewer-name').value.trim(),
                             rating: document.getElementById('review-rating').value,
-                            content: document.getElementById('review-content').value,
+                            content: document.getElementById('review-content').value.trim(),
                         };
                         // Basic validation
                         if (!newReview.name || !newReview.rating || !newReview.content) {
                             showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位。', 'error');
                             return;
                         }
+
+                        // Generate a simple unique ID for the review
+                        newReview.id = reviews.length ? Math.max(...reviews.map(r => r.id || 0)) + 1 : 1;
 
                         reviews.push(newReview);
                         localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
@@ -985,9 +1030,9 @@
                 inquiryForm.addEventListener('submit', (e) => {
                     e.preventDefault();
                     try {
-                        const name = document.getElementById('inquiry-name').value;
-                        const email = document.getElementById('inquiry-email').value;
-                        const message = document.getElementById('inquiry-message').value;
+                        const name = document.getElementById('inquiry-name').value.trim();
+                        const email = document.getElementById('inquiry-email').value.trim();
+                        const message = document.getElementById('inquiry-message').value.trim();
                         
                         // Check if email field is valid according to HTML5 validation
                         const emailInput = document.getElementById('inquiry-email');
@@ -1019,7 +1064,7 @@
                 console.error('Error: Inquiry form element not found!');
             }
 
-            // --- Refresh Offers Button Listener (New) ---
+            // --- Refresh Offers Button Listener ---
             if (refreshOffersBtn) {
                 refreshOffersBtn.addEventListener('click', () => {
                     console.log('Refresh Offers button clicked. Reloading all data.');
@@ -1028,6 +1073,17 @@
                 });
             } else {
                 console.error('Error: Refresh offers button not found!');
+            }
+
+            // --- Refresh Coffee Button Listener (NEW) ---
+            if (refreshCoffeeBtn) {
+                refreshCoffeeBtn.addEventListener('click', () => {
+                    console.log('Refresh Coffee button clicked. Reloading all data.');
+                    window.loadAndRenderAllData(); // Re-fetch and re-render all data
+                    showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
+                });
+            } else {
+                console.error('Error: Refresh coffee button not found!');
             }
 
 
