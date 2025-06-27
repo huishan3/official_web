@@ -106,6 +106,46 @@
             border-radius: 0.75rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
+
+        /* Front-end Custom Modal Styles */
+        .front-modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .front-modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .front-modal-close-button {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+        }
+        .front-modal-close-button:hover,
+        .front-modal-close-button:focus {
+            color: black;
+        }
+        .front-modal-success { color: var(--color-accent); } /* Green-ish */
+        .front-modal-error { color: #ef4444; } /* Red */
     </style>
 </head>
 <body>
@@ -159,8 +199,7 @@
                                 <p class="col-span-2"><span class="font-semibold">風味:</span> <span id="detail-flavor"></span></p>
                                 <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
                             </div>
-                            <img id="detail-image" src="" alt="咖啡豆圖片" class="w-24 h-24 object-cover rounded-md mt-4 mx-auto" 
-                                onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
+                            <!-- Removed image from bean details display as requested -->
                         </div>
                     </div>
                     <div class="w-full md:w-1/2">
@@ -377,6 +416,16 @@
         </div>
     </footer>
 
+    <!-- Custom Message Modal for Frontend -->
+    <div id="frontMessageModal" class="front-modal">
+        <div class="front-modal-content">
+            <span class="front-modal-close-button" onclick="closeFrontMessageModal()">&times;</span>
+            <h3 id="frontModalTitle" class="text-2xl font-bold mb-4"></h3>
+            <p id="frontModalMessage" class="text-gray-700 mb-6"></p>
+            <button class="bg-primary hover:bg-[#a07654] text-white font-bold py-2 px-4 rounded-md" onclick="closeFrontMessageModal()">了解</button>
+        </div>
+    </div>
+
     <!-- Script Block 1: Global Constants & Data Variables -->
     <script>
         // These constants and variables need to be globally accessible across all script blocks.
@@ -391,14 +440,14 @@
 
         // Default data - serves as fallback if localStorage is empty/invalid
         const defaultCoffeeBeans = [
-            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025/10/12', price: 280, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
-            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025/10/28', price: 600, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
-            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025/10/31', price: 600, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
-            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
-            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'medium', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
-            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025/11/01', price: 540, category: 'light', image: './image/image_6.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
-            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025/08/15', price: 800, category: 'light', image: './image/image_7.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
-            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025/08/15', price: 1800, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
+            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
+            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
+            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
+            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
+            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'medium', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
+            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, category: 'light', image: './image/image_6.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
+            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025-08-15', price: 800, category: 'light', image: './image/image_7.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
+            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
         ];
 
         const defaultSpecialOffers = [
@@ -419,7 +468,6 @@
         (function() {
             // Get DOM elements needed by this script block, and potentially passed to rendering functions.
             // These are local to this IIFE.
-            // Removed productList reference as #products section is gone
             const specialOffersList = document.getElementById('special-offers-list');
             const faqContainer = document.getElementById('faq-container');
             const reviewList = document.getElementById('review-list');
@@ -678,7 +726,7 @@
             const detailExpiry = document.getElementById('detail-expiry');
             const detailFlavor = document.getElementById('detail-flavor');
             const detailPrice = document.getElementById('detail-price');
-            const detailImage = document.getElementById('detail-image');
+            // Removed detailImage as it's no longer needed
 
             /**
              * Populates the flavor guide select box and initializes/updates the radar chart. Exposed globally.
@@ -816,7 +864,7 @@
                             detailExpiry.textContent = selectedBean.expiryDate || 'N/A';
                             detailFlavor.textContent = selectedBean.flavor || 'N/A';
                             detailPrice.textContent = selectedBean.price || '---';
-                            detailImage.src = selectedBean.image || ''; // Image URL
+                            // detailImage.src = selectedBean.image || ''; // Image URL - Removed as requested
                             // Show the details block
                             beanDetailsDisplay.classList.remove('hidden');
                         }
@@ -851,7 +899,36 @@
         (function() {
             const reviewForm = document.getElementById('review-form');
             const inquiryForm = document.getElementById('inquiry-form');
-            // Removed searchInput and filterSelect references as #products section is gone
+
+            // --- Custom Frontend Message Modal Elements ---
+            const frontMessageModal = document.getElementById('frontMessageModal');
+            const frontModalTitle = document.getElementById('frontModalTitle');
+            const frontModalMessage = document.getElementById('frontModalMessage');
+
+            /**
+             * Shows the custom frontend message modal.
+             * @param {string} title - The title of the message.
+             * @param {string} message - The message content.
+             * @param {string} type - 'success' or 'error' to change title color.
+             */
+            function showFrontMessageModal(title, message, type = 'info') {
+                frontModalTitle.textContent = title;
+                frontModalMessage.textContent = message;
+                frontModalTitle.classList.remove('front-modal-success', 'front-modal-error');
+                if (type === 'success') {
+                    frontModalTitle.classList.add('front-modal-success');
+                } else if (type === 'error') {
+                    frontModalTitle.classList.add('front-modal-error');
+                }
+                frontMessageModal.style.display = 'flex';
+            }
+
+            /**
+             * Closes the custom frontend message modal.
+             */
+            window.closeFrontMessageModal = function() {
+                frontMessageModal.style.display = 'none';
+            };
 
 
             // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
@@ -877,7 +954,7 @@
                         };
                         // Basic validation
                         if (!newReview.name || !newReview.rating || !newReview.content) {
-                            alert('請填寫所有評論欄位。');
+                            showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位。', 'error');
                             return;
                         }
 
@@ -885,12 +962,12 @@
                         localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
                         window.renderReviews(); // Call globally exposed function
                         reviewForm.reset();
-                        alert('感謝您的評論！');
+                        showFrontMessageModal('感謝您', '您的評論已成功送出！', 'success');
                         console.log('New review submitted:', newReview);
                     }
                     catch (error) {
                         console.error('Error submitting review:', error);
-                        alert('提交評論時發生錯誤，請稍後再試。');
+                        showFrontMessageModal('提交錯誤', '提交評論時發生錯誤，請稍後再試。', 'error');
                     }
                 });
                 console.log('Review form event listener attached.');
@@ -910,11 +987,11 @@
                         // Check if email field is valid according to HTML5 validation
                         const emailInput = document.getElementById('inquiry-email');
                         if (!emailInput.checkValidity()) {
-                            alert('請輸入有效的電子郵件地址。');
+                            showFrontMessageModal('輸入錯誤', '請輸入有效的電子郵件地址。', 'error');
                             return;
                         }
                         if (!name || !email || !message) {
-                            alert('請填寫所有聯絡資訊欄位。');
+                            showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位。', 'error');
                             return;
                         }
 
@@ -924,12 +1001,12 @@
                         const mailtoLink = `mailto:melodybean33427@gmail.com?subject=${subject}&body=${body}`;
                         window.location.href = mailtoLink;
 
-                        alert('您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。');
+                        showFrontMessageModal('訊息已準備', '您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。', 'info');
                         inquiryForm.reset();
                         console.log('Inquiry form submitted for:', name);
                     } catch (error) {
                         console.error('Error submitting inquiry form:', error);
-                        alert('提交詢問時發生錯誤，請稍後再試。');
+                        showFrontMessageModal('提交錯誤', '提交詢問時發生錯誤，請稍後再試。', 'error');
                     }
                 });
                 console.log('Inquiry form event listener attached.');
@@ -955,7 +1032,7 @@
             // --- Event Listeners for Search and Filter ---
             // These event listeners need to be attached after DOM is fully loaded and elements exist.
             document.addEventListener('DOMContentLoaded', () => { 
-                // Removed event listeners for searchInput and filterSelect as the product section is removed
+                // All product-related search/filter elements and logic have been removed.
             });
 
             // --- Initial load of all data and render on page load ---
