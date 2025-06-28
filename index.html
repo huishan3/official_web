@@ -177,7 +177,7 @@
                 <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
                 <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
                 <a href="#image-gallery" class="hover:text-primary transition-colors">咖啡藝廊</a>
-                <a href="#offers" class="hover:text-primary transition-colors">最新優惠</a> <!-- Added back offers link -->
+                <!-- Removed offers link from navigation -->
                 <a href="#faq" class="hover:text-primary transition-colors">常見問題</a>
                 <a href="#contact" class="px-4 py-2 rounded-full btn-primary">聯絡我們</a>
             </div>
@@ -285,7 +285,7 @@
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 100ms;">
                         <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">如何保存咖啡豆？</h3>
-                        <p class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。</p>
+                        <p class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。根據不同的烘焙程度，咖啡豆可以保存數週到數月。</p>
                         <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 200ms;">
@@ -342,25 +342,7 @@
             </div>
         </section>
 
-        <!-- Re-added separate offers section -->
-        <section id="offers" class="py-20">
-            <div class="max-w-4xl mx-auto px-6 text-center">
-                <div class="fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">最新優惠與活動</h2>
-                    <p class="mt-4 text-lg text-gray-600 mb-8">不定期推出精選特價，讓您以更優惠的價格品嚐我們的精品咖啡。</p>
-                    <div id="special-offers-list" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    </div>
-                    <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-                        <a href="#flavor-guide" class="px-8 py-3 rounded-full btn-primary inline-block">
-                            <i class="fas fa-tags mr-2"></i> 探索更多咖啡風味
-                        </a>
-                        <button id="refresh-offers-btn" class="px-8 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors inline-block">
-                            <i class="fas fa-sync-alt mr-2"></i> 重新整理優惠
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Removed separate offers section as requested -->
 
         <section id="faq" class="py-20 bg-white/50">
             <div class="max-w-4xl mx-auto px-6">
@@ -548,7 +530,7 @@
 
         // These are declared with 'let' and are now scoped within the IIFE.
         let coffeeBeans = []; 
-        let specialOffers = []; 
+        // let specialOffers = []; // Removed
         let reviews = [];
         let radarChart; // Chart.js instance
 
@@ -647,14 +629,13 @@
                 }
                 console.log('[DEBUG] Coffee beans data after loading logic:', coffeeBeans); // Crucial log
 
-                // Load Special Offers: Now using OfferDataManager
-                specialOffers = window.OfferDataManager.loadOffersFromLocalStorage();
-                // If localStorage is empty and OfferDataManager returns empty, seed with the centralized default offers
-                if (specialOffers.length === 0) {
-                    specialOffers = window.OfferDataManager.mergeWithDefaultSchema(window.OfferDataManager.DEFAULT_SPECIAL_OFFERS, window.OfferDataManager.defaultOfferTemplate);
-                    window.OfferDataManager.saveOffersToLocalStorage(specialOffers); // Save to populate localStorage
-                }
-                console.log('[DEBUG] Special offers data after loading logic (using OfferDataManager):', specialOffers); // Crucial log
+                // Removed specialOffers loading as the section is being removed
+                // specialOffers = window.OfferDataManager.loadOffersFromLocalStorage();
+                // if (specialOffers.length === 0) {
+                //     specialOffers = window.OfferDataManager.mergeWithDefaultSchema(window.OfferDataManager.DEFAULT_SPECIAL_OFFERS, window.OfferDataManager.defaultOfferTemplate);
+                //     window.OfferDataManager.saveOffersToLocalStorage(specialOffers);
+                // }
+                // console.log('[DEBUG] Special offers data after loading logic (using OfferDataManager):', specialOffers);
 
                 // Load Reviews (always from localStorage for user-submitted content)
                 let storedReviews = null;
@@ -672,7 +653,7 @@
 
                 // --- Trigger rendering for all sections ---
                 console.log('[DEBUG] Triggering render functions...');
-                window.renderSpecialOffers();
+                // window.renderSpecialOffers(); // Removed
                 window.renderFaqs(); 
                 window.renderReviews(); 
                 window.updateFlavorGuideSelect();
@@ -693,49 +674,50 @@
             console.log('--- Finished loadAndRenderAllData (Frontend Display) ---');
         };
 
-        /**
-         * Renders the list of special offers. Exposed globally.
-         */
-        window.renderSpecialOffers = function() {
-            try {
-                const specialOffersList = document.getElementById('special-offers-list');
-                if (!specialOffersList) {
-                    console.error('[ERROR] specialOffersList element not found!');
-                    return;
-                }
-                console.log('[DEBUG] Rendering special offers. Current specialOffers data before clearing:', specialOffers);
-                console.log('[DEBUG] Number of offers to render:', specialOffers.length);
-                specialOffersList.innerHTML = ''; // Clear existing content
-                if (Array.isArray(specialOffers) && specialOffers.length === 0) {
-                    specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
-                    console.warn('[DEBUG] No special offers to render. Displaying "no offers" message.');
-                } else {
-                    specialOffers.forEach((offer, index) => {
-                        console.log(`[DEBUG] Rendering offer #${index + 1}:`, offer);
-                        const offerCard = document.createElement('div');
-                        offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
-                        offerCard.innerHTML = `
-                            <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
-                            <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
-                            <p class="text-gray-600 mb-3">${offer.description}</p>
-                            <div class="mt-auto">
-                                <span class="offer-price-old">NT$${offer.originalPrice}</span>
-                                <span class="offer-price-new">NT$${offer.specialPrice}</span>
-                            </div>
-                        `;
-                        specialOffersList.appendChild(offerCard);
-                    });
-                    console.log(`[DEBUG] Successfully rendered ${specialOffers.length} offer cards.`);
-                }
-            } catch (error) {
-                console.error('[ERROR] Error rendering special offers:', error);
-                const specialOffersList = document.getElementById('special-offers-list');
-                if (specialOffersList) {
-                    specialOffersList.innerHTML = '<div class="error-message col-span-full">載入優惠活動時發生錯誤。</div>';
-                }
-            }
-        };
+        // Removed renderSpecialOffers function as the section is being removed
+        // /**
+        //  * Renders the list of special offers. Exposed globally.
+        //  */
+        // window.renderSpecialOffers = function() {
+        //     try {
+        //         const specialOffersList = document.getElementById('special-offers-list');
+        //         if (!specialOffersList) {
+        //             console.error('[ERROR] specialOffersList element not found!');
+        //             return;
+        //         }
+        //         console.log('[DEBUG] Rendering special offers. Current specialOffers data before clearing:', specialOffers);
+        //         console.log('[DEBUG] Number of offers to render:', specialOffers.length);
+        //         specialOffersList.innerHTML = ''; // Clear existing content
+        //         if (Array.isArray(specialOffers) && specialOffers.length === 0) {
+        //             specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
+        //             console.warn('[DEBUG] No special offers to render. Displaying "no offers" message.');
+        //         } else {
+        //             specialOffers.forEach((offer, index) => {
+        //                 console.log(`[DEBUG] Rendering offer #${index + 1}:`, offer);
+        //                 const offerCard = document.createElement('div');
+        //                 offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
+        //                 offerCard.innerHTML = `
+        //                     <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
+        //                          onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
+        //                     <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
+        //                     <p class="text-gray-600 mb-3">${offer.description}</p>
+        //                     <div class="mt-auto">
+        //                         <span class="offer-price-old">NT$${offer.originalPrice}</span>
+        //                         <span class="offer-price-new">NT$${offer.specialPrice}</span>
+        //                     </div>
+        //                 `;
+        //                 specialOffersList.appendChild(offerCard);
+        //             });
+        //             console.log(`[DEBUG] Successfully rendered ${specialOffers.length} offer cards.`);
+        //         }
+        //     } catch (error) {
+        //         console.error('[ERROR] Error rendering special offers:', error);
+        //         const specialOffersList = document.getElementById('special-offers-list');
+        //         if (specialOffersList) {
+        //             specialOffersList.innerHTML = '<div class="error-message col-span-full">載入優惠活動時發生錯誤。</div>';
+        //         }
+        //     }
+        // };
 
         /**
          * Renders the FAQ items and attaches accordion functionality. Exposed globally.
@@ -1032,14 +1014,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const reviewForm = document.getElementById('review-form');
             const inquiryForm = document.getElementById('inquiry-form');
-            const refreshOffersBtn = document.getElementById('refresh-offers-btn'); 
+            // const refreshOffersBtn = document.getElementById('refresh-offers-btn'); // Removed
             const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
 
             // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
             window.addEventListener('storage', (event) => {
                 console.log('[DEBUG] Storage event fired!', event.key, event.oldValue, event.newValue, event.url);
 
-                if (event.key === COFFEE_BEANS_KEY || event.key === SPECIAL_OFFERS_KEY || event.key === REVIEWS_KEY) {
+                // Only react to coffee beans and reviews changes
+                if (event.key === COFFEE_BEANS_KEY || event.key === REVIEWS_KEY) {
                     console.log(`[DEBUG] localStorage key '${event.key}' changed. Reloading data.`);
                     window.loadAndRenderAllData();
                 }
@@ -1116,16 +1099,16 @@
                 console.error('[ERROR] Inquiry form element not found!');
             }
 
-            // --- Refresh Offers Button Listener ---
-            if (refreshOffersBtn) {
-                refreshOffersBtn.addEventListener('click', () => {
-                    console.log('[DEBUG] Refresh Offers button clicked. Reloading all data.');
-                    window.loadAndRenderAllData();
-                    showFrontMessageModal('更新成功', '優惠活動已重新整理！', 'success');
-                });
-            } else {
-                console.error('[ERROR] Refresh offers button not found!');
-            }
+            // Removed refresh offers button listener as the section is being removed
+            // if (refreshOffersBtn) {
+            //     refreshOffersBtn.addEventListener('click', () => {
+            //         console.log('[DEBUG] Refresh Offers button clicked. Reloading all data.');
+            //         window.loadAndRenderAllData();
+            //         showFrontMessageModal('更新成功', '優惠活動已重新整理！', 'success');
+            //     });
+            // } else {
+            //     console.error('[ERROR] Refresh offers button not found!');
+            // }
 
             // --- Refresh Coffee Button Listener ---
             if (refreshCoffeeBtn) {
