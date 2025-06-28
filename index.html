@@ -460,15 +460,95 @@
     <!-- Consolidated Script Block -->
     <script>
         'use strict';
+        (function() { // Start IIFE
+
+        // 📦 dataManager.js - 統一優惠資料管理模組
+        // 這部分是您提供的 dataManager.js 內容，直接嵌入到 HTML 中以確保可用性
+        const defaultOfferTemplate = {
+            id: 0,
+            name: '',
+            description: '',
+            originalPrice: 0,
+            specialPrice: 0,
+            image: ''
+        };
+
+        const SPECIAL_OFFERS_KEY = 'melodySpecialOffers';
+
+        // 新增預設優惠活動資料，確保前後台預設值一致
+        const DEFAULT_SPECIAL_OFFERS = [
+            { id: 101, name: '預設優惠：系統初始體驗包', description: '這是系統預設的優惠，如果localStorage中沒有數據，將會顯示此優惠。', originalPrice: 500, specialPrice: 400, image: 'https://placehold.co/400x200/b58863/FFFFFF?text=Default+Offer' }
+        ];
+
+        /**
+         * 🧠 mergeWithDefaultSchema
+         * 將輸入的每筆資料補齊為與預設欄位一致的格式
+         * @param {Array<Object>} dataArray - 原始優惠資料
+         * @param {Object} defaultTemplate - 欄位模板
+         * @returns {Array<Object>}
+         */
+        function mergeWithDefaultSchema(dataArray, defaultTemplate) {
+            if (!Array.isArray(dataArray)) return [];
+            return dataArray.map(item => ({
+                ...defaultTemplate,
+                ...item
+            }));
+        }
+
+        /**
+         * 📥 loadOffersFromLocalStorage
+         * 從 localStorage 讀取優惠資料，並補齊欄位格式
+         * @returns {Array<Object>}
+         */
+        function loadOffersFromLocalStorage() {
+            try {
+                const rawData = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
+                return mergeWithDefaultSchema(rawData || [], defaultOfferTemplate);
+            } catch (e) {
+                console.error('[優惠資料載入失敗]', e);
+                return [];
+            }
+        }
+
+        /**
+         * 📤 saveOffersToLocalStorage
+         * 將優惠資料儲存至 localStorage
+         * @param {Array<Object>} offers
+         */
+        function saveOffersToLocalStorage(offers) {
+            try {
+                localStorage.setItem(SPECIAL_OFFERS_KEY, JSON.stringify(offers));
+            } catch (e) {
+                console.error('[優惠資料儲存失敗]', e);
+            }
+        }
+
+        /**
+         * 🗑 clearOffers
+         * 清除 localStorage 中的優惠資料
+         */
+        function clearOffers() {
+            localStorage.removeItem(SPECIAL_OFFERS_KEY);
+        }
+
+        // ✅ 全域掛載模組，供前後台呼叫
+        window.OfferDataManager = {
+            loadOffersFromLocalStorage,
+            saveOffersToLocalStorage,
+            clearOffers,
+            mergeWithDefaultSchema,
+            defaultOfferTemplate,
+            DEFAULT_SPECIAL_OFFERS // 將統一的預設優惠資料匯出
+        };
+        // 📦 dataManager.js END
 
         // --- Global Constants & Data Variables ---
         const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
-        const SPECIAL_OFFERS_KEY = 'melodySpecialOffers';
         const REVIEWS_KEY = 'melodyReviews';
 
-        // These are declared with 'let' and intended to be globally accessible within this single script block.
+        // These are declared with 'let' and are now scoped within the IIFE.
         let coffeeBeans = []; 
-        let specialOffers = [];
+        let specialOffers = []; 
         let reviews = [];
         let radarChart; // Chart.js instance
 
@@ -484,8 +564,10 @@
             { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, stock: 1, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
         ];
 
-        const defaultSpecialOffers = [
-            { id: 101, name: '預設優惠：系統初始體驗包', description: '這是系統預設的優惠，如果localStorage中沒有數據，將會顯示此優惠。', originalPrice: 500, specialPrice: 400, image: 'https://placehold.co/400x200/b58863/FFFFFF?text=Default+Offer' }
+        const defaultReviews = [
+            { id: 1, name: '咖啡愛好者', rating: '⭐️⭐️⭐️⭐️⭐️', content: 'Melody Bean 的咖啡簡直是藝術品！每種風味都層次豐富，讓人回味無窮。特別喜歡他們對烘焙的堅持，每次都能喝到最新鮮的咖啡豆。' },
+            { id: 2, name: '音樂人小林', rating: '⭐️⭐️⭐️⭐️', content: '作為一個音樂人，我很欣賞 Melody Bean 將音樂理念融入咖啡的巧思。在這裡，一杯咖啡不僅是飲品，更像是一段靜謐的旋律。下次會再帶朋友一起來。' },
+            { id: 3, name: '早晨提神必備', rating: '⭐️⭐️⭐️⭐️⭐️', content: '每天早上一杯 Melody Bean 的咖啡已經成為我的固定儀式。它總能為我帶來一整天的好心情和清晰思緒。強烈推薦給需要美好早晨的朋友們！' }
         ];
 
         const faqs = [
@@ -551,9 +633,8 @@
                 }
                 if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
                     // Ensure loaded data has all expected fields, merge with default template if necessary
-                    // This helps if backend saves old schema or misses fields.
+                    // This handles cases where localStorage might have old schema
                     coffeeBeans = storedCoffeeBeans.map(bean => ({
-                        // Ensure 'stock' is included even if not in old stored data
                         stock: 0, // Default for new 'stock' field if missing from old data
                         ...defaultCoffeeBeans[0], // Use a template from default to ensure all keys exist
                         ...bean // Overlay existing values from localStorage
@@ -566,29 +647,14 @@
                 }
                 console.log('[DEBUG] Coffee beans data after loading logic:', coffeeBeans); // Crucial log
 
-                // Load Special Offers: Prioritize localStorage, fallback to defaults
-                let storedSpecialOffers = null;
-                try {
-                    const specialOffersJson = localStorage.getItem(SPECIAL_OFFERS_KEY);
-                    if (specialOffersJson) {
-                        storedSpecialOffers = JSON.parse(specialOffersJson);
-                        console.log('[DEBUG] Parsed special offers from localStorage:', storedSpecialOffers);
-                    } else {
-                        console.log('[DEBUG] localStorage for special offers is empty.');
-                    }
-                } catch (e) {
-                    console.error('[ERROR] Error parsing stored special offers from localStorage. Falling back to default data.', e);
-                    // Fallback to default if parsing fails
+                // Load Special Offers: Now using OfferDataManager
+                specialOffers = window.OfferDataManager.loadOffersFromLocalStorage();
+                // If localStorage is empty and OfferDataManager returns empty, seed with the centralized default offers
+                if (specialOffers.length === 0) {
+                    specialOffers = window.OfferDataManager.mergeWithDefaultSchema(window.OfferDataManager.DEFAULT_SPECIAL_OFFERS, window.OfferDataManager.defaultOfferTemplate);
+                    window.OfferDataManager.saveOffersToLocalStorage(specialOffers); // Save to populate localStorage
                 }
-                if (Array.isArray(storedSpecialOffers) && storedSpecialOffers.length > 0) {
-                    specialOffers = storedSpecialOffers;
-                    console.log('[DEBUG] Successfully loaded special offers from localStorage:', specialOffers);
-                } else {
-                    specialOffers = [...defaultSpecialOffers]; // Use spread to avoid modifying default array directly
-                    localStorage.setItem(SPECIAL_OFFERS_KEY, JSON.stringify(defaultSpecialOffers)); // Always re-save defaults if localStorage is empty/invalid
-                    console.log('[DEBUG] localStorage for special offers was empty or invalid. Using and re-saving default data:', specialOffers);
-                }
-                console.log('[DEBUG] Special offers data after loading logic:', specialOffers); // Crucial log
+                console.log('[DEBUG] Special offers data after loading logic (using OfferDataManager):', specialOffers); // Crucial log
 
                 // Load Reviews (always from localStorage for user-submitted content)
                 let storedReviews = null;
@@ -600,8 +666,9 @@
                 } catch (e) {
                     console.error('[ERROR] Error parsing stored reviews from localStorage:', e);
                 }
-                reviews = Array.isArray(storedReviews) ? storedReviews : [];
-                console.log('[DEBUG] Loaded reviews (from localStorage):', reviews);
+                reviews = Array.isArray(storedReviews) ? storedReviews : [...defaultReviews]; // Use defaultReviews if localStorage is empty/invalid
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); // Ensure defaults are saved if not present
+                console.log('[DEBUG] Loaded reviews (from localStorage or default):', reviews);
 
                 // --- Trigger rendering for all sections ---
                 console.log('[DEBUG] Triggering render functions...');
@@ -1091,6 +1158,8 @@
             console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
             window.loadAndRenderAllData();
         });
+
+        })(); // End IIFE
     </script>
 </body>
 </html>
