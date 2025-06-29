@@ -605,108 +605,6 @@
             pointer-events: auto; /* 確保咖啡機可互動 */
         }
 
-        /* 滾動進度指示器 */
-        #scroll-progress-indicator {
-            position: fixed;
-            z-index: 51; /* 高於內容，低於導覽列和模態框 */
-            background-color: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(5px);
-            padding: 10px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            font-family: 'Playfair Display', serif;
-            color: var(--color-secondary);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            /* Desktop styles */
-            top: 100px;
-            right: 20px;
-            transform: none; /* Reset transform for desktop */
-
-            /* Mobile adjustments */
-            @media (max-width: 768px) { /* md breakpoint */
-                top: auto;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 8px 12px; /* Smaller padding */
-                font-size: 0.9rem; /* Smaller font */
-            }
-        }
-
-        #progress-circle-svg {
-            width: 30px;
-            height: 30px;
-            transform: rotate(-90deg); /* 從頂部開始 */
-        }
-        #progress-circle-bg {
-            stroke: #e0e0e0;
-            stroke-width: 3;
-            fill: none;
-        }
-        #progress-circle-fill {
-            stroke: var(--color-primary);
-            stroke-width: 3;
-            fill: none;
-            stroke-dasharray: 157; /* 2 * PI * r (r=25) = 157 */
-            stroke-dashoffset: 157; /* 預設完全隱藏 */
-            transition: stroke-dashoffset 0.1s linear;
-        }
-        @media (max-width: 768px) {
-            #progress-circle-svg {
-                width: 25px; /* Smaller */
-                height: 25px;
-            }
-        }
-
-
-        /* 載入動畫 */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--color-bg);
-            z-index: 1001;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease-out;
-            opacity: 1;
-        }
-        .spinner {
-            border: 8px solid rgba(0,0,0,0.1);
-            border-top: 8px solid var(--color-primary);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Three.js 容器，現在全螢幕且浮動 */
-        #threejs-container {
-            position: relative;
-            width: 100%; 
-            height: 60vh; /* Define a height, responsive to viewport height */
-            min-height: 400px; /* Ensure a minimum height for smaller screens */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Prevent content overflow */
-            background-color: #fdfaf5; /* Background for the machine section */
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05); /* Subtle inner shadow */
-        }
-
         /* 內容區域的調整，恢復全寬 */
         main {
             position: relative;
@@ -826,7 +724,7 @@
 
     <main>
         <!-- Home Section -->
-        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative overflow-hidden" style="background-image: url('https://placehold.co/1920x1080/b58863/FFFFFF?text=Melody+Bean+咖啡');">
+        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative overflow-hidden" style="background-image: url('./image/image_2.jpg');">
             <div class="absolute inset-0 bg-black/40"></div>
             <div class="relative text-center z-10 p-6">
                 <h1 class="text-5xl md:text-7xl font-serif mb-4 text-shadow-soft">品味旋律，啜飲人生</h1>
@@ -1079,28 +977,28 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <!-- Images will be rendered here -->
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 0ms;">
-                        <img src="https://placehold.co/400x300/a07654/FFFFFF?text=咖啡豆近照" alt="咖啡豆近照" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_1.png" alt="咖啡豆近照" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 100ms;">
-                        <img src="https://placehold.co/400x300/3f2e2e/FFFFFF?text=手沖咖啡" alt="手沖咖啡" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_2.png" alt="手沖咖啡" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 200ms;">
-                        <img src="https://placehold.co/400x300/6b8e23/FFFFFF?text=咖啡師工作" alt="咖啡師工作" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_3.png" alt="咖啡師工作" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 300ms;">
-                        <img src="https://placehold.co/400x300/b58863/FFFFFF?text=咖啡店內景" alt="咖啡店內景" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_4.png" alt="咖啡店內景" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 400ms;">
-                        <img src="https://placehold.co/400x300/3f2e2e/FFFFFF?text=咖啡與書籍" alt="咖啡與書籍" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_5.png" alt="咖啡與書籍" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 500ms;">
-                        <img src="https://placehold.co/400x300/6b8e23/FFFFFF?text=烘焙中的咖啡豆" alt="烘焙中的咖啡豆" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_6.png" alt="烘焙中的咖啡豆" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 600ms;">
-                        <img src="https://placehold.co/400x300/b58863/FFFFFF?text=咖啡杯特寫" alt="咖啡杯特寫" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_7.png" alt="咖啡杯特寫" class="w-full h-48 object-cover object-center">
                     </div>
                     <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 700ms;">
-                        <img src="https://placehold.co/400x300/3f2e2e/FFFFFF?text=多樣化咖啡器具" alt="多樣化咖啡器具" class="w-full h-48 object-cover object-center">
+                        <img src="./image/image_8.png" alt="多樣化咖啡器具" class="w-full h-48 object-cover object-center">
                     </div>
                 </div>
             </div>
@@ -1326,14 +1224,14 @@
 
         // Default data - serves as fallback if localStorage is empty/invalid
         const defaultCoffeeBeans = [
-            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, stock: 10, category: 'light', image: 'https://placehold.co/400x300/a07654/FFFFFF?text=GEISHA+水洗', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
-            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, stock: 5, category: 'light', image: 'https://placehold.co/400x300/3f2e2e/FFFFFF?text=Heirloom+雙重厭氧', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
-            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, stock: 8, category: 'light', image: 'https://placehold.co/400x300/6b8e23/FFFFFF?text=Heirloom+雙重厭氧+B', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
-            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 12, category: 'medium', image: 'https://placehold.co/400x300/b58863/FFFFFF?text=GEISHA+中淺焙', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
-            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-05', price: 580, stock: 0, category: 'light', image: 'https://placehold.co/400x300/3f2e2e/FFFFFF?text=GEISHA+水洗+2280m', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
-            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 7, category: 'light', image: 'https://placehold.co/400x300/6b8e23/FFFFFF?text=衣索比亞+淺焙', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
-            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025-08-15', price: 800, stock: 3, category: 'light', image: 'https://placehold.co/400x300/b58863/FFFFFF?text=哥斯大黎加+Geisha+白蜜', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
-            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, stock: 1, category: 'light', image: 'https://placehold.co/400x300/3f2e2e/FFFFFF?text=哥斯大黎加+淺焙', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
+            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, stock: 10, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
+            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, stock: 5, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
+            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, stock: 8, category: 'light', image: './image/image_3.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
+            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 12, category: 'medium', image: './image/image_4.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
+            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-05', price: 580, stock: 0, category: 'light', image: './image/image_5.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '來自高海拔的獨特風味，建議在需要提振精神的早晨品嚐，感受其清晰明亮的層次。' },
+            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 7, category: 'light', image: './image/image_6.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
+            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025-08-15', price: 800, stock: 3, category: 'light', image: './image/image_7.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
+            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, stock: 1, category: 'light', image: './image/image_8.png', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
         ];
 
         // REMOVED DEFAULT REVIEWS as per user request: "不要有預設留言"
@@ -1528,12 +1426,12 @@
 
         // --- Three.js Related Variables ---
         let scene, camera, renderer, coffeeMachineGroup, grinderPart, brewSpout, bodyPart, trayPart;
-        let ambientLight, directionalLight, lightSource; // Declare lightSource here
-        let mouse = new THREE.Vector2(); // Store normalized mouse coordinates
-        let raycaster = new THREE.Raycaster(); // For picking objects in 3D scene
+        let ambientLight, directionalLight, lightSource; 
+        let coffeeBeanBag, pouringBeansGroup, glassCoffeeCup, coffeePourStream, coffeeLiquid, cremaLayer, steamParticles; 
+        let idleCoffeeBeans; 
 
-        let coffeeBeanBag, pouringBeansGroup, glassCoffeeCup, coffeePourStream, coffeeLiquid, cremaLayer, steamParticles; // Added coffeePourStream
-        let idleCoffeeBeans; // For showing static beans in grinder top (initial state)
+        let mouse = new THREE.Vector2(); 
+        let raycaster = new THREE.Raycaster(); 
 
         let targetCameraPosition = new THREE.Vector3();
         let targetMachinePosition = new THREE.Vector3();
@@ -1544,7 +1442,7 @@
         let isGrinding = false;
         let isBrewing = false;
         let isPouringBeans = false;
-        let currentBrewingStep = 0; // 0: Idle, 1: Beans Added (after pour animation), 2: Grinding, 3: Brewing, 4: Coffee Ready
+        let currentBrewingStep = 0; 
 
         const sectionsData = [ // Section data for scroll progress indicator and 3D model interaction
             { id: 'home', title: '首頁', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
@@ -2238,7 +2136,6 @@
                 if (progress < 1) {
                     requestAnimationFrame(animateGrinding);
                 } else {
-                    // Grinding finished
                     isGrinding = false;
                     grinderPart.rotation.y = 0; // Stop rotation
                     bodyPart.position.y = 0; // Reset vibration
@@ -2555,7 +2452,7 @@
                     coffeeBeans = storedBeans.map(bean => {
                         const mergedBean = { ...defaultCoffeeBeans[0], ...bean };
                         if (!mergedBean.image || !mergedBean.image.startsWith('http')) {
-                            mergedBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=${encodeURIComponent(mergedBean.name.split(' ')[0])}`;
+                            mergedBean.image = `./image/${mergedBean.id}.png`; // Use local path
                         }
                         return mergedBean;
                     });
@@ -2564,7 +2461,7 @@
                     coffeeBeans = defaultCoffeeBeans.map(bean => {
                         const newBean = { ...bean };
                         if (!newBean.image || !newBean.image.startsWith('http')) {
-                             newBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=${encodeURIComponent(newBean.name.split(' ')[0])}`;
+                             newBean.image = `./image/${newBean.id}.png`; // Use local path
                         }
                         return newBean;
                     });
@@ -2576,7 +2473,7 @@
                 coffeeBeans = defaultCoffeeBeans.map(bean => {
                      const newBean = { ...bean };
                         if (!newBean.image || !newBean.image.startsWith('http')) {
-                             newBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=${encodeURIComponent(newBean.name.split(' ')[0])}`;
+                             newBean.image = `./image/${newBean.id}.png`; // Use local path
                         }
                         return newBean;
                     });
