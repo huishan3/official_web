@@ -911,25 +911,29 @@
                         <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
                         <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
                     </div>
-                    <!-- START: YouTube Video Integration -->
+                    <!-- START: Local Video Integration (Updated from YouTube Embed) -->
                     <div class="mt-8 text-center">
                         <h4 class="text-2xl font-serif text-secondary mb-4">我們的品牌故事影片</h4>
                         <div class="relative w-full overflow-hidden rounded-lg shadow-xl" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio for responsive video -->
-                            <iframe 
+                            <video
                                 class="absolute top-0 left-0 w-full h-full rounded-lg"
-                                src="https://www.youtube.com/embed/Gj7bNv6iHJA?autoplay=1&mute=1&loop=1&playlist=Gj7bNv6iHJA&controls=1&modestbranding=1&rel=0" 
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                allowfullscreen>
-                            </iframe>
+                                controls
+                                autoplay
+                                muted
+                                loop
+                                playsinline> <!-- playsinline for iOS autoplay -->
+                                <source src="./video/video_1.mp4" type="video/mp4">
+                                您的瀏覽器不支持影片標籤。
+                            </video>
                         </div>
                     </div>
-                    <!-- END: YouTube Video Integration -->
+                    <!-- END: Local Video Integration -->
                 </div>
                 <div class="mt-16 text-center fade-in-up">
                     <h3 class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
                     <div class="card p-8 flex flex-col md:flex-row items-center gap-8">
-                        <img src="https://placehold.co/150x150/a07654/FFFFFF?text=職人" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
+                        <!-- Updated image path for "咖啡職人" -->
+                        <img src="./image/image_3.jpg" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
                         <div class="text-left">
                             <h4 class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
                             <p class="text-lg text-primary mt-1">陳師傅</p>
@@ -1136,6 +1140,8 @@
         (function() { // Start Immediately Invoked Function Expression (IIFE)
 
         // 📦 dataManager.js - Unified Offer Data Management Module
+        // This module is still included for completeness, but its functions related to offers
+        // are no longer called by the frontend (as the offers section is removed).
         const defaultOfferTemplate = {
             id: 0,
             name: '',
@@ -1175,7 +1181,7 @@
         function loadOffersFromLocalStorage() {
             try {
                 const rawData = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
-                return mergeWithDefaultSchema(rawData || [], defaultTemplate);
+                return mergeWithDefaultSchema(rawData || [], defaultOfferTemplate);
             } catch (e) {
                 console.error('[優惠資料載入失敗]', e);
                 return [];
@@ -1308,7 +1314,7 @@
         // --- Particle Generation and Management (for 2D background particles) ---
         const PARTICLE_LIFETIME_MS = 6000; // Particle lifetime (milliseconds)
         const PARTICLE_EMOJI_COFFEE = '☕'; // Coffee bean Emoji
-        const PARTICLE_EMOJI_NOTE = '🎶'; // Musical note Emoji
+        const PARTICLE_EMOJI_NOTE = '�'; // Musical note Emoji
         const PARTICLE_SPAWN_INTERVAL_MS = 500; // How often a new particle is generated (milliseconds)
 
         let particleTimer; // Timer for managing particle generation
@@ -3030,3 +3036,4 @@
     </script>
 </body>
 </html>
+�
