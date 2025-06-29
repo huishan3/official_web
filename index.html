@@ -148,6 +148,8 @@
             transform: scale(0.9); /* Initial scale for pop-in effect */
             opacity: 0; /* Initial opacity for pop-in */
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            display: flex; /* Make it a flex container */
+            flex-direction: column; /* Stack children vertically */
         }
         .front-modal.active .front-modal-content {
             transform: scale(1); /* Scale up to normal size */
@@ -167,10 +169,14 @@
             color: var(--color-secondary);
         }
         /* Icon styling for modal */
-        #frontModalIcon { /* New icon styling */
+        #frontModalIcon { /* New icon container styling */
             font-size: 4rem; /* Large icon */
             margin-bottom: 1rem;
             line-height: 1; /* Ensure vertical alignment */
+            display: flex; /* Allow content to center */
+            justify-content: center;
+            align-items: center;
+            height: 4rem; /* Fixed height for consistency */
         }
         .icon-success { color: var(--color-accent); } /* Green */
         .icon-error { color: #ef4444; } /* Red */
@@ -180,6 +186,17 @@
         .front-modal-success { color: var(--color-accent); }
         .front-modal-error { color: #ef4444; }
         .front-modal-info { color: var(--color-primary); }
+
+        /* Modal Message Content with Scrolling */
+        #frontModalMessage {
+            max-height: 40vh; /* Adjust as needed, limit height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding-right: 15px; /* Prevent scrollbar from overlapping text */
+            margin-bottom: 1rem; /* Space before the button */
+            flex-grow: 1; /* Allow it to grow and take available space */
+            text-align: left; /* Align text to left inside the scrollable area */
+            padding-left: 5px; /* Small left padding for text */
+        }
 
 
         /* 庫存指示器樣式 */
@@ -207,9 +224,17 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.01); opacity: 0.95; }
         }
-        .section-title.animate-pulse-on-scroll.is-visible {
+        /* Only apply pulse animation when 'is-pulsing' class is present */
+        .section-title.animate-pulse-on-scroll.is-pulsing {
             animation: pulse 2s infinite ease-in-out;
         }
+        /* Ensure it's not animating when not pulsing */
+        .section-title.animate-pulse-on-scroll:not(.is-pulsing) {
+            animation: none;
+            opacity: 1; /* Ensure it stays visible */
+            transform: scale(1); /* Ensure it stays normal size */
+        }
+
 
         /* 首頁標題與段落動畫 */
         @keyframes fadeInSlideUp {
@@ -424,6 +449,28 @@
             pointer-events: auto; /* 顯示時才允許互動 */
         }
 
+        /* Three.js 互動回饋彈窗 */
+        #three-js-feedback-toast {
+            position: fixed;
+            bottom: 80px; /* Above coffee-fact-toast */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(63, 46, 46, 0.9); /* Darker secondary */
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+            z-index: 997; /* Below coffee-fact-toast */
+            pointer-events: none;
+        }
+        #three-js-feedback-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* 首頁滾動提示按鈕 */
         #scroll-down-btn {
             position: absolute;
@@ -561,8 +608,6 @@
         /* 滾動進度指示器 */
         #scroll-progress-indicator {
             position: fixed;
-            top: 100px;
-            right: 20px;
             z-index: 51; /* 高於內容，低於導覽列和模態框 */
             background-color: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(5px);
@@ -575,6 +620,21 @@
             display: flex;
             align-items: center;
             gap: 8px;
+
+            /* Desktop styles */
+            top: 100px;
+            right: 20px;
+            transform: none; /* Reset transform for desktop */
+
+            /* Mobile adjustments */
+            @media (max-width: 768px) { /* md breakpoint */
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 8px 12px; /* Smaller padding */
+                font-size: 0.9rem; /* Smaller font */
+            }
         }
 
         #progress-circle-svg {
@@ -595,6 +655,13 @@
             stroke-dashoffset: 157; /* 預設完全隱藏 */
             transition: stroke-dashoffset 0.1s linear;
         }
+        @media (max-width: 768px) {
+            #progress-circle-svg {
+                width: 25px; /* Smaller */
+                height: 25px;
+            }
+        }
+
 
         /* 載入動畫 */
         #loading-overlay {
@@ -1084,6 +1151,11 @@
         <p></p>
     </div>
 
+    <!-- Three.js 互動回饋彈窗 (新加入) -->
+    <div id="three-js-feedback-toast">
+        <p></p>
+    </div>
+
     <!-- 滾動進度指示器 -->
     <div id="scroll-progress-indicator">
         <span id="current-chapter-text">首頁</span>
@@ -1218,7 +1290,8 @@
                     <h4 class="font-bold text-lg mt-4 mb-2">5. 享受您的手沖咖啡</h4>
                     <p class="mb-2">當咖啡液不再滴落時，即可移除濾杯。一杯香醇的手沖咖啡就完成了！記得在最佳溫度品嚐。</p>
                     <p class="text-sm mt-4 text-gray-500">提示：實驗不同研磨度、水溫和注水手法，找到最適合您口味的黃金比例。</p>
-                `
+                `,
+                modalIcon: 'fas fa-hand-holding-water' // 新增圖標
             },
             2: {
                 title: '咖啡豆的黃金保存法則',
@@ -1228,14 +1301,15 @@
                     <p class="mb-2">光線和高溫是咖啡豆風味的兩大殺手。請務必將咖啡豆存放在陰涼、乾燥且沒有陽光直射的地方。廚房檯面上的陽光直射或靠近爐灶的地方都不適合。</p>
                     <h4 class="font-bold text-lg mt-4 mb-2">2. 密封保存</h4>
                     <p class="mb-2">空氣是造成咖啡豆氧化、風味流失的主因。請使用帶有單向排氣閥的密封罐或專用咖啡袋，盡量排出空氣。避免使用透明或非密封的容器。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">3. 避免潮濕</h4>
+                    <h4 class="font-bold text-lg mt-4 mb-2">3. 避免潮濕在濕度高的環境下，咖啡豆容易受潮並失去風味。請確保儲存環境的乾燥。</h4>
                     <p class="mb-2">濕氣會加速咖啡豆的變質和黴菌生長。避免將咖啡豆存放在潮濕的環境中。</p>
                     <h4 class="font-bold text-lg mt-4 mb-2">4. 不建議冷藏（短時間可以）</h4>
                     <p class="mb-2">冰箱內濕氣重且異味多，容易讓咖啡豆吸收雜味並受潮。若需短期保存（一週內），可放在密封罐中；若需長期保存，可考慮冷凍。</p>
                     <h4 class="font-bold text-lg mt-4 mb-2">5. 冷凍保存（長期最佳）</h4>
                     <p class="mb-2">如果咖啡豆量大且希望長期保存（數週至數月），可以將其分裝於小份量、密封良好的袋子或容器中，放入冷凍庫。取用時直接取出所需份量，不要反覆解凍再冷凍。</p>
                     <p class="text-sm mt-4 text-gray-500">提示：咖啡豆的最佳賞味期通常在烘焙後 2-4 週內。購買少量、新鮮烘焙的咖啡豆，並盡快享用是最好的方式。</p>
-                `
+                `,
+                modalIcon: 'fas fa-box-open' // 新增圖標
             },
             3: {
                 title: '音樂與咖啡的奇妙共鳴：提升感官體驗',
@@ -1252,7 +1326,8 @@
                     <h4 class="font-bold text-lg mt-4 mb-2">實驗您的專屬旋律</h4>
                     <p class="mb-2">不妨下次沖泡咖啡時，嘗試播放不同風格的音樂。閉上眼睛，感受咖啡在口中與音樂在耳邊的交織。您可能會發現新的風味維度，找到最能提升您品飲體驗的「專屬旋律」。</p>
                     <p class="text-sm mt-4 text-gray-500">提示：這是一種個人化的體驗，沒有絕對的對錯。盡情享受探索的過程吧！</p>
-                `
+                `,
+                modalIcon: 'fas fa-music' // 新增圖標
             }
         };
 
@@ -1346,6 +1421,25 @@
                 sectionObserver.observe(section);
             });
 
+            // Observer for section titles with pulse animation
+            const pulseObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const titleElement = entry.target;
+                    if (titleElement.classList.contains('animate-pulse-on-scroll')) {
+                        if (entry.isIntersecting) {
+                            titleElement.classList.add('is-pulsing'); // Add class to start pulse animation
+                        } else {
+                            titleElement.classList.remove('is-pulsing'); // Remove class to stop pulse animation
+                        }
+                    }
+                });
+            }, { threshold: 0.5 }); // More aggressive threshold for titles
+
+            document.querySelectorAll('.animate-pulse-on-scroll').forEach(el => {
+                pulseObserver.observe(el);
+            });
+
+
             // Start generating particles only if at least one observed section is visible
             particleTimer = setInterval(() => {
                 if (activeSections.size > 0) {
@@ -1368,7 +1462,7 @@
         }
 
         // --- Three.js Related Variables ---
-        let scene, camera, renderer, coffeeMachineGroup, grinderPart, brewSpout, bodyPart, trayPart;
+        let scene, camera, renderer, coffeeMachineGroup, grinderPart, brewSpout, bodyPart, trayPart, coffeeCupBody; // Added coffeeCupBody for raycasting
         let lightSource, ambientLight, directionalLight;
         let mouse = new THREE.Vector2(); // Store normalized mouse coordinates
         let raycaster = new THREE.Raycaster(); // For picking objects in 3D scene
@@ -1595,11 +1689,12 @@
             const cupHandleGeometry = new THREE.TorusGeometry(0.15, 0.05, 8, 16); // Smaller handle
             const cupMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.1, metalness: 0.1 });
             coffeeCup = new THREE.Group();
-            const cupBody = new THREE.Mesh(cupBodyGeometry, cupMaterial);
+            coffeeCupBody = new THREE.Mesh(cupBodyGeometry, cupMaterial); // Store mesh reference
+            coffeeCupBody.name = 'coffeeCup'; // Name for raycasting
             const cupHandle = new THREE.Mesh(cupHandleGeometry, cupMaterial);
             cupHandle.position.set(0.45, 0, 0);
             cupHandle.rotation.y = Math.PI / 2;
-            coffeeCup.add(cupBody);
+            coffeeCup.add(coffeeCupBody);
             coffeeCup.add(cupHandle);
             coffeeCup.position.set(0, -1.5, 0); // Initial position below spout
             coffeeCup.visible = false;
@@ -1777,6 +1872,22 @@
         }
 
         /**
+         * Shows a temporary text feedback toast for Three.js interactions.
+         * @param {string} message - The message to display.
+         */
+        function showThreeJSTextFeedback(message) {
+            const feedbackToast = document.getElementById('three-js-feedback-toast');
+            if (feedbackToast) {
+                feedbackToast.textContent = message;
+                feedbackToast.classList.add('show');
+                setTimeout(() => {
+                    feedbackToast.classList.remove('show');
+                }, 2000); // Show for 2 seconds
+            }
+        }
+
+
+        /**
          * Handles mouse move events for 3D model rotation.
          * Only triggers on the Three.js canvas.
          */
@@ -1795,11 +1906,18 @@
             raycaster.setFromCamera(mouse, camera);
 
             // Calculate objects intersecting the picking ray
-            const intersects = raycaster.intersectObjects(coffeeMachineGroup.children, true);
+            const intersects = raycaster.intersectObjects(coffeeMachineGroup.children.concat(coffeeCupBody), true); // Include cup body for interaction
 
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
                 console.log('Clicked 3D object:', clickedObject.name);
+
+                // Store original emissive color for feedback
+                const originalEmissive = clickedObject.material.emissive.getHex();
+                clickedObject.material.emissive.setHex(0x00FF00); // Green glow for feedback
+                setTimeout(() => {
+                    clickedObject.material.emissive.setHex(originalEmissive);
+                }, 300); // Revert after 300ms
 
                 // Reset all ongoing animations before starting a new one
                 resetAllAnimations();
@@ -1807,9 +1925,11 @@
                 switch (clickedObject.name) {
                     case 'grinder':
                         startGrindingAnimation();
+                        showThreeJSTextFeedback('開始研磨咖啡豆...');
                         break;
                     case 'spout':
                         startBrewingAnimation();
+                        showThreeJSTextFeedback('正在沖泡咖啡...');
                         break;
                     case 'body':
                     case 'tray':
@@ -1817,9 +1937,15 @@
                     case 'button1':
                     case 'button2':
                         startGeneralMachineAnimation();
+                        showThreeJSTextFeedback('咖啡機發出輕微振動...');
+                        break;
+                    case 'coffeeCup': // New interaction for the coffee cup
+                        showCoffeeFactToast(); // Trigger a random coffee fact
+                        showThreeJSTextFeedback('發現一個咖啡小知識！');
                         break;
                     default:
                         // No specific action for other parts or if not recognized
+                        showThreeJSTextFeedback('您點擊了咖啡機！');
                         break;
                 }
             }
@@ -1834,7 +1960,7 @@
             isGeneralAnimating = false;
 
             grinderPart.rotation.y = 0; // Stop grinder rotation
-            if (brewSpout && brewSpout.material) brewSpout.material.emissive.setHex(0x000000); // Reset spout light
+            // No need for brewSpout material reset as emissive is handled on click
             
             // Hide temporary animation elements
             if (grinderTopParticles) grinderTopParticles.visible = false;
@@ -1874,7 +2000,7 @@
             coffeeCup.visible = true;
             coffeePourStream.visible = true;
             coffeeInCupLiquid.visible = true;
-            aromaParticles.visible = true; // Show aroma from cup
+            // aromaParticles.visible = true; // Aroma is now triggered after pour completes
 
             // Set initial liquid levels
             coffeePourStream.scale.y = 0.01;
@@ -1900,20 +2026,29 @@
                 coffeePourStream.scale.y = 2.0 * progress; // Grow height
                 coffeePourStream.position.y = brewSpout.position.y - 0.25 - (coffeePourStream.geometry.parameters.height * coffeePourStream.scale.y / 2);
 
-                // Liquid in cup fills up
+                // Liquid in cup fills up with minor wobble
                 const maxLiquidHeight = 0.7; // Max height inside the cup
                 coffeeInCupLiquid.scale.y = maxLiquidHeight * progress;
                 coffeeInCupLiquid.position.y = coffeeCup.position.y - (coffeeCup.children[0].geometry.parameters.height / 2) + (coffeeInCupLiquid.geometry.parameters.height * coffeeInCupLiquid.scale.y / 2);
+                
+                // Add subtle wobble to liquid surface
+                const wobbleFactor = Math.sin(performance.now() * 0.01) * 0.01;
+                coffeeInCupLiquid.scale.x = (maxLiquidHeight * progress > 0.01 ? 1 + wobbleFactor : 0.01);
+                coffeeInCupLiquid.scale.z = (maxLiquidHeight * progress > 0.01 ? 1 - wobbleFactor : 0.01);
 
                 if (progress < 1) {
                     requestAnimationFrame(animatePouring);
                 } else {
                     isBrewing = false;
                     coffeePourStream.visible = false; // Hide pour stream
+                    aromaParticles.visible = true; // Show aroma after pour completes
+                    updateParticleSystem3D('steam'); // Briefly show steam after pour completes
+
                     setTimeout(() => {
                          aromaParticles.visible = false; // Hide aroma after a small delay
+                         updateParticleSystem3D('none'); // Hide steam after a short burst
                          scrollToSection('coffee-grounds-magic'); // Scroll after animation
-                    }, 500); // Give a bit more time for aroma to fade or cup to be "ready"
+                    }, 1500); // Give a bit more time for aroma/steam to fade or cup to be "ready"
                 }
             }
             animatePouring();
@@ -1959,13 +2094,7 @@
                 // If we land on flavor guide without clicking grinder, still show coffee beans (not falling)
                 if (coffeeBeanParticles) coffeeBeanParticles.visible = true; 
             } else if (targetData.id === 'our-beans' && !isGeneralAnimating) {
-                if (coffeeBeanParticles) coffeeBeanParticles.visible = true;
-                if (coffeeBeanParticles) {
-                    coffeeBeanParticles.children.forEach(bean => {
-                        const colors = [0x8B4513, 0x693C1A, 0x4A2C0F, 0x2A1B0C]; // Light to dark coffee colors
-                        bean.material.color.setHex(colors[Math.floor(Math.random() * colors.length)]);
-                    });
-                }
+                // Not directly related to Three.js machine state, perhaps just general view
             } else if (targetData.id === 'coffee-grounds-magic' && !isBrewing) {
                 // If we land on grounds magic without clicking spout, show cup and aroma
                 if (coffeeCup) coffeeCup.visible = true;
@@ -2074,35 +2203,55 @@
         /**
          * Displays a custom frontend message modal.
          * @param {string} title - Message title.
-         * @param {string} message - Message content.
+         * @param {Object|string} content - Message content (can be string or object with text, modalIcon, modalImage).
          * @param {string} type - 'success', 'error', or 'info' to change icon and title color.
          */
-        window.showFrontMessageModal = function(title, message, type = 'info') {
+        window.showFrontMessageModal = function(title, content, type = 'info') {
             frontModalTitle.textContent = title;
-            frontModalMessage.innerHTML = message; // Allows HTML content
+            const messageText = typeof content === 'string' ? content : (content.text || '');
+            frontModalMessage.innerHTML = messageText; // Allows HTML content
 
-            // Reset icon and title colors
-            frontModalIcon.className = 'mb-4 text-5xl'; // Reset classes
+            // Reset icon container HTML and classes
+            frontModalIcon.innerHTML = '';
+            frontModalIcon.className = 'mb-4 text-5xl'; // Reset to base classes
             frontModalTitle.classList.remove('front-modal-success', 'front-modal-error', 'front-modal-info'); // Remove all possible color classes
 
-            // Set icon and color based on type
-            let iconClass = '';
+            // Determine icon/image based on content type
+            if (typeof content === 'object' && content.modalImage) {
+                frontModalIcon.innerHTML = `<img src="${content.modalImage}" alt="${title}" class="w-24 h-24 mx-auto rounded-full object-cover">`;
+            } else if (typeof content === 'object' && content.modalIcon) {
+                frontModalIcon.className += ` ${content.modalIcon} icon-${type}`;
+            } else {
+                // Default icon based on type if no specific icon/image provided in content
+                let defaultIconClass = '';
+                switch (type) {
+                    case 'success':
+                        defaultIconClass = 'fas fa-check-circle icon-success';
+                        break;
+                    case 'error':
+                        defaultIconClass = 'fas fa-times-circle icon-error';
+                        break;
+                    case 'info':
+                    default:
+                        defaultIconClass = 'fas fa-info-circle icon-info';
+                        break;
+                }
+                frontModalIcon.className += ` ${defaultIconClass}`;
+            }
+            
+            // Set title color based on type
             switch (type) {
                 case 'success':
-                    iconClass = 'fas fa-check-circle icon-success';
                     frontModalTitle.classList.add('front-modal-success');
                     break;
                 case 'error':
-                    iconClass = 'fas fa-times-circle icon-error';
                     frontModalTitle.classList.add('front-modal-error');
                     break;
                 case 'info':
                 default:
-                    iconClass = 'fas fa-info-circle icon-info';
                     frontModalTitle.classList.add('front-modal-info'); 
                     break;
             }
-            frontModalIcon.className += ` ${iconClass}`; // Append icon classes
 
             frontMessageModal.classList.add('active'); // Add active class to show
         };
@@ -2365,7 +2514,7 @@
                             <span class="text-yellow-500">${review.rating}</span>
                         </div>
                         <p class="text-gray-700 leading-relaxed">${review.content}</p>
-                        <p class="text-sm text-gray-500 mt-2">${review.date}</p>
+                        <p class="text-sm text-gray-500 mt-2">${review.date || new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' })}</p>
                     </div>
                 `;
                 reviewList.appendChild(reviewElement);
@@ -2385,7 +2534,7 @@
             const reviewContent = document.getElementById('review-content').value.trim();
 
             if (!reviewerName || !reviewRating || !reviewContent) {
-                showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位！', 'error');
+                window.showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位！', 'error');
                 return;
             }
 
@@ -2401,7 +2550,7 @@
             saveReviews();
             renderReviews();
             event.target.reset(); // Clear form
-            showFrontMessageModal('感謝您的評論！', '您的寶貴意見已成功送出！', 'success');
+            window.showFrontMessageModal('感謝您的評論！', '您的寶貴意見已成功送出！', 'success');
             console.log('[DEBUG] 新評論已提交:', newReview);
         }
 
@@ -2455,11 +2604,11 @@
             const message = document.getElementById('inquiry-message').value.trim();
 
             if (!name || !email || !message) {
-                showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位！', 'error');
+                window.showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位！', 'error');
                 return;
             }
             if (!email.includes('@') || !email.includes('.')) {
-                showFrontMessageModal('電子郵件格式錯誤', '請輸入有效的電子郵件地址！', 'error');
+                window.showFrontMessageModal('電子郵件格式錯誤', '請輸入有效的電子郵件地址！', 'error');
                 return;
             }
 
@@ -2467,7 +2616,7 @@
             // Here you would typically send this data to a server (e.g., via fetch API)
             // For this example, we'll just show a success message.
 
-            showFrontMessageModal('訊息已送出', '感謝您的詢問，我們將盡快與您聯繫！', 'success');
+            window.showFrontMessageModal('訊息已送出', '感謝您的詢問，我們將盡快與您聯繫！', 'success');
             event.target.reset(); // Clear form
         }
 
@@ -2525,8 +2674,11 @@
             let currentSectionNum = 1;
             for (let i = 0; i < sectionElementsArray.length; i++) {
                 const section = sectionElementsArray[i];
-                if (section.getBoundingClientRect().top <= window.innerHeight / 2 &&
-                    section.getBoundingClientRect().bottom >= window.innerHeight / 2) {
+                // Check if the middle of the viewport is within this section
+                const rect = section.getBoundingClientRect();
+                const viewportMiddle = window.innerHeight / 2;
+
+                if (rect.top <= viewportMiddle && rect.bottom >= viewportMiddle) {
                     currentSection = sectionsData[i];
                     currentSectionNum = i + 1;
                     currentActiveSectionIndex = i; // Update global index
@@ -2621,7 +2773,7 @@
                 refreshCoffeeBtn.addEventListener('click', () => {
                     console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
                     window.loadAndRenderAllData(); // Reloads all data
-                    showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
+                    window.showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
                 });
             } else {
                 console.error('[ERROR] Refresh coffee button not found!');
@@ -2637,25 +2789,15 @@
                 window.loadAndRenderAllData();
             });
 
-            // Scroll animation observer
+            // Scroll animation observer for fade-in-up elements
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        // For section titles, also trigger pulse animation if they have that class
-                        if (entry.target.classList.contains('animate-pulse-on-scroll')) {
-                            // This class is added to trigger the animation. The animation itself might be infinite or one-shot.
-                        }
-                        // Stop observing once visible to prevent re-triggering for fade-in-up
-                        if (!entry.target.classList.contains('section-title')) { // Keep observing titles for pulse if needed
-                            observer.unobserve(entry.target);
-                        }
-                    } else {
-                        // Remove is-visible if it scrolls out of view, might be useful for re-triggering animation on re-entry
-                        // entry.target.classList.remove('is-visible'); 
+                        observer.unobserve(entry.target); // Stop observing once visible for fade-in-up
                     }
                 });
-            }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
+            }, { threshold: 0.1 });
 
             document.querySelectorAll('.fade-in-up').forEach(el => {
                 observer.observe(el);
@@ -2666,7 +2808,7 @@
             const scrollDownBtn = document.getElementById('scroll-down-btn');
             if (scrollDownBtn) {
                 scrollDownBtn.addEventListener('click', () => {
-                    const firstSection = document.getElementById('coffee-machine-display'); // Scroll to the next section after home
+                    const firstSection = document.getElementById('coffee-machine-display'); // Corrected variable name
                     if (firstSection) {
                         firstSection.scrollIntoView({ behavior: 'smooth' });
                     }
@@ -2680,9 +2822,10 @@
                     const knowledgeId = event.target.dataset.knowledgeId;
                     const article = knowledgeArticles[knowledgeId];
                     if (article) {
-                        showFrontMessageModal(article.title, article.content, 'info');
+                        // Pass the entire article object to modal for rich content
+                        window.showFrontMessageModal(article.title, { text: article.content, modalIcon: article.modalIcon, modalImage: article.modalImage }, 'info');
                     } else {
-                        showFrontMessageModal('錯誤', '找不到此篇文章內容。', 'error');
+                        window.showFrontMessageModal('錯誤', '找不到此篇文章內容。', 'error');
                     }
                 });
             });
