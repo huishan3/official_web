@@ -551,9 +551,10 @@
 
         /* Three.js canvas styling */
         #three-canvas {
-            position: absolute;
-            width: 100% !important;
-            height: 100% !important;
+            width: 100% !important; /* Take full width of its container */
+            height: 100% !important; /* Take full height of its container */
+            display: block; /* Remove extra space below canvas */
+            background-color: transparent; /* Ensure canvas background is transparent */
             pointer-events: auto; /* 確保咖啡機可互動 */
         }
 
@@ -627,21 +628,24 @@
 
         /* Three.js 容器，現在全螢幕且浮動 */
         #threejs-container {
-            position: fixed;
-            inset: 0; /* top, right, bottom, left 都是 0 */
-            width: 100%;
-            height: 100vh;
-            z-index: -1; /* 確保在內容之後 */
-            display: flex;
+            /* Now integrated into the document flow, not fixed */
+            position: relative; /* important for canvas to fill it */
+            width: 100%; /* Take full width of its parent section */
+            height: 60vh; /* Define a height, responsive to viewport height */
+            /* Removed z-index: -1 as it's no longer a background */
+            /* Removed inset: 0 */
+            display: flex; /* To center the canvas if needed, though canvas fills it */
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* 防止內容溢出 */
+            overflow: hidden; /* Prevent content overflow */
+            background-color: #fdfaf5; /* Background for the machine section */
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05); /* Subtle inner shadow */
         }
 
         /* 內容區域的調整，恢復全寬 */
         main {
             position: relative;
-            z-index: 1; /* 確保內容在 Three.js 區域之上 */
+            z-index: 1; /* 確保內容在 Three.js 區域之上，如果 Three.js 容器本身有定位 */
             width: 100%; /* 內容區塊佔據全寬 */
             margin-left: 0; /* 移除左邊距 */
             overflow-x: hidden; /* 防止水平滾動 */
@@ -662,16 +666,17 @@
         #home {
             position: relative;
             z-index: 2; /* 確保在載入時覆蓋 Three.js */
-            /* 調整 padding 以避免與咖啡機重疊 */
-            padding-bottom: 10vh; /* 增加底部內邊距 */
+            padding-bottom: 4rem; /* Adjust padding as the machine is no longer "below" it visually */
         }
 
-        /* 導航欄的調整，確保在 Three.js 之上 */
+        /* 導航欄的調整，確保在 Three.3 之上 */
         nav {
             position: sticky;
             top: 0;
             z-index: 100; /* 導航欄置頂 */
         }
+
+        /* Adjust the camera position in JS or Three.js parameters if the machine looks too small/large in its new container */
     </style>
 </head>
 <body>
@@ -679,11 +684,6 @@
     <div id="loading-overlay">
         <div class="spinner"></div>
         <p class="text-xl text-secondary">正在為您準備香醇的咖啡體驗...</p>
-    </div>
-
-    <!-- Three.js 容器，現在全螢幕浮動在背景 -->
-    <div id="threejs-container">
-        <canvas id="three-canvas"></canvas>
     </div>
 
     <nav class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
@@ -715,6 +715,13 @@
                     <path d="M12 21L4 13H10V3H14V13H20L12 21Z" />
                 </svg>
             </button>
+        </section>
+
+        <!-- NEW SECTION: Coffee Machine Display -->
+        <section id="coffee-machine-display" class="py-10 bg-white/50 relative overflow-hidden flex items-center justify-center">
+            <div id="threejs-container">
+                <canvas id="three-canvas"></canvas>
+            </div>
         </section>
 
         <section id="flavor-guide" class="py-20 bg-white/50 relative overflow-hidden">
@@ -866,13 +873,20 @@
                         <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
                         <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
                     </div>
+                    <!-- START: YouTube Video Integration -->
                     <div class="mt-8 text-center">
-                        <div class="relative w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
-                            <i class="fas fa-play-circle text-6xl text-gray-500 opacity-75"></i>
-                            <p class="absolute text-gray-700 text-sm mt-2">（未來將在此處加入品牌故事影片）</p>
-                            <img src="https://placehold.co/600x300/e0e0e0/555555?text=品牌故事影片預覽" alt="品牌故事影片預覽" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                        <h4 class="text-2xl font-serif text-secondary mb-4">我們的品牌故事影片</h4>
+                        <div class="relative w-full overflow-hidden rounded-lg shadow-xl" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio for responsive video -->
+                            <iframe 
+                                class="absolute top-0 left-0 w-full h-full rounded-lg"
+                                src="https://www.youtube.com/embed/Gj7bNv6iHJA?autoplay=1&mute=1&loop=1&playlist=Gj7bNv6iHJA&controls=1&modestbranding=1&rel=0" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                            </iframe>
                         </div>
                     </div>
+                    <!-- END: YouTube Video Integration -->
                 </div>
                 <div class="mt-16 text-center fade-in-up">
                     <h3 class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
@@ -1126,7 +1140,7 @@
         function loadOffersFromLocalStorage() {
             try {
                 const rawData = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
-                return mergeWithDefaultSchema(rawData || [], defaultOfferTemplate);
+                return mergeWithDefaultSchema(rawData || [], defaultTemplate);
             } catch (e) {
                 console.error('[優惠資料載入失敗]', e);
                 return [];
@@ -1310,7 +1324,7 @@
             // Clear any existing timers to avoid duplication
             if (particleTimer) clearInterval(particleTimer);
 
-            const sections = ['home', 'flavor-guide', 'our-beans', 'coffee-grounds-magic', 'story', 'knowledge', 'image-gallery', 'faq', 'review', 'contact']; // Updated sections list
+            const sections = ['home', 'coffee-machine-display', 'flavor-guide', 'our-beans', 'coffee-grounds-magic', 'story', 'knowledge', 'image-gallery', 'faq', 'review', 'contact']; // Updated sections list
             const sectionElements = sections.map(id => document.getElementById(id)).filter(Boolean); // Get actual elements
 
             const activeSections = new Set(); // Track currently visible section IDs
@@ -1319,8 +1333,10 @@
             const sectionObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible'); // Add is-visible class
                         activeSections.add(entry.target.id);
                     } else {
+                        entry.target.classList.remove('is-visible'); // Remove is-visible class
                         activeSections.delete(entry.target.id);
                     }
                 });
@@ -1372,6 +1388,7 @@
 
         const sectionsData = [ // Section data for scroll progress indicator and 3D model interaction
             { id: 'home', title: '首頁', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'coffee-machine-display', title: '咖啡機展示', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null }, // Added new section
             { id: 'flavor-guide', title: '風味探索', cameraPos: { x: 0, y: 0.6, z: 1.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.8, lightColor: 0xFFA07A, hotspot: 'grinder' }, // Closer view of grinder
             { id: 'our-beans', title: '精選咖啡豆', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 2.2, lightColor: 0xFFFACD, hotspot: 'body' }, // View of coffee machine body
             { id: 'coffee-grounds-magic', title: '咖啡渣魔法', cameraPos: { x: 0, y: -0.6, z: 1.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.0, lightColor: 0x8B4513, hotspot: 'spout' }, // View of spout
@@ -1398,11 +1415,11 @@
             scene = new THREE.Scene();
             
             // Set up camera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000); // Use canvas dimensions
             
             // Set up renderer
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true }); // alpha: true allows transparent background
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight); // Use canvas dimensions
             renderer.setPixelRatio(window.devicePixelRatio);
 
             // Lighting setup
@@ -1418,10 +1435,10 @@
             // Create cute coffee machine model
             createCuteCoffeeMachine();
 
-            // Create 3D particle system (for steam and coffee grounds)
+            // Create 3D particle system
             createParticleSystem3D();
 
-            // Create additional floating elements (coffee beans, coffee cup, aroma particles)
+            // Create additional floating elements
             createFloatingElements();
 
             // Event listener for window resize
@@ -1438,7 +1455,10 @@
             });
 
             // Set initial camera and coffee machine position
-            setSectionView(sectionsData[0]); // Start with 'home' view
+            setSectionView(sectionsData[1]); // Start with 'coffee-machine-display' view by default
+            
+            // Adjust camera for initial view if needed
+            camera.position.z = 2.5; // Good default distance
 
             console.log('[DEBUG] Three.js initialized.');
         }
@@ -1506,7 +1526,8 @@
             scene.add(coffeeMachineGroup);
 
             // Set initial coffee machine position, slightly to the left of center to make space for content
-            coffeeMachineGroup.position.set(sectionsData[0].machineTargetPos.x, sectionsData[0].machineTargetPos.y, sectionsData[0].machineTargetPos.z);
+            // No longer needs specific x offset here, as it's within a flow element
+            coffeeMachineGroup.position.set(sectionsData[1].machineTargetPos.x, sectionsData[1].machineTargetPos.y, sectionsData[1].machineTargetPos.z);
             coffeeMachineGroup.rotation.y = Math.PI / 8; // Slight angle
         }
 
@@ -1723,20 +1744,9 @@
         }
 
         /**
-         * Updates the animation of floating elements.
+         * Animates the 3D floating elements.
          */
         function animateFloatingElements() {
-            // For general background particles (not part of specific animations)
-            // if (coffeeBeanParticles.visible) { // This `coffeeBeanParticles` is for the flavor guide section
-            //     coffeeBeanParticles.children.forEach(bean => {
-            //         bean.position.x += Math.sin(performance.now() * bean.userData.speed + bean.id) * 0.001;
-            //         bean.position.y += Math.cos(performance.now() * bean.userData.speed + bean.id) * 0.001;
-            //         bean.position.z += Math.sin(performance.now() * bean.userData.speed * 0.8 + bean.id) * 0.001;
-            //         bean.rotation.x += bean.userData.speed * 5;
-            //         bean.rotation.y += bean.userData.speed * 5;
-            //     });
-            // }
-
             // Coffee cup can have a slight float
             if (coffeeCup.visible) {
                  coffeeCup.position.y = -1.0 + Math.sin(performance.now() * 0.001) * 0.05; // Slight up/down float
@@ -1757,10 +1767,13 @@
          * Handles window resize.
          */
         function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            console.log('[DEBUG] Window resized, Three.js canvas updated.');
+            const canvas = document.getElementById('three-canvas');
+            if (canvas) {
+                camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                console.log('[DEBUG] Window resized, Three.js canvas updated.');
+            }
         }
 
         /**
@@ -1970,11 +1983,19 @@
                     coffeeInCupLiquid.position.y = coffeeCup.position.y - (coffeeCup.children[0].geometry.parameters.height / 2) + (coffeeInCupLiquid.geometry.parameters.height * coffeeInCupLiquid.scale.y / 2);
                 }
                 coffeeCup.position.set(0.5, -1.0, 0); 
-            } else {
+            } else if (targetData.id === 'coffee-machine-display') { // For the new coffee machine section itself
+                // Show coffee machine and potentially some default state (e.g., subtle steam)
+                // This section is now the "default" view for the machine when not interacting with other parts.
+                updateParticleSystem3D('steam'); // Example: subtle steam when just viewing
+                if (coffeeCup) coffeeCup.visible = false;
+                if (aromaParticles) aromaParticles.visible = false;
+            }
+            else {
                 // For other sections, ensure all specific animation elements are hidden
                 if (coffeeBeanParticles) coffeeBeanParticles.visible = false;
                 if (coffeeCup) coffeeCup.visible = false;
                 if (aromaParticles) aromaParticles.visible = false;
+                updateParticleSystem3D('none'); // No particles when viewing other sections
             }
         }
 
@@ -1995,12 +2016,15 @@
             coffeeMachineGroup.position.y += Math.sin(time * 0.5) * 0.005; 
 
             // Mouse control for rotation (only subtle adjustment when not focusing specific parts)
-            if (sectionsData[currentActiveSectionIndex].hotspot === null && !isGrinding && !isBrewing && !isGeneralAnimating) {
+            // Apply mouse rotation only when viewing the coffee machine display section or home
+            const currentSectionData = sectionsData[currentActiveSectionIndex];
+            if ((currentSectionData.id === 'home' || currentSectionData.id === 'coffee-machine-display') && !isGrinding && !isBrewing && !isGeneralAnimating) {
                 const targetRotationY = mouse.x * 0.5; // X-axis movement affects Y-axis rotation (left/right)
                 const targetRotationX = mouse.y * 0.5; // Y-axis movement affects X-axis rotation (up/down)
                 coffeeMachineGroup.rotation.y += (targetRotationY - coffeeMachineGroup.rotation.y) * 0.08;
                 coffeeMachineGroup.rotation.x += (targetRotationX - coffeeMachineGroup.rotation.x) * 0.08;
             }
+
 
             // Continuous grinder animation if grinding is active
             if (isGrinding) {
@@ -2080,768 +2104,590 @@
             }
             frontModalIcon.className += ` ${iconClass}`; // Append icon classes
 
-            frontMessageModal.classList.add('active'); // Add active class to show with animation
+            frontMessageModal.classList.add('active'); // Add active class to show
         };
 
         /**
          * Closes the custom frontend message modal.
          */
         window.closeFrontMessageModal = function() {
-            frontMessageModal.classList.remove('active'); // Remove active class to hide with animation
+            frontMessageModal.classList.remove('active'); // Remove active class to hide
         };
 
-
-        // --- Core Data Loading and Rendering Functions (globally exposed) ---
+        // --- Data Loading and Rendering Functions ---
 
         /**
-         * Loads data from localStorage, falling back to default data if localStorage is empty/invalid.
-         * Then, triggers all necessary rendering functions. Globally exposed.
+         * Loads coffee beans data from localStorage or uses default data.
          */
-        window.loadAndRenderAllData = function() {
-            console.log('--- Starting data load and render (Frontend Display) ---');
+        function loadCoffeeBeans() {
             try {
-                // Load coffee beans: prioritize localStorage, otherwise fall back to default
-                let storedCoffeeBeans = null;
-                try {
-                    const coffeeBeansJson = localStorage.getItem(COFFEE_BEANS_KEY);
-                    if (coffeeBeansJson) {
-                        storedCoffeeBeans = JSON.parse(coffeeBeansJson);
-                        console.log('[DEBUG] Parsed coffee bean data from localStorage:', storedCoffeeBeans);
-                    } else {
-                        console.log('[DEBUG] Coffee bean data in localStorage is empty.');
-                    }
-                } catch (e) {
-                    console.error('[ERROR] Error parsing coffee bean data from localStorage. Falling back to default data.', e);
-                    // Fall back to default if parsing fails
-                }
-                if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
-                    // Ensure loaded data includes all expected fields, merge with default template if necessary
-                    // This handles cases where localStorage might have old schema
-                    coffeeBeans = storedCoffeeBeans.map(bean => ({
-                        stock: 0, // Default to 0 if 'stock' is missing in old data
-                        ...defaultCoffeeBeans[0], // Use one from default template to ensure all keys exist
-                        ...bean // Overwrite with existing values from localStorage
-                    }));
-                    console.log('[DEBUG] Successfully loaded and merged coffee bean data from localStorage:', coffeeBeans);
+                const storedBeans = JSON.parse(localStorage.getItem(COFFEE_BEANS_KEY));
+                if (storedBeans && storedBeans.length > 0) {
+                    // Merge with default schema to ensure all fields are present for loaded data
+                    coffeeBeans = storedBeans.map(bean => ({ ...defaultCoffeeBeans[0], ...bean }));
+                    console.log('[DEBUG] 咖啡豆資料從 localStorage 載入成功:', coffeeBeans);
                 } else {
-                    coffeeBeans = [...defaultCoffeeBeans]; // Use spread operator to avoid direct modification of default array
-                    localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(defaultCoffeeBeans)); // Always store default if localStorage is empty/invalid
-                    console.log('[DEBUG] Coffee bean data in localStorage is empty or invalid. Using and re-storing default data:', coffeeBeans);
+                    coffeeBeans = defaultCoffeeBeans;
+                    saveCoffeeBeans(); // Save default data if localStorage was empty
+                    console.log('[DEBUG] 載入預設咖啡豆資料。');
                 }
-                console.log('[DEBUG] Coffee bean data after load logic:', coffeeBeans); // Key log
-
-                // Load reviews (always load user-submitted content from localStorage)
-                let storedReviews = null;
-                try {
-                    const reviewsJson = localStorage.getItem(REVIEWS_KEY);
-                    if (reviewsJson) {
-                        storedReviews = JSON.parse(reviewsJson);
-                    }
-                } catch (e) {
-                    console.error('[ERROR] Error parsing reviews from localStorage:', e);
-                }
-                reviews = Array.isArray(storedReviews) ? storedReviews : [...defaultReviews]; // Use defaultReviews if localStorage is empty/invalid
-                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); // Ensure default is stored if not present
-                console.log('[DEBUG] Loaded reviews (from localStorage or default):', reviews);
-
-                // --- Trigger rendering for all sections ---
-                console.log('[DEBUG] Triggering render functions...');
-                window.renderFaqs(); 
-                window.renderReviews(); 
-                window.updateFlavorGuideSelect();
-                console.log('[DEBUG] Render functions triggered.');
-                
-            } catch (error) {
-                console.error('[CRITICAL ERROR] Unhandled error during data load and render:', error);
-                const mainContent = document.querySelector('main');
-                if (mainContent) {
-                    mainContent.innerHTML = `
-                        <div class="error-message p-8 my-20">
-                            <h1>載入網站內容時發生嚴重錯誤。</h1>
-                            <p>請檢查您的瀏覽器控制台以獲取詳細信息。</p>
-                        </div>
-                    `;
-                }
+            } catch (e) {
+                console.error('[ERROR] 載入咖啡豆資料時發生錯誤，使用預設資料:', e);
+                coffeeBeans = defaultCoffeeBeans;
             }
-            console.log('--- Finished data load and render (Frontend Display) ---');
-        };
+        }
 
         /**
-         * Renders FAQ items and attaches accordion functionality. Globally exposed.
+         * Saves coffee beans data to localStorage.
          */
-        window.renderFaqs = function() {
+        function saveCoffeeBeans() {
             try {
-                const faqContainer = document.getElementById('faq-container');
-                if (!faqContainer) {
-                    console.error('[ERROR] faqContainer element not found!');
-                    return;
-                }
-                console.log('[DEBUG] Rendering FAQs. FAQ length:', faqs.length);
-                faqContainer.innerHTML = ''; // Clear existing content before rendering
-                if (Array.isArray(faqs) && faqs.length === 0) {
-                     faqContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有常見問題。</p>';
-                } else {
-                    faqs.forEach(faq => {
-                        const item = document.createElement('div');
-                        item.className = 'card';
-                        item.innerHTML = `
-                            <button class="accordion-button w-full text-left p-4 text-lg font-semibold">
-                                ${faq.q}
-                            </button>
-                            <div class="accordion-content">
-                                <p class="p-4 pt-0 text-gray-700">${faq.a}</p>
-                            </div>
-                        `;
-                        faqContainer.appendChild(item);
-                    });
-                }
-                // Re-attach accordion event listeners after rendering
-                const newFaqButtons = document.querySelectorAll('.accordion-button');
-                newFaqButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        button.classList.toggle('open');
-                        const content = button.nextElementSibling;
-                        if (content.style.maxHeight) {
-                            content.style.maxHeight = null;
-                        } else {
-                            content.style.maxHeight = content.scrollHeight + 'px';
-                        }
-                    });
-                });
-                console.log(`[DEBUG] Rendered ${faqs.length} FAQ items.`);
-            } catch (error) {
-                console.error('[ERROR] Error rendering FAQs:', error);
-                if (faqContainer) {
-                    faqContainer.innerHTML = '<div class="error-message">載入常見問題時發生錯誤。</div>';
-                }
+                localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(coffeeBeans));
+                console.log('[DEBUG] 咖啡豆資料已儲存到 localStorage。');
+            } catch (e) {
+                console.error('[ERROR] 儲存咖啡豆資料時發生錯誤:', e);
             }
-        };
+        }
 
         /**
-         * Renders customer reviews. Globally exposed.
+         * Renders the coffee bean selection dropdown and initial details.
          */
-        window.renderReviews = function() {
-            try {
-                const reviewList = document.getElementById('review-list');
-                if (!reviewList) {
-                    console.error('[ERROR] reviewList element not found!');
-                    return;
-                }
-                reviewList.innerHTML = '';
-                // If reviews is empty, display a message
-                if (Array.isArray(reviews) && reviews.length === 0) {
-                    reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
-                    console.log('[DEBUG] No reviews to render.');
-                } else {
-                    reviews.forEach(review => {
-                        const item = document.createElement('div');
-                        item.className = 'card p-6 mb-4 border-b border-gray-200 pb-4'; /* Added border and bottom padding */
-                        item.innerHTML = `
-                            <div class="flex items-center mb-2">
-                                <span class="font-semibold text-lg mr-2">${review.name}</span>
-                                <span class="text-yellow-500">${review.rating}</span>
-                            </div>
-                            <p class="text-gray-700">${review.content}</p>
-                        `;
-                        reviewList.appendChild(item);
-                    });
-                    console.log(`[DEBUG] Rendered ${reviews.length} review items.`);
-                }
-            } catch (error) {
-                console.error('[ERROR] Error rendering reviews:', error);
-                if (reviewList) {
-                    reviewList.innerHTML = '<div class="error-message">載入顧客回饋時發生錯誤。</div>';
-                }
+        function renderCoffeeBeanSelection() {
+            const flavorSelect = document.getElementById('flavor-select');
+            if (!flavorSelect) return;
+
+            flavorSelect.innerHTML = '<option value="" disabled selected>請選擇咖啡豆...</option>';
+            coffeeBeans.forEach(bean => {
+                const option = document.createElement('option');
+                option.value = bean.id;
+                option.textContent = bean.name;
+                flavorSelect.appendChild(option);
+            });
+            console.log('[DEBUG] 咖啡豆選擇下拉選單已渲染。');
+            // Select the first bean by default and display its details
+            if (coffeeBeans.length > 0) {
+                flavorSelect.value = coffeeBeans[0].id;
+                displayBeanDetails(coffeeBeans[0]);
+                updateRadarChart(coffeeBeans[0].flavorProfile);
             }
-        };
+        }
 
         /**
-         * Populates the flavor guide select box and initializes/updates the radar chart. Globally exposed.
+         * Displays details of a selected coffee bean.
+         * @param {Object} bean - The coffee bean object.
          */
-        window.updateFlavorGuideSelect = function() {
-            try {
-                const flavorSelect = document.getElementById('flavor-select');
-                const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-                const beanDetailsDisplay = document.getElementById('bean-details-display');
+        function displayBeanDetails(bean) {
+            if (!bean) return;
 
-                if (!flavorSelect) {
-                    console.error('[ERROR] flavorSelect element not found!');
-                    return;
-                }
-                console.log('[DEBUG] Updating flavor guide selector. Number of coffee beans:', coffeeBeans.length);
+            document.getElementById('detail-name').textContent = bean.name || 'N/A';
+            document.getElementById('detail-country').textContent = bean.country || 'N/A';
+            document.getElementById('detail-variety').textContent = bean.variety || 'N/A';
+            document.getElementById('detail-roast').textContent = bean.roast || 'N/A';
+            document.getElementById('detail-weight').textContent = bean.weight || 'N/A';
+            document.getElementById('detail-expiry').textContent = bean.expiryDate || 'N/A';
+            document.getElementById('detail-flavor').textContent = bean.flavor || 'N/A';
+            document.getElementById('detail-price').textContent = bean.price ? bean.price.toLocaleString() : 'N/A';
+            document.getElementById('detail-stock').textContent = bean.stock !== undefined ? bean.stock : 'N/A';
+            
+            const stockStatusElement = document.getElementById('stock-status');
+            stockStatusElement.className = 'stock-indicator'; // Reset classes
+            if (bean.stock > 5) {
+                stockStatusElement.textContent = '庫存充足';
+                stockStatusElement.classList.add('stock-in-stock');
+            } else if (bean.stock > 0 && bean.stock <= 5) {
+                stockStatusElement.textContent = '庫存緊張';
+                stockStatusElement.classList.add('stock-low-stock');
+            } else {
+                stockStatusElement.textContent = '已售罄';
+                stockStatusElement.classList.add('stock-out-of-stock');
+            }
 
-                // Repopulate options based on potentially updated coffee beans
-                flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
-                if (Array.isArray(coffeeBeans)) {
-                    coffeeBeans.forEach(bean => {
-                        const option = document.createElement('option');
-                        option.value = bean.id;
-                        option.textContent = bean.name;
-                        flavorSelect.appendChild(option);
-                    });
-                }
+            // Update lifestyle suggestion
+            document.getElementById('lifestyle-suggestion').querySelector('p').textContent = bean.lifestyle || '此款咖啡風味獨特，能豐富您的日常，為您帶來愉悅的品飲體驗。';
+            
+            const beanDetailsDisplay = document.getElementById('bean-details-display');
+            beanDetailsDisplay.classList.remove('is-visible');
+            void beanDetailsDisplay.offsetWidth; // Trigger reflow
+            beanDetailsDisplay.classList.add('is-visible');
+            console.log(`[DEBUG] 咖啡豆詳細資訊已更新: ${bean.name}`);
+        }
 
-                const ctx = document.getElementById('flavorRadarChart')?.getContext('2d');
-                if (ctx) {
-                    // Destroy old chart if it exists to prevent re-initialization issues
-                    if (radarChart) { // radarChart is a global variable
-                        radarChart.destroy();
-                        console.log('[DEBUG] Destroyed existing radar chart.');
-                    }
-                    radarChart = new Chart(ctx, {
-                        type: 'radar',
-                        data: {
-                            labels: ['酸度', '醇厚度', '甜度', '香氣', '餘韻'],
-                            datasets: [{
-                                label: '風味圖譜',
-                                data: [0, 0, 0, 0, 0],
-                                backgroundColor: 'rgba(181, 136, 99, 0.2)',
-                                borderColor: 'rgba(181, 136, 99, 1)',
-                                pointBackgroundColor: 'rgba(181, 136, 99, 1)',
-                                pointBorderColor: '#fff',
-                                pointHoverBackgroundColor: '#fff',
-                                pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
-                            }]
+        /**
+         * Initializes or updates the flavor radar chart.
+         * @param {Object} flavorProfile - Object with acidity, body, sweetness, aroma, finish ratings.
+         */
+        function updateRadarChart(flavorProfile) {
+            const ctx = document.getElementById('flavorRadarChart');
+            if (!ctx) {
+                console.warn('Radar chart canvas not found!');
+                return;
+            }
+
+            const data = {
+                labels: ['酸度 (Acidity)', '醇厚度 (Body)', '甜度 (Sweetness)', '香氣 (Aroma)', '餘韻 (Finish)'],
+                datasets: [{
+                    label: '風味評分 (1-5)',
+                    data: [
+                        flavorProfile.acidity || 0,
+                        flavorProfile.body || 0,
+                        flavorProfile.sweetness || 0,
+                        flavorProfile.aroma || 0,
+                        flavorProfile.finish || 0
+                    ],
+                    backgroundColor: 'rgba(181, 136, 99, 0.5)', // --color-primary with opacity
+                    borderColor: 'rgba(181, 136, 99, 1)',
+                    borderWidth: 1,
+                    pointBackgroundColor: 'rgba(181, 136, 99, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
+                }]
+            };
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: '#ccc'
                         },
-                        options: {
-                            scales: {
-                                r: {
-                                    angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
-                                    grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                                    pointLabels: { font: { size: 14, family: "'Noto Sans TC', sans-serif" } },
-                                    suggestedMin: 0,
-                                    suggestedMax: 5,
-                                    ticks: {
-                                        stepSize: 1,
-                                        backdropColor: 'transparent'
-                                    }
-                                }
+                        grid: {
+                            color: '#e0e0e0'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 14,
+                                family: 'Noto Sans TC'
                             },
-                            plugins: {
-                                legend: {
-                                    display: false
+                            color: '#333'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 5,
+                        ticks: {
+                            stepSize: 1,
+                            display: false // Hide numbers on the scale
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Hide the legend
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
                                 }
+                                if (context.parsed.r !== null) {
+                                    label += context.parsed.r;
+                                }
+                                return label;
                             }
                         }
-                    });
-                    console.log('[DEBUG] Created new radar chart.');
-                } else {
-                    console.error('[ERROR] flavorRadarChart canvas context not found!');
-                }
-
-                // Remove and re-add event listener to prevent duplication
-                flavorSelect.removeEventListener('change', window.handleFlavorSelectChange); 
-                flavorSelect.addEventListener('change', window.handleFlavorSelectChange);
-
-                // Trigger change to load data for the first item or display message if no data
-                if(Array.isArray(coffeeBeans) && coffeeBeans.length > 0) {
-                    flavorSelect.value = coffeeBeans[0].id; // Set the first item as default selected
-                    flavorSelect.dispatchEvent(new Event('change'));
-                    console.log('[DEBUG] Flavor selector initialized with first coffee bean.');
-                } else {
-                    if(lifestyleSuggestionP) {
-                        lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
-                        console.log('[DEBUG] No coffee beans, setting flavor guide message.');
-                    }
-                    if (beanDetailsDisplay) {
-                        beanDetailsDisplay.classList.remove('is-visible'); // Ensure hiding animation and content if no data
-                        beanDetailsDisplay.style.opacity = '0';
-                        beanDetailsDisplay.style.pointerEvents = 'none';
                     }
                 }
-            } catch (error) {
-                console.error('[ERROR] Error updating flavor guide:', error);
-                if (flavorSelect) {
-                    flavorSelect.innerHTML = '<option value="" disabled selected>載入風味指南時發生錯誤。</option>';
-                }
-                if (lifestyleSuggestionP) {
-                    lifestyleSuggestionP.textContent = '風味指南載入失敗，請檢查數據。';
-                    lifestyleSuggestionP.classList.add('error-message');
-                }
-                if (beanDetailsDisplay) {
-                    beanDetailsDisplay.classList.remove('is-visible');
-                    beanDetailsDisplay.style.opacity = '0';
-                    beanDetailsDisplay.style.pointerEvents = 'none';
-                }
+            };
+
+            if (radarChart) {
+                radarChart.data = data;
+                radarChart.options = options;
+                radarChart.update();
+                console.log('[DEBUG] 雷達圖已更新。');
+            } else {
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: data,
+                    options: options
+                });
+                console.log('[DEBUG] 雷達圖已初始化。');
             }
-        };
+        }
 
         /**
-         * Handles the change event for the flavor select dropdown.
-         * Updates the radar chart, lifestyle suggestion, and coffee bean details based on the selected bean. Globally exposed.
+         * Loads reviews data from localStorage or uses default data.
          */
-        window.handleFlavorSelectChange = function(e) {
+        function loadReviews() {
             try {
-                const selectedBean = Array.isArray(coffeeBeans) ? coffeeBeans.find(b => b.id == e.target.value) : undefined;
-                const beanDetailsDisplay = document.getElementById('bean-details-display');
-                const brewingVisualizer = document.getElementById('brewing-visualizer');
-                const coffeeLiquid = brewingVisualizer?.querySelector('.brewing-liquid');
-
-                if (selectedBean && radarChart && beanDetailsDisplay) {
-                    // Get references inside the handler to ensure they are available
-                    const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-                    const detailName = document.getElementById('detail-name');
-                    const detailCountry = document.getElementById('detail-country');
-                    const detailVariety = document.getElementById('detail-variety');
-                    const detailRoast = document.getElementById('detail-roast');
-                    const detailWeight = document.getElementById('detail-weight');
-                    const detailExpiry = document.getElementById('detail-expiry');
-                    const detailFlavor = document.getElementById('detail-flavor');
-                    const detailPrice = document.getElementById('detail-price');
-                    const detailStock = document.getElementById('detail-stock');
-                    const stockStatus = document.getElementById('stock-status');
-
-                    // Step 1: Hide the actual details and show brewing animation
-                    beanDetailsDisplay.style.opacity = '0';
-                    beanDetailsDisplay.style.pointerEvents = 'none';
-                    if (brewingVisualizer && coffeeLiquid) {
-                        brewingVisualizer.classList.add('active'); // Make brewing visualizer visible
-                        coffeeLiquid.style.height = '0%'; // Reset liquid fill
-                        setTimeout(() => {
-                            coffeeLiquid.style.height = '80%'; // Start liquid fill animation
-                        }, 50); // Small delay to ensure CSS reset takes effect
-                    }
-
-                    // Update radar chart immediately
-                    const flavorData = selectedBean.flavorProfile && typeof selectedBean.flavorProfile === 'object' 
-                                        ? Object.values(selectedBean.flavorProfile) 
-                                        : [0, 0, 0, 0, 0];
-                    radarChart.data.datasets[0].data = flavorData;
-                    radarChart.data.datasets[0].label = selectedBean.name;
-                    radarChart.update();
-                    
-                    // After brewing animation, show actual details and hide animation
-                    setTimeout(() => {
-                        if (brewingVisualizer) {
-                            brewingVisualizer.classList.remove('active'); // Hide brewing visualizer
-                        }
-
-                        // Step 2: Populate and show the actual bean details
-                        if (lifestyleSuggestionP) {
-                            lifestyleSuggestionP.textContent = selectedBean.lifestyle || '無生活提案。';
-                            lifestyleSuggestionP.classList.remove('error-message');
-                        }
-
-                        detailName.textContent = selectedBean.name || 'N/A';
-                        detailCountry.textContent = selectedBean.country || 'N/A';
-                        detailVariety.textContent = selectedBean.variety || 'N/A';
-                        detailRoast.textContent = selectedBean.roast || 'N/A';
-                        detailWeight.textContent = selectedBean.weight || 'N/A'; /* FIXED: changed selectedD.weight to selectedBean.weight */
-                        detailExpiry.textContent = selectedBean.expiryDate || 'N/A';
-                        detailFlavor.textContent = selectedBean.flavor || 'N/A';
-                        detailPrice.textContent = selectedBean.price || '---';
-                        detailStock.textContent = selectedBean.stock || 0;
-                        
-                        stockStatus.className = 'stock-indicator';
-                        if (selectedBean.stock === 0) {
-                            stockStatus.textContent = '已售罄';
-                            stockStatus.classList.add('stock-out-of-stock');
-                        } else if (selectedBean.stock > 0 && selectedBean.stock <= 5) {
-                            stockStatus.textContent = '庫存緊張';
-                            stockStatus.classList.add('stock-low-stock');
-                        } else {
-                            stockStatus.textContent = '有貨';
-                            stockStatus.classList.add('stock-in-stock');
-                        }
-
-                        beanDetailsDisplay.style.opacity = '1'; // Make details visible
-                        beanDetailsDisplay.style.pointerEvents = 'auto'; // Re-enable pointer events
-                        beanDetailsDisplay.classList.add('is-visible'); // Trigger fade-in-up if it applies
-                        console.log('[DEBUG] Flavor selection changed. Updated radar chart, lifestyle suggestion, and coffee bean details:', selectedBean.name);
-
-                    }, 1800); // Wait for brewing animation to complete (1.5s transition + 0.3s buffer)
-
-                } else if (!selectedBean) {
-                    console.warn('[WARNING] Selected coffee bean with ID not found:', e.target.value);
-                    const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-                    const beanDetailsDisplay = document.getElementById('bean-details-display');
-                    const brewingVisualizer = document.getElementById('brewing-visualizer');
-
-                    if (lifestyleSuggestionP) {
-                        lifestyleSuggestionP.textContent = '無法找到選定的咖啡豆風味數據。';
-                        lifestyleSuggestionP.classList.add('error-message');
-                    }
-                    // If no bean is selected or found, hide both the visualizer and details
-                    if (brewingVisualizer) brewingVisualizer.classList.remove('active');
-                    if (beanDetailsDisplay) {
-                        beanDetailsDisplay.style.opacity = '0';
-                        beanDetailsDisplay.style.pointerEvents = 'none';
-                    }
+                const storedReviews = JSON.parse(localStorage.getItem(REVIEWS_KEY));
+                if (storedReviews && storedReviews.length > 0) {
+                    reviews = storedReviews;
+                    console.log('[DEBUG] 評論資料從 localStorage 載入成功:', reviews);
+                } else {
+                    reviews = defaultReviews; // Ensure it's an empty array if no default reviews are desired
+                    saveReviews(); // Save empty array if localStorage was empty and no default
+                    console.log('[DEBUG] 載入預設評論資料 (可能為空)。');
                 }
-            } catch (error) {
-                console.error('[ERROR] Error handling flavor selection change:', error);
-                const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-                const beanDetailsDisplay = document.getElementById('bean-details-display');
-                const brewingVisualizer = document.getElementById('brewing-visualizer');
+            } catch (e) {
+                console.error('[ERROR] 載入評論資料時發生錯誤，使用預設資料:', e);
+                reviews = defaultReviews;
+            }
+        }
 
-                if (lifestyleSuggestionP) {
-                    lifestyleSuggestionP.textContent = '載入選定咖啡豆風味時發生錯誤。';
-                    lifestyleSuggestionP.classList.add('error-message');
-                }
-                if (brewingVisualizer) brewingVisualizer.classList.remove('active');
-                if (beanDetailsDisplay) {
-                    beanDetailsDisplay.style.opacity = '0';
-                    beanDetailsDisplay.style.pointerEvents = 'none';
+        /**
+         * Saves reviews data to localStorage.
+         */
+        function saveReviews() {
+            try {
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+                console.log('[DEBUG] 評論資料已儲存到 localStorage。');
+            } catch (e) {
+                console.error('[ERROR] 儲存評論資料時發生錯誤:', e);
+            }
+        }
+
+        /**
+         * Renders the list of reviews.
+         */
+        function renderReviews() {
+            const reviewList = document.getElementById('review-list');
+            if (!reviewList) return;
+
+            reviewList.innerHTML = ''; // Clear previous reviews
+            if (reviews.length === 0) {
+                reviewList.innerHTML = '<p class="text-center text-gray-500">目前沒有任何評論，快來成為第一個分享心得的人吧！</p>';
+                return;
+            }
+
+            reviews.forEach((review, index) => {
+                const reviewElement = document.createElement('div');
+                reviewElement.className = 'card p-6 flex items-start space-x-4 fade-in-up';
+                reviewElement.style.transitionDelay = `${index * 50}ms`; // Stagger animation
+                reviewElement.innerHTML = `
+                    <div class="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-xl font-bold">
+                        ${review.name.charAt(0)}
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-semibold text-lg text-secondary">${review.name}</h4>
+                            <span class="text-yellow-500">${review.rating}</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed">${review.content}</p>
+                        <p class="text-sm text-gray-500 mt-2">${review.date}</p>
+                    </div>
+                `;
+                reviewList.appendChild(reviewElement);
+            });
+            console.log('[DEBUG] 評論列表已渲染。');
+        }
+
+        /**
+         * Handles review form submission.
+         * @param {Event} event - The form submission event.
+         */
+        function handleReviewSubmit(event) {
+            event.preventDefault();
+
+            const reviewerName = document.getElementById('reviewer-name').value.trim();
+            const reviewRating = document.getElementById('review-rating').value;
+            const reviewContent = document.getElementById('review-content').value.trim();
+
+            if (!reviewerName || !reviewRating || !reviewContent) {
+                showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位！', 'error');
+                return;
+            }
+
+            const newReview = {
+                id: reviews.length > 0 ? Math.max(...reviews.map(r => r.id)) + 1 : 1,
+                name: reviewerName,
+                rating: reviewRating,
+                content: reviewContent,
+                date: new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' })
+            };
+
+            reviews.push(newReview);
+            saveReviews();
+            renderReviews();
+            event.target.reset(); // Clear form
+            showFrontMessageModal('感謝您的評論！', '您的寶貴意見已成功送出！', 'success');
+            console.log('[DEBUG] 新評論已提交:', newReview);
+        }
+
+        /**
+         * Renders FAQ items.
+         */
+        function renderFaqs() {
+            const faqContainer = document.getElementById('faq-container');
+            if (!faqContainer) return;
+
+            faqContainer.innerHTML = '';
+            faqs.forEach((faq, index) => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'bg-white rounded-lg shadow-md overflow-hidden fade-in-up';
+                faqItem.style.transitionDelay = `${index * 70}ms`; // Stagger animation
+                faqItem.innerHTML = `
+                    <button class="accordion-button w-full text-left p-5 font-semibold text-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors rounded-t-lg">
+                        ${faq.q}
+                    </button>
+                    <div class="accordion-content p-5 text-gray-700 leading-relaxed bg-white">
+                        <p>${faq.a}</p>
+                    </div>
+                `;
+                faqContainer.appendChild(faqItem);
+            });
+
+            // Add event listeners for accordion
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    button.classList.toggle('open');
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }
+                });
+            });
+            console.log('[DEBUG] FAQ 列表已渲染。');
+        }
+
+        /**
+         * Handles inquiry form submission.
+         * @param {Event} event - The form submission event.
+         */
+        function handleInquirySubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('inquiry-name').value.trim();
+            const email = document.getElementById('inquiry-email').value.trim();
+            const message = document.getElementById('inquiry-message').value.trim();
+
+            if (!name || !email || !message) {
+                showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位！', 'error');
+                return;
+            }
+            if (!email.includes('@') || !email.includes('.')) {
+                showFrontMessageModal('電子郵件格式錯誤', '請輸入有效的電子郵件地址！', 'error');
+                return;
+            }
+
+            console.log('[DEBUG] 聯絡表單提交:', { name, email, message });
+            // Here you would typically send this data to a server (e.g., via fetch API)
+            // For this example, we'll just show a success message.
+
+            showFrontMessageModal('訊息已送出', '感謝您的詢問，我們將盡快與您聯繫！', 'success');
+            event.target.reset(); // Clear form
+        }
+
+        /**
+         * Shows a random coffee fact as a toast message.
+         */
+        function showCoffeeFactToast() {
+            const facts = [
+                '咖啡是世界上第二大交易的商品，僅次於石油。',
+                '每天全球消耗約22.5億杯咖啡。',
+                '最早發現咖啡提神作用的是衣索比亞的牧羊人。',
+                '濾掛咖啡是日本人發明的。',
+                '咖啡豆其實是咖啡果實的種子。',
+                '一杯拿鐵的「拿鐵」是義大利語「牛奶」的意思。',
+                '淺烘焙的咖啡含有更多咖啡因，因為烘焙過程會消耗咖啡因。',
+                '貓咪不能喝咖啡，對牠們來說咖啡因是有毒的。',
+                '咖啡渣可以去除冰箱異味、充當肥料。',
+                '喝咖啡可以降低多種疾病的風險，例如肝癌和帕金森氏症。'
+            ];
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            const toast = document.getElementById('coffee-fact-toast');
+            toast.querySelector('p').textContent = randomFact;
+            toast.classList.add('show');
+
+            // Hide after a few seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000); // Show for 5 seconds
+            console.log('[DEBUG] 咖啡小知識彈窗顯示。');
+        }
+
+        // --- Scroll Progress Indicator & Back to Top Button ---
+        const scrollProgressIndicator = document.getElementById('scroll-progress-indicator');
+        const chapterCounter = document.getElementById('chapter-counter');
+        const currentChapterText = document.getElementById('current-chapter-text');
+        const progressCircleFill = document.getElementById('progress-circle-fill');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
+
+        const sectionElementsArray = sectionsData.map(s => document.getElementById(s.id)).filter(Boolean); // Get actual elements
+
+        /**
+         * Updates the scroll progress indicator.
+         */
+        function updateScrollProgress() {
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = window.scrollY;
+            const progress = (scrolled / totalHeight);
+
+            // Update circular progress
+            const circumference = 13 * 2 * Math.PI; // r=13 for the circle
+            progressCircleFill.style.strokeDashoffset = circumference - (progress * circumference);
+
+            // Determine current section
+            let currentSection = sectionsData[0]; // Default to home
+            let currentSectionNum = 1;
+            for (let i = 0; i < sectionElementsArray.length; i++) {
+                const section = sectionElementsArray[i];
+                if (section.getBoundingClientRect().top <= window.innerHeight / 2 &&
+                    section.getBoundingClientRect().bottom >= window.innerHeight / 2) {
+                    currentSection = sectionsData[i];
+                    currentSectionNum = i + 1;
+                    currentActiveSectionIndex = i; // Update global index
+                    break;
                 }
             }
+            currentChapterText.textContent = currentSection.title;
+            chapterCounter.textContent = `${currentSectionNum}/${sectionsData.length}`;
+
+            // Update camera and light based on current section
+            setSectionView(currentSection);
+
+            // Show/hide back to top button
+            if (scrolled > window.innerHeight / 2) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
+
+        // --- Loading Overlay Management ---
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        /**
+         * Hides the loading overlay.
+         */
+        function hideLoadingOverlay() {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 500); // Match transition duration
+            console.log('[DEBUG] 載入畫面已隱藏。');
+        }
+
+        // --- Initialization and Event Listeners ---
+        window.loadAndRenderAllData = function() {
+            loadCoffeeBeans();
+            renderCoffeeBeanSelection();
+            loadReviews();
+            renderReviews();
+            renderFaqs();
+            // Start particle generation only after data is loaded and rendered
+            startParticleGeneration();
+            showCoffeeFactToast(); // Show initial fact after everything loads
+            updateScrollProgress(); // Initial update for scroll progress and 3D view
         };
-
-
-        // --- Event Listeners and Initialization ---
+        
         document.addEventListener('DOMContentLoaded', () => {
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const reviewForm = document.getElementById('review-form');
-            const inquiryForm = document.getElementById('inquiry-form');
-            const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
-            const backToTopBtn = document.getElementById('back-to-top-btn');
-            const scrollDownBtn = document.getElementById('scroll-down-btn');
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('main > section');
-
-            // --- Loading overlay hide ---
-            window.addEventListener('load', () => {
-                if (loadingOverlay) {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 500); // Matches CSS transition time
-                }
-            });
-
-
-            // --- LocalStorage change listener (for cross-tab synchronization) ---
-            window.addEventListener('storage', (event) => {
-                console.log('[DEBUG] Storage event triggered!', event.key, event.oldValue, event.newValue, event.url);
-
-                // React only to changes in coffee beans and reviews
-                if (event.key === COFFEE_BEANS_KEY || event.key === REVIEWS_KEY) {
-                    console.log(`[DEBUG] localStorage key '${event.key}' changed. Reloading data.`);
-                    window.loadAndRenderAllData();
-                }
-            });
-
-            // --- Review form submission ---
-            if(reviewForm) {
-                reviewForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    try {
-                        const newReview = {
-                            name: document.getElementById('reviewer-name').value.trim(),
-                            rating: document.getElementById('review-rating').value,
-                            content: document.getElementById('review-content').value.trim(),
-                        };
-                        if (!newReview.name || !newReview.rating || !newReview.content) {
-                            showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位。', 'error');
-                            return;
-                        }
-                        newReview.id = reviews.length ? Math.max(...reviews.map(r => r.id || 0)) + 1 : 1;
-
-                        reviews.push(newReview);
-                        localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); 
-                        window.renderReviews();
-                        reviewForm.reset();
-                        showFrontMessageModal('感謝您', '您的評論已成功送出！', 'success');
-                        console.log('[DEBUG] New review submitted:', newReview);
-                    }
-                    catch (error) {
-                        console.error('[ERROR] Error submitting review:', error);
-                        showFrontMessageModal('提交錯誤', '提交評論時發生錯誤，請稍後再試。', 'error');
-                    }
-                });
-                console.log('[DEBUG] Review form event listener attached.');
-            } else {
-                console.error('[ERROR] Review form element not found!');
-            }
+            console.log('[DEBUG] DOM 已完全載入。');
             
-            // --- Inquiry form submission ---
-            if(inquiryForm) {
-                inquiryForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    try {
-                        const name = document.getElementById('inquiry-name').value.trim();
-                        const email = document.getElementById('inquiry-email').value.trim();
-                        const message = document.getElementById('inquiry-message').value.trim();
-                        
-                        const emailInput = document.getElementById('inquiry-email');
-                        if (!emailInput.checkValidity()) {
-                            showFrontMessageModal('輸入錯誤', '請輸入有效的電子郵件地址。', 'error');
-                            return;
-                        }
-                        if (!name || !email || !message) {
-                            showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位。', 'error');
-                            return;
-                        }
+            // Initialize Three.js first
+            initThreeJS();
+            animate(); // Start the Three.js animation loop
 
-                        const subject = encodeURIComponent(`來自網站的詢問 - ${name}`);
-                        const body = encodeURIComponent(`發件人姓名: ${name}\n發件人電子郵件: ${email}\n\n訊息內容:\n${message}`);
-                        
-                        const mailtoLink = `mailto:melodybean33427@gmail.com?subject=${subject}&body=${body}`;
-                        window.location.href = mailtoLink;
-
-                        showFrontMessageModal('訊息已準備', '您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。', 'info');
-                        inquiryForm.reset();
-                        console.log('[DEBUG] Inquiry form submitted:', name);
-                    } catch (error) {
-                        console.error('[ERROR] Error submitting inquiry form:', error);
-                        showFrontMessageModal('提交錯誤', '提交詢問時發生錯誤，請稍後再試。', 'error');
+            // Attach event listeners after DOM is loaded
+            const flavorSelect = document.getElementById('flavor-select');
+            if (flavorSelect) {
+                flavorSelect.addEventListener('change', (event) => {
+                    const selectedBeanId = parseInt(event.target.value);
+                    const selectedBean = coffeeBeans.find(bean => bean.id === selectedBeanId);
+                    if (selectedBean) {
+                        displayBeanDetails(selectedBean);
+                        updateRadarChart(selectedBean.flavorProfile);
                     }
                 });
-                console.log('[DEBUG] Inquiry form event listener attached.');
             } else {
-                console.error('[ERROR] Inquiry form element not found!');
+                console.error('[ERROR] Flavor select element not found!');
             }
 
-            // --- Refresh coffee button listener ---
+            const reviewForm = document.getElementById('review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', handleReviewSubmit);
+            } else {
+                console.error('[ERROR] Review form not found!');
+            }
+
+            const inquiryForm = document.getElementById('inquiry-form');
+            if (inquiryForm) {
+                inquiryForm.addEventListener('submit', handleInquirySubmit);
+            } else {
+                console.error('[ERROR] Inquiry form not found!');
+            }
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                console.log('[DEBUG] 返回頂部按鈕被點擊。');
+            });
+
+            // Refresh button listener
+            const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
             if (refreshCoffeeBtn) {
                 refreshCoffeeBtn.addEventListener('click', () => {
                     console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
-                    window.loadAndRenderAllData();
+                    window.loadAndRenderAllData(); // Reloads all data
                     showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
                 });
             } else {
                 console.error('[ERROR] Refresh coffee button not found!');
             }
+            
+            // Event listener for scroll to update progress and 3D view
+            window.addEventListener('scroll', updateScrollProgress);
 
+            // Hide loading overlay once all initial setup is done
+            window.addEventListener('load', () => {
+                hideLoadingOverlay();
+                // Initial data load and render
+                window.loadAndRenderAllData();
+            });
 
-            // --- Scroll animation observer ---
+            // Scroll animation observer
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        // Only unobserve elements that do not repeat animations (e.g., simple fade-in-up elements)
-                        if (!entry.target.classList.contains('animate-pulse-on-scroll')) {
+                        // For section titles, also trigger pulse animation if they have that class
+                        if (entry.target.classList.contains('animate-pulse-on-scroll')) {
+                            // This class is added to trigger the animation. The animation itself might be infinite or one-shot.
+                        }
+                        // Stop observing once visible to prevent re-triggering for fade-in-up
+                        if (!entry.target.classList.contains('section-title')) { // Keep observing titles for pulse if needed
                             observer.unobserve(entry.target);
                         }
                     } else {
-                        // If it's a pulsing element and it leaves the view, reset it so it can animate again on re-entry
-                        if (entry.target.classList.contains('animate-pulse-on-scroll')) {
-                            entry.target.classList.remove('is-visible');
-                        }
+                        // Remove is-visible if it scrolls out of view, might be useful for re-triggering animation on re-entry
+                        // entry.target.classList.remove('is-visible'); 
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
 
-            document.querySelectorAll('.fade-in-up, .animate-pulse-on-scroll').forEach(el => {
+            document.querySelectorAll('.fade-in-up').forEach(el => {
                 observer.observe(el);
             });
             console.log('[DEBUG] Scroll animation observer set up.');
 
-
-            // --- Navigation active state listener ---
-            // Listen to all main content sections to update navigation active state
-            const navObserver = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    const id = entry.target.id;
-                    const navLink = document.querySelector(`.nav-link[href="#${id}"]`);
-                    if (navLink) {
-                        // Trigger when the center of the section enters or leaves the viewport
-                        // More precisely determine the current active section to avoid multiple links highlighting
-                        if (entry.isIntersecting && entry.intersectionRatio > 0.4) {
-                             navLinks.forEach(link => link.classList.remove('active-nav'));
-                             navLink.classList.add('active-nav');
-                            
-                            // When scrolling changes active section, also trigger 3D model view switch
-                            const sectionIndex = sectionsData.findIndex(s => s.id === id);
-                            if (sectionIndex !== -1 && currentActiveSectionIndex !== sectionIndex) {
-                                currentActiveSectionIndex = sectionIndex;
-                                setSectionView(sectionsData[currentActiveSectionIndex]);
-                            }
-                        }
-                    }
-                });
-            }, { threshold: 0.4 }); // Trigger when 40% of the section is visible
-
-            sections.forEach(section => {
-                navObserver.observe(section);
-            });
-
-            // Add smooth scroll to navigation links
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring(1);
-                    scrollToSection(targetId); // Use our new unified scroll function
-                });
-            });
-
-
-            // --- Back to top button logic ---
-            const scrollThreshold = 300; // Show button after scrolling 300px
-            if (backToTopBtn) {
-                // Show/hide button
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > scrollThreshold) { 
-                        backToTopBtn.classList.add('show');
-                    } else {
-                        backToTopBtn.classList.remove('show');
-                    }
-                });
-
-                // Scroll to top on click
-                backToTopBtn.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                    // When returning to top, switch 3D model view back to home state
-                    scrollToSection('home');
-                });
-                console.log('[DEBUG] Back to top button event listener attached.');
-            } else {
-                console.error('[ERROR] Back to top button not found!');
-            }
-
-            // --- Home section scroll down button logic ---
+            // Add event listener for scroll-down-btn on home section
+            const scrollDownBtn = document.getElementById('scroll-down-btn');
             if (scrollDownBtn) {
                 scrollDownBtn.addEventListener('click', () => {
-                    const firstSection = document.querySelector('main > section:nth-of-type(2)'); // Skip home section
+                    const firstSection = document.getElementById('coffee-machine-display'); // Scroll to the next section after home
                     if (firstSection) {
-                        scrollToSection(firstSection.id); // Use new unified scroll function
+                        firstSection.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
-                console.log('[DEBUG] Scroll down button event listener attached.');
-            } else {
-                console.error('[ERROR] Scroll down button not found!');
             }
 
-
-            // --- Coffee fact toast logic ---
-            const coffeeFacts = [
-                "你知道嗎？咖啡曾經在17世紀被土耳其視為非法，因為它會刺激人們討論政治！",
-                "全球每天消耗約22.5億杯咖啡，咖啡是世界上最受歡迎的飲品之一。",
-                "咖啡豆實際上是咖啡果實的種子。",
-                "世界上最昂貴的咖啡是「麝香貓咖啡」，由麝香貓吃下咖啡豆後排泄出來。",
-                "烘焙越深的咖啡豆，咖啡因含量反而越低，因為高溫會分解咖啡因。"
-            ];
-            let lastScrollY = 0;
-            let factDisplayed = false;
-            const factToast = document.getElementById('coffee-fact-toast');
-            const factText = factToast?.querySelector('p');
-            let scrollTriggerTimeout;
-
-            function showRandomCoffeeFact() {
-                if (!factToast || !factText || factDisplayed) return;
-
-                const randomIndex = Math.floor(Math.random() * coffeeFacts.length);
-                factText.textContent = coffeeFacts[randomIndex];
-                factToast.classList.add('show');
-                factDisplayed = true; // Set flag when toast is shown
-
-                setTimeout(() => {
-                    factToast.classList.remove('show');
-                    setTimeout(() => {
-                        factDisplayed = false; // Allow new fact after fade out
-                    }, 500); // After transition ends
-                }, 6000); // Display for 6 seconds
-            }
-
-            // Trigger fact randomly on scroll, but with a debounce and frequency control
-            window.addEventListener('scroll', () => {
-                const currentScrollY = window.scrollY;
-                const scrollDifference = Math.abs(currentScrollY - lastScrollY);
-
-                clearTimeout(scrollTriggerTimeout); // Clear previous timeout on new scroll event
-
-                if (scrollDifference > 100 && !factDisplayed) { // Only consider significant scrolls and if no fact is active
-                    scrollTriggerTimeout = setTimeout(() => {
-                        if (Math.random() < 0.15) { // 15% chance to show a fact after a scroll
-                            showRandomCoffeeFact();
-                        }
-                    }, 200); // Debounce time
-                }
-                lastScrollY = currentScrollY;
-            });
-            console.log('[DEBUG] Coffee fact toast event listener attached.');
-
-
-            // --- Coffee Knowledge "Read More" link functionality ---
-            const moreInfoLinks = document.querySelectorAll('.more-info-link');
-            moreInfoLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const knowledgeId = this.dataset.knowledgeId;
+            // More Info Links for Knowledge section
+            document.querySelectorAll('.more-info-link').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const knowledgeId = event.target.dataset.knowledgeId;
                     const article = knowledgeArticles[knowledgeId];
                     if (article) {
-                        showFrontMessageModal(article.title, article.content);
+                        showFrontMessageModal(article.title, article.content, 'info');
                     } else {
-                        showFrontMessageModal('錯誤', '找不到相關知識文章。', 'error');
+                        showFrontMessageModal('錯誤', '找不到此篇文章內容。', 'error');
                     }
                 });
             });
-            console.log('[DEBUG] Knowledge article "Read More" link event listeners attached.');
 
-            // --- Close modal when clicking outside of it ---
-            if (frontMessageModal) {
-                frontMessageModal.addEventListener('click', (event) => {
-                    // Only close if the click is directly on the modal background, not on its content
-                    if (event.target === frontMessageModal) {
-                        closeFrontMessageModal();
-                    }
-                });
-                console.log('[DEBUG] Modal outside click close event listener attached.');
-            }
-
-
-            // --- Coffee Grounds flip card listener ---
-            document.querySelectorAll('.flip-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    this.classList.toggle('flipped');
-                });
-            });
-            console.log('[DEBUG] Coffee grounds flip card event listeners attached.');
-
-            // --- Scroll progress indicator update ---
-            const currentChapterText = document.getElementById('current-chapter-text');
-            const chapterCounter = document.getElementById('chapter-counter');
-            const progressCircleFill = document.getElementById('progress-circle-fill');
-            const circleCircumference = 2 * Math.PI * 13; // Radius is 13
-
-            function updateScrollProgress() {
-                const totalSections = sectionsData.length;
-                
-                // Calculate scroll progress bar (based on entire document scroll)
-                const docScrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-                const scrolled = window.scrollY;
-                const progress = docScrollHeight > 0 ? (scrolled / docScrollHeight) : 0;
-                progressCircleFill.style.strokeDashoffset = circleCircumference * (1 - progress);
-
-                // Update chapter title and counter
-                let currentSectionTitle = sectionsData[0].title;
-                let currentSectionNumber = 1;
-
-                // Determine current active section based on scroll position
-                for (let i = 0; i < sectionsData.length; i++) {
-                    const sectionElement = document.getElementById(sectionsData[i].id);
-                    if (sectionElement) {
-                        const rect = sectionElement.getBoundingClientRect();
-                        // Consider it active when the center of the section enters the viewport
-                        if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
-                            currentSectionTitle = sectionsData[i].title;
-                            currentSectionNumber = i + 1;
-                            break;
-                        }
-                    }
-                }
-                currentChapterText.textContent = currentSectionTitle;
-                chapterCounter.textContent = `${currentSectionNumber}/${totalSections}`;
-            }
-
-            // Listen to scroll event to update progress indicator
-            window.addEventListener('scroll', updateScrollProgress);
-            updateScrollProgress(); // Update once on initial load
-
-
-            // --- Three.js Initialization and Animation Start ---
-            initThreeJS();
-            animate(); // Start Three.js animation loop
-
-            // --- Initial data load and render on page load ---
-            console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
-            window.loadAndRenderAllData();
-
-            // Start 2D particle generation after initial load (separate from 3D scene)
-            startParticleGeneration();
-        });
+        }); // End DOMContentLoaded
 
         })(); // End IIFE
     </script>
