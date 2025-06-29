@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js 庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -17,9 +19,10 @@
             --color-primary: #b58863; /* 柔和木質棕 */
             --color-secondary: #3f2e2e; /* 深咖啡文字 */
             --color-accent: #6b8e23; /* 橄欖綠 */
+            --color-highlight: #fce5d8; /* 新增活潑亮點色：淺珊瑚或淺桃色 */
         }
         html {
-            scroll-behavior: smooth;
+            scroll-behavior: smooth; /* 平滑捲動 */
         }
         body {
             font-family: 'Noto Sans TC', sans-serif;
@@ -27,10 +30,12 @@
             color: var(--color-secondary);
             background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
             background-attachment: fixed;
+            overflow-x: hidden; /* 防止水平滾動條 */
         }
         h1, h2, h3, h4, .font-serif {
             font-family: 'Playfair Display', serif;
         }
+        /* 淡入上滑動畫 */
         .fade-in-up {
             opacity: 0;
             transform: translateY(30px);
@@ -40,28 +45,41 @@
             opacity: 1;
             transform: translateY(0);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        /* 卡片懸停效果 */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        .card:hover {
+            transform: translateY(-8px); /* 更明顯的提升 */
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15); /* 更強的陰影 */
+        }
+        /* 主要按鈕樣式 */
         .btn-primary {
             background-color: var(--color-primary);
             color: white;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-primary:hover {
             background-color: #a07654;
+            transform: translateY(-2px); /* 懸停時輕微上浮 */
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
         }
+        /* 次要按鈕樣式 */
         .btn-secondary {
             background-color: var(--color-secondary);
             color: white;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-secondary:hover {
             background-color: #5a4444;
+            transform: translateY(-2px); /* 懸停時輕微上浮 */
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
         }
+        /* FAQ 手風琴樣式 */
         .accordion-button::after {
-            content: '\f078'; /* Font Awesome down arrow */
+            content: '\f078'; /* Font Awesome 向下箭頭 */
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             float: right;
@@ -75,79 +93,96 @@
             overflow: hidden;
             transition: max-height 0.5s ease-in-out;
         }
+        /* 區塊標題顏色 */
         .section-title {
             color: var(--color-primary);
         }
-        .offer-price-old {
-            text-decoration: line-through;
-            color: #888;
-            font-size: 0.9em;
-            margin-right: 8px;
-        }
-        .offer-price-new {
-            color: #d9534f; /* Red for new price */
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        /* Custom styles for error messages */
+        /* 錯誤訊息樣式 */
         .error-message {
-            color: #ef4444; /* Tailwind red-500 */
+            color: #ef4444; /* Tailwind 紅色-500 */
             text-align: center;
             padding: 1rem;
-            border: 1px solid #fca5a5; /* Tailwind red-300 */
-            background-color: #fee2e2; /* Tailwind red-100 */
+            border: 1px solid #fca5a5; /* Tailwind 紅色-300 */
+            background-color: #fee2e2; /* Tailwind 紅色-100 */
             border-radius: 0.5rem;
             margin-top: 1rem;
             font-weight: 500;
         }
-        /* Adjusted card style for bean details in flavor guide */
+        /* 風味指南中咖啡豆詳細資訊的卡片樣式 */
         .card {
             background-color: var(--color-surface);
             border-radius: 0.75rem;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* Front-end Custom Modal Styles */
+        /* 前台自訂訊息彈窗樣式 */
         .front-modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
+            display: flex; /* Always flex to center content */
+            position: fixed; /* Keep in place */
+            z-index: 1000; /* Topmost */
             left: 0;
             top: 0;
             width: 100%; /* Full width */
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            background-color: rgba(0,0,0,0.6); /* Slightly darker, more prominent overlay */
             justify-content: center;
             align-items: center;
+            transition: opacity 0.3s ease-out; /* For fade-in/out */
+            opacity: 0; /* Initial state: hidden */
+            pointer-events: none; /* Disable interaction when hidden */
+        }
+        .front-modal.active { /* Use 'active' class to show modal */
+            opacity: 1;
+            pointer-events: auto; /* Enable interaction when active */
         }
         .front-modal-content {
-            background-color: #fefefe;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px;
+            background-color: var(--color-surface); /* Consistent with card background, slightly off-white */
+            padding: 30px; /* More padding */
+            border-radius: 16px; /* More rounded */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); /* Stronger shadow */
+            max-width: 450px; /* Slightly wider */
             width: 90%;
             text-align: center;
             position: relative;
+            transform: scale(0.9); /* Initial scale for pop-in effect */
+            opacity: 0; /* Initial opacity for pop-in */
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .front-modal.active .front-modal-content {
+            transform: scale(1); /* Scale up to normal size */
+            opacity: 1; /* Fade in */
         }
         .front-modal-close-button {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+            color: #888;
+            font-size: 24px; /* Smaller icon */
             position: absolute;
-            top: 10px;
-            right: 15px;
+            top: 15px;
+            right: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
         }
         .front-modal-close-button:hover,
         .front-modal-close-button:focus {
-            color: black;
+            color: var(--color-secondary);
         }
-        .front-modal-success { color: var(--color-accent); } /* Green-ish */
-        .front-modal-error { color: #ef4444; } /* Red */
+        /* Icon styling for modal */
+        #frontModalIcon { /* New icon styling */
+            font-size: 4rem; /* Large icon */
+            margin-bottom: 1rem;
+            line-height: 1; /* Ensure vertical alignment */
+        }
+        .icon-success { color: var(--color-accent); } /* Green */
+        .icon-error { color: #ef4444; } /* Red */
+        .icon-info { color: var(--color-primary); } /* Primary color for info */
 
-        /* Stock indicator styles */
+        /* Title colors for modal based on type */
+        .front-modal-success { color: var(--color-accent); }
+        .front-modal-error { color: #ef4444; }
+        .front-modal-info { color: var(--color-primary); }
+
+
+        /* 庫存指示器樣式 */
         .stock-indicator {
             font-weight: bold;
             padding: 0.25rem 0.5rem;
@@ -155,52 +190,541 @@
             font-size: 0.85em;
         }
         .stock-in-stock {
-            background-color: #d1fae5; /* Green-100 */
-            color: #065f46; /* Green-800 */
+            background-color: #d1fae5; /* 綠色-100 */
+            color: #065f46; /* 綠色-800 */
         }
         .stock-low-stock {
-            background-color: #fef3c7; /* Yellow-100 */
-            color: #92400e; /* Yellow-800 */
+            background-color: #fef3c7; /* 黃色-100 */
+            color: #92400e; /* 黃色-800 */
         }
         .stock-out-of-stock {
-            background-color: #fee2e2; /* Red-100 */
-            color: #991b1b; /* Red-800 */
+            background-color: #fee2e2; /* 紅色-100 */
+            color: #991b1b; /* 紅色-800 */
+        }
+
+        /* 區塊標題脈衝動畫 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.01); opacity: 0.95; }
+        }
+        .section-title.animate-pulse-on-scroll.is-visible {
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        /* 首頁標題與段落動畫 */
+        @keyframes fadeInSlideUp {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        #home .relative.text-center.z-10 h1 { 
+            animation: fadeInSlideUp 1.2s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+        #home .relative.text-center.z-10 p { 
+            animation: fadeInSlideUp 1.2s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+        /* 確保這些元素在動畫運行前初始透明度為 0 */
+        #home .relative.text-center.z-10 h1,
+        #home .relative.text-center.z-10 p {
+            opacity: 0; 
+        }
+
+        /* 圖片藝廊懸停效果及微妙旋轉 */
+        .gallery-item img {
+            transition: transform 0.3s ease-in-out;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05) rotate(1deg); /* 增加輕微旋轉 */
+        }
+
+        /* 重新整理按鈕點擊時旋轉 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #refresh-coffee-btn i {
+            animation: none; 
+            transition: transform 0.3s ease-out;
+        }
+        #refresh-coffee-btn:active i { 
+            animation: spin 0.6s linear;
+        }
+        
+        /* 風味指南詳細資訊淡入 */
+        #bean-details-display {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        #bean-details-display.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 粒子動畫 (咖啡豆 & 音符) --- */
+        @keyframes floatAndFadeCoffee {
+            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.3; } /* 降低峰值透明度以增加細膩感 */
+            80% { opacity: 0.2; } /* 降低結束透明度以增加細膩感 */
+            100% { transform: translate(var(--x-end), var(--y-end)) scale(1.2); opacity: 0; }
+        }
+
+        @keyframes floatAndFadeNote {
+            0% { transform: translate(0, 0) scale(0.7); opacity: 0; }
+            20% { opacity: 0.2; } /* 降低峰值透明度以增加細膩感 */
+            80% { opacity: 0.15; } /* 降低結束透明度以增加細膩感 */
+            100% { transform: translate(var(--x-end), var(--y-end)) scale(1.1); opacity: 0; }
+        }
+
+        .animated-particle {
+            position: absolute; /* 相對父元素定位 */
+            font-size: 1.5rem; /* 基礎大小，會縮放 */
+            opacity: 0;
+            pointer-events: none; /* 不阻擋滑鼠事件 */
+            user-select: none; /* 不允許文字選取 */
+            z-index: -1; /* 確保粒子在內容下方 */
+        }
+
+        .animated-particle.coffee-bean {
+            color: var(--color-primary); /* 咖啡色系 */
+            animation: floatAndFadeCoffee var(--duration) ease-out forwards;
+        }
+
+        .animated-particle.musical-note {
+            color: var(--color-highlight); /* 使用新的高亮色作為音符顏色 */
+            animation: floatAndFadeNote var(--duration) ease-out forwards;
+        }
+
+        /* 選項：為粒子增加輕微旋轉 */
+        @keyframes rotateParticle {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animated-particle.coffee-bean,
+        .animated-particle.musical-note {
+            animation: var(--animation-name) var(--duration) ease-out forwards, rotateParticle var(--rotate-duration) linear infinite;
+        }
+
+        /* 返回頂部按鈕樣式 */
+        #back-to-top-btn {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, opacity 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0; /* 預設透明 */
+            transform: translateY(10px); /* 預設稍微向下 */
+        }
+
+        #back-to-top-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #back-to-top-btn:hover {
+            background-color: #a07654;
+            transform: translateY(-3px);
+        }
+
+        /* 導覽列活動連結樣式 */
+        .nav-link.active-nav {
+            font-weight: 700; /* 加粗 */
+            color: var(--color-primary); /* 主要顏色 */
+            border-bottom: 2px solid var(--color-primary); /* 下劃線 */
+            padding-bottom: 4px; /* 與下劃線的間距 */
+        }
+
+        /* 沖泡動畫視覺效果 */
+        #brewing-visualizer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-surface); /* 覆蓋資訊區塊 */
+            border-radius: 0.75rem; /* 配合父容器的圓角 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            pointer-events: none; /* 確保不阻擋下方事件 */
+            z-index: 20; /* 確保在其他內容之上 */
+        }
+
+        #brewing-visualizer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .brewing-cup-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border: 2px solid #ccc; /* 咖啡杯邊框 */
+            background-color: #fefefe; /* 咖啡杯顏色 */
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.1);
+        }
+
+        .brewing-liquid {
+            width: 100%;
+            background-color: var(--color-primary); /* 咖啡液顏色 */
+            height: 0%;
+            transition: height 1.5s ease-in-out; /* 咖啡液填充動畫 */
+            border-radius: 0 0 50% 50% / 0 0 10% 10%; /* 頂部輕微弧度 */
+        }
+
+        .brewing-liquid.fill {
+            height: 80% !important; /* 填充至 80% */
+        }
+
+        /* 咖啡小知識彈窗樣式 */
+        #coffee-fact-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-secondary); /* 深色背景 */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            text-align: center;
+            max-width: 300px;
+            opacity: 0;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            z-index: 998; /* 在返回頂部按鈕之下，但在模態框之下 */
+            pointer-events: none; /* 預設不阻擋滑鼠事件 */
+        }
+
+        #coffee-fact-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto; /* 顯示時才允許互動 */
+        }
+
+        /* 首頁滾動提示按鈕 */
+        #scroll-down-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: none;
+            border: none;
+            cursor: pointer;
+            animation: bounce 2s infinite; /* 跳動動畫 */
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        #scroll-down-btn:hover {
+            opacity: 1;
+        }
+
+        #scroll-down-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* 咖啡渣卡片翻轉效果 */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 250px; /* 固定高度，避免內容高度不一導致跳動 */
+            perspective: 1000px; /* 3D 效果 */
+            cursor: pointer;
+            transition: transform 0.6s;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            border-radius: 0.75rem;
+            overflow: hidden; /* Prevent content overflow during flip */
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background-color: var(--color-surface);
+        }
+
+        .flip-card-back {
+            background-color: var(--color-primary); /* 翻轉後的背景色 */
+            color: white;
+            transform: rotateY(180deg);
+            padding: 1.5rem;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+        .flip-card-back h4 {
+            color: white; /* Make sure title is visible on dark background */
+            margin-bottom: 0.5rem;
+        }
+        .flip-card-front img {
+            max-height: 80px; /* Adjust icon size */
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* 咖啡豆區塊的圖片懸停提示 */
+        .bean-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .bean-card .bean-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            backdrop-filter: blur(3px); /* 輕微模糊效果 */
+        }
+        .bean-card:hover .bean-overlay {
+            opacity: 1;
+        }
+
+        /* Three.js canvas styling */
+        #three-canvas {
+            position: absolute;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: auto; /* 確保咖啡機可互動 */
+        }
+
+        /* 滾動進度指示器 */
+        #scroll-progress-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 51; /* 高於內容，低於導覽列和模態框 */
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Playfair Display', serif;
+            color: var(--color-secondary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #progress-circle-svg {
+            width: 30px;
+            height: 30px;
+            transform: rotate(-90deg); /* 從頂部開始 */
+        }
+        #progress-circle-bg {
+            stroke: #e0e0e0;
+            stroke-width: 3;
+            fill: none;
+        }
+        #progress-circle-fill {
+            stroke: var(--color-primary);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 157; /* 2 * PI * r (r=25) = 157 */
+            stroke-dashoffset: 157; /* 預設完全隱藏 */
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* 載入動畫 */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-bg);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+        }
+        .spinner {
+            border: 8px solid rgba(0,0,0,0.1);
+            border-top: 8px solid var(--color-primary);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Three.js 容器，現在全螢幕且浮動 */
+        #threejs-container {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left 都是 0 */
+            width: 100%;
+            height: 100vh;
+            z-index: -1; /* 確保在內容之後 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* 防止內容溢出 */
+        }
+
+        /* 內容區域的調整，恢復全寬 */
+        main {
+            position: relative;
+            z-index: 1; /* 確保內容在 Three.js 區域之上 */
+            width: 100%; /* 內容區塊佔據全寬 */
+            margin-left: 0; /* 移除左邊距 */
+            overflow-x: hidden; /* 防止水平滾動 */
+        }
+
+        /* 各個 Section 確保足夠高以便滾動 */
+        section {
+            min-height: 100vh; /* 確保每個區塊足夠高 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 內容垂直居中 */
+            padding: 4rem 2rem; /* 增加內邊距 */
+            box-sizing: border-box;
+            background-color: var(--color-bg); /* 各自背景色 */
+            border-bottom: 1px solid rgba(0,0,0,0.05); /* 輕微分隔線 */
+        }
+        /* 調整 Home Section，使其內容在視覺上不會被咖啡機遮擋 */
+        #home {
+            position: relative;
+            z-index: 2; /* 確保在載入時覆蓋 Three.js */
+            /* 調整 padding 以避免與咖啡機重疊 */
+            padding-bottom: 10vh; /* 增加底部內邊距 */
+        }
+
+        /* 導航欄的調整，確保在 Three.js 之上 */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100; /* 導航欄置頂 */
         }
     </style>
 </head>
 <body>
+    <!-- 載入動畫 -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="text-xl text-secondary">正在為您準備香醇的咖啡體驗...</p>
+    </div>
+
+    <!-- Three.js 容器，現在全螢幕浮動在背景 -->
+    <div id="threejs-container">
+        <canvas id="three-canvas"></canvas>
+    </div>
+
     <nav class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
             <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
             <div class="hidden md:flex items-center space-x-6 text-lg">
-                <a href="#flavor-guide" class="hover:text-primary transition-colors">風味探索</a>
-                <a href="#story" class="hover:text-primary transition-colors">我們的故事</a>
-                <a href="#knowledge" class="hover:text-primary transition-colors">咖啡知識</a>
-                <a href="#image-gallery" class="hover:text-primary transition-colors">咖啡藝廊</a>
-                <!-- Removed offers link from navigation -->
-                <a href="#faq" class="hover:text-primary transition-colors">常見問題</a>
-                <a href="#contact" class="px-4 py-2 rounded-full btn-primary">聯絡我們</a>
+                <a href="#flavor-guide" class="hover:text-primary transition-colors nav-link">風味探索</a>
+                <a href="#our-beans" class="hover:text-primary transition-colors nav-link">精選咖啡豆</a>
+                <a href="#coffee-grounds-magic" class="hover:text-primary transition-colors nav-link">咖啡渣魔法</a>
+                <a href="#story" class="hover:text-primary transition-colors nav-link">我們的故事</a>
+                <a href="#knowledge" class="hover:text-primary transition-colors nav-link">咖啡知識</a>
+                <a href="#image-gallery" class="hover:text-primary transition-colors nav-link">咖啡藝廊</a>
+                <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
+                <a href="#contact" class="px-4 py-2 rounded-full btn-primary nav-link">聯絡我們</a>
             </div>
             </div>
     </nav>
 
     <main>
-        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative" style="background-image: url('./image/image_2.jpg');">
+        <!-- Home Section 保持全寬 -->
+        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative overflow-hidden" style="background-image: url('./image/image_2.jpg');">
             <div class="absolute inset-0 bg-black/40"></div>
-            <div class="relative text-center z-10 p-6 fade-in-up">
+            <div class="relative text-center z-10 p-6">
                 <h1 class="text-5xl md:text-7xl font-serif mb-4 text-shadow-soft">品味旋律，啜飲人生</h1>
                 <p class="text-xl md:text-2xl max-w-2xl mx-auto">在 Melody Bean，每一顆咖啡豆都承載著一段故事與一首旋律，我們邀請您一同放慢腳步，感受生活中的溫暖與美好。</p>
             </div>
+            <button id="scroll-down-btn" aria-label="向下滾動">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21L4 13H10V3H14V13H20L12 21Z" />
+                </svg>
+            </button>
         </section>
 
-        <section id="flavor-guide" class="py-20 bg-white/50">
+        <section id="flavor-guide" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">風味探索指南</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">風味探索指南</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">不知道如何選擇？讓我們為您視覺化每一款咖啡的獨特個性。</p>
                 </div>
                 <div class="flex flex-col md:flex-row items-center gap-8 fade-in-up">
-                    <div class="w-full md:w-1/2">
+                    <div class="w-full">
                         <label for="flavor-select" class="block text-left mb-2 font-semibold">選擇一款咖啡豆來查看風味圖譜：</label>
                         <select id="flavor-select" class="w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
                             </select>
@@ -208,7 +732,15 @@
                             <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
                             <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
                         </div>
-                        <div id="bean-details-display" class="mt-6 text-left p-4 bg-blue-50 rounded-lg border border-blue-300 text-gray-700 hidden">
+                        <div id="bean-details-display" class="mt-6 text-left p-4 bg-blue-50 rounded-lg border border-blue-300 text-gray-700 relative overflow-hidden" style="min-height: 280px;">
+                            <!-- 沖泡動畫容器 -->
+                            <div id="brewing-visualizer">
+                                <div class="brewing-cup-container">
+                                    <div class="brewing-liquid"></div>
+                                </div>
+                                <p class="mt-4 text-gray-700 text-sm">正在為您沖泡這款咖啡...</p>
+                            </div>
+                            <!-- 實際的詳細資訊內容 -->
                             <h4 class="font-bold font-serif text-lg text-blue-700 mb-2">品項詳細資訊</h4>
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <p><span class="font-semibold">名稱:</span> <span id="detail-name"></span></p>
@@ -218,10 +750,9 @@
                                 <p><span class="font-semibold">重量:</span> <span id="detail-weight"></span></p>
                                 <p><span class="font-semibold">期限:</span> <span id="detail-expiry"></span></p>
                                 <p class="col-span-2"><span class="font-semibold">風味:</span> <span id="detail-flavor"></span></p>
-                                <p class="col-span-2"><span class="font-semibold">庫存:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p> <!-- NEW -->
+                                <p class="col-span-2"><span class="font-semibold">庫存:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p>
                                 <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
                             </div>
-                            <!-- Removed image from bean details display as requested -->
                         </div>
                         <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
                             <button id="refresh-coffee-btn" class="px-8 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors inline-block">
@@ -229,37 +760,124 @@
                             </button>
                         </div>
                     </div>
-                    <div class="w-full md:w-1/2">
+                    <div class="w-full hidden md:block">
                         <canvas id="flavorRadarChart"></canvas>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="story" class="py-20">
+        <!-- NEW SECTION: Our Premium Coffee Beans -->
+        <section id="our-beans" class="py-20 relative overflow-hidden">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">我們的精選咖啡豆</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">來自世界各地的精品咖啡豆，每一顆都蘊含著獨特的故事與風味。</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="card p-4 fade-in-up bean-card">
+                        <img src="https://placehold.co/400x300/a07654/FFFFFF?text=黃金曼特寧" alt="黃金曼特寧" class="w-full h-48 object-cover rounded-md mb-4">
+                        <div class="bean-overlay">
+                            <p>黃金曼特寧：醇厚濃郁，帶有巧克力和堅果香氣，是經典中的經典。</p>
+                        </div>
+                        <h3 class="text-xl font-serif mb-2">黃金曼特寧</h3>
+                        <p class="text-gray-600 text-sm">風味：黑巧克力、焦糖、低酸度</p>
+                    </div>
+                    <div class="card p-4 fade-in-up bean-card" style="transition-delay: 100ms;">
+                        <img src="https://placehold.co/400x300/3f2e2e/FFFFFF?text=耶加雪菲" alt="耶加雪菲" class="w-full h-48 object-cover rounded-md mb-4">
+                        <div class="bean-overlay">
+                            <p>耶加雪菲：花香、柑橘與莓果的清新結合，口感明亮活潑。</p>
+                        </div>
+                        <h3 class="text-xl font-serif mb-2">衣索比亞 耶加雪菲</h3>
+                        <p class="text-gray-600 text-sm">風味：茉莉花、檸檬、佛手柑</p>
+                    </div>
+                    <div class="card p-4 fade-in-up bean-card" style="transition-delay: 200ms;">
+                        <img src="https://placehold.co/400x300/6b8e23/FFFFFF?text=哥倫比亞_薇拉" alt="哥倫比亞 薇拉" class="w-full h-48 object-cover rounded-md mb-4">
+                        <div class="bean-overlay">
+                            <p>哥倫比亞 薇拉：平衡的甜感，帶有核果與巧克力的尾韻，口感順滑。</p>
+                        </div>
+                        <h3 class="text-xl font-serif mb-2">哥倫比亞 薇拉</h3>
+                        <p class="text-gray-600 text-sm">風味：核桃、可可、焦糖</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW SECTION: The Magic of Coffee Grounds -->
+        <section id="coffee-grounds-magic" class="py-20 bg-white/50 relative overflow-hidden">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">咖啡渣的魔法</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">別急著丟棄！用過的咖啡渣，其實是生活中的環保寶藏。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="flip-card fade-in-up">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=肥料" alt="天然植物肥料" class="mb-4">
+                                <h3 class="text-xl font-serif mb-2">天然植物肥料</h3>
+                                <p class="text-gray-600 text-sm">富含氮、磷、鉀，讓您的植物枝繁葉茂。</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <h4 class="font-bold text-lg">DIY 植物肥料</h4>
+                                <p>將乾燥的咖啡渣直接混入盆栽土壤中，或與廚餘堆肥一同發酵，為植物提供天然養分。特別適合喜酸性土壤的植物，如杜鵑、繡球花。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card fade-in-up" style="transition-delay: 100ms;">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=除臭" alt="天然除臭劑" class="mb-4">
+                                <h3 class="text-xl font-serif mb-2">天然除臭劑</h3>
+                                <p class="text-gray-600 text-sm">吸附異味，讓冰箱、鞋櫃恢復清新。</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <h4 class="font-bold text-lg">製作除臭包</h4>
+                                <p>將乾燥咖啡渣裝入透氣小袋或網襪中，放置於冰箱、鞋櫃、衣櫥或煙灰缸，有效吸附濕氣與異味。定期更換以保持效果。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flip-card fade-in-up" style="transition-delay: 200ms;">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=去角質" alt="身體去角質" class="mb-4">
+                                <h3 class="text-xl font-serif mb-2">溫和身體去角質</h3>
+                                <p class="text-gray-600 text-sm">天然顆粒溫和去除老廢角質，還您柔滑肌膚。</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <h4 class="font-bold text-lg">DIY 咖啡渣磨砂膏</h4>
+                                <p>將乾燥咖啡渣與少量橄欖油或椰子油混合，加入少許蜂蜜（可選），輕輕按摩身體肌膚後沖洗。咖啡因也有助於緊緻肌膚。敏感肌膚請謹慎使用。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="story" class="py-20 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">我們的故事</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">我們的故事</h2>
                 </div>
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
                     <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
-                    <p class="text-gray-700 leading-relaxed space-y-4">
-                        <span>🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</span>
-                        <span>☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</span>
-                        <span>2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</span>
-                    </p>
+                    <div class="text-gray-700 leading-relaxed">
+                        <div class="mb-4">🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
+                        <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
+                        <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
+                    </div>
                     <div class="mt-8 text-center">
                         <div class="relative w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg overflow-hidden">
                             <i class="fas fa-play-circle text-6xl text-gray-500 opacity-75"></i>
                             <p class="absolute text-gray-700 text-sm mt-2">（未來將在此處加入品牌故事影片）</p>
-                            <img src="https://placehold.co/600x300/e0e0e0/555555?text=品牌故事影片預覽" alt="品牌故事影片預覽" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                            
                         </div>
                     </div>
                 </div>
                 <div class="mt-16 text-center fade-in-up">
-                    <h3 class="text-3xl font-serif section-title mb-8">幕後職人</h3>
+                    <h3 class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
                     <div class="card p-8 flex flex-col md:flex-row items-center gap-8">
-                        <img src="https://placehold.co/150x150/a07654/FFFFFF?text=職人" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
+                        
                         <div class="text-left">
                             <h4 class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
                             <p class="text-lg text-primary mt-1">陳師傅</p>
@@ -271,70 +889,70 @@
             </div>
         </section>
 
-        <section id="knowledge" class="py-20 bg-white/50">
+        <section id="knowledge" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">線上咖啡小學堂</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">線上咖啡小學堂</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">一些關於咖啡的趣聞與知識，希望能豐富您的咖啡生活。</p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="card p-6 fade-in-up group">
                         <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">手沖咖啡新手入門</h3>
                         <p class="text-gray-600">想在家享受一杯完美的手沖咖啡嗎？從磨豆、水溫到注水技巧，我們為您整理了幾個關鍵步驟，讓您輕鬆上手。</p>
-                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="1">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 100ms;">
                         <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">如何保存咖啡豆？</h3>
                         <p class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。根據不同的烘焙程度，咖啡豆可以保存數週到數月。</p>
-                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="2">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 200ms;">
                         <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">音樂與咖啡的完美結合</h3>
                         <p class="text-gray-600">您知道嗎？聆聽不同類型的音樂，可能會影響您對咖啡風味的感受。下次品嚐時，不妨試著搭配一首古典樂或爵士樂吧！</p>
-                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link">閱讀更多 &raquo;</a>
+                        <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="3">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- NEW SECTION: Image Gallery -->
-        <section id="image-gallery" class="py-20 bg-white/50">
+        <section id="image-gallery" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">咖啡藝廊：視覺饗宴</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">咖啡藝廊：視覺饗宴</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">透過鏡頭，探索咖啡與生活的各種美好瞬間。</p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <!-- Images will be rendered here -->
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 0ms;">
                         <img src="./image/image_1.png" alt="咖啡豆近照" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=咖啡豆1'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 100ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 100ms;">
                         <img src="./image/image_2.png" alt="手沖咖啡" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=咖啡時光'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 200ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 200ms;">
                         <img src="./image/image_3.png" alt="咖啡師工作" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=職人'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 300ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 300ms;">
                         <img src="./image/image_4.png" alt="咖啡店內景" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=店內環境'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 400ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 400ms;">
                         <img src="./image/image_5.png" alt="咖啡與書籍" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=閱讀時光'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 500ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 500ms;">
                         <img src="./image/image_6.png" alt="烘焙中的咖啡豆" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=烘焙'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 600ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 600ms;">
                         <img src="./image/image_7.png" alt="咖啡杯特寫" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=一杯好咖啡'; this.style.objectFit='contain';">
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up" style="transition-delay: 700ms;">
+                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 700ms;">
                         <img src="./image/image_8.png" alt="多樣化咖啡器具" class="w-full h-48 object-cover object-center"
                             onerror="this.onerror=null; this.src='https://placehold.co/400x300/a07654/FFFFFF?text=咖啡器具'; this.style.objectFit='contain';">
                     </div>
@@ -342,22 +960,20 @@
             </div>
         </section>
 
-        <!-- Removed separate offers section as requested -->
-
-        <section id="faq" class="py-20 bg-white/50">
+        <section id="faq" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">常見問題</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">常見問題</h2>
                 </div>
                 <div id="faq-container" class="space-y-4 fade-in-up">
                 </div>
             </div>
         </section>
 
-        <section id="review" class="py-20">
+        <section id="review" class="py-20 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">顧客的溫馨回饋</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">顧客的溫馨回饋</h2>
                 </div>
                 <div id="review-list" class="space-y-6 fade-in-up">
                 </div>
@@ -382,10 +998,10 @@
             </div>
         </section>
 
-        <section id="contact" class="py-20 bg-white/50">
+        <section id="contact" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6 text-center">
                  <div class="fade-in-up">
-                    <h2 class="text-4xl font-serif section-title">聯絡我們</h2>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">聯絡我們</h2>
                     <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題、課程詢問或商品訂購需求，都歡迎隨時與我們聯繫！</p>
                 </div>
                 <div class="card p-8 fade-in-up">
@@ -429,23 +1045,48 @@
         </div>
     </footer>
 
-    <!-- Custom Message Modal for Frontend -->
+    <!-- 返回頂部按鈕 -->
+    <button id="back-to-top-btn" title="返回頂部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- 自訂訊息彈窗 (前台) -->
     <div id="frontMessageModal" class="front-modal">
         <div class="front-modal-content">
-            <span class="front-modal-close-button" onclick="closeFrontMessageModal()">&times;</span>
-            <h3 id="frontModalTitle" class="text-2xl font-bold mb-4"></h3>
+            <button class="front-modal-close-button" onclick="closeFrontMessageModal()">
+                <i class="fas fa-times"></i> <!-- Changed to Font Awesome icon -->
+            </button>
+            <div id="frontModalIcon" class="mb-4 text-5xl"></div> <!-- New icon container -->
+            <h3 id="frontModalTitle" class="font-serif text-2xl font-bold mb-4"></h3>
             <p id="frontModalMessage" class="text-gray-700 mb-6"></p>
-            <button class="bg-primary hover:bg-[#a07654] text-white font-bold py-2 px-4 rounded-md" onclick="closeFrontMessageModal()">了解</button>
+            <button class="px-6 py-2 rounded-full btn-primary" onclick="closeFrontMessageModal()">
+                <i class="fas fa-mug-hot mr-2"></i> 了解 <!-- Changed icon and styling -->
+            </button>
         </div>
     </div>
 
-    <!-- Consolidated Script Block -->
+    <!-- 咖啡小知識彈窗 -->
+    <div id="coffee-fact-toast">
+        <p></p>
+    </div>
+
+    <!-- 滾動進度指示器 -->
+    <div id="scroll-progress-indicator">
+        <span id="current-chapter-text">首頁</span>
+        <span id="chapter-counter">1/10</span>
+        <svg id="progress-circle-svg">
+            <circle id="progress-circle-bg" cx="15" cy="15" r="13"></circle>
+            <circle id="progress-circle-fill" cx="15" cy="15" r="13"></circle>
+        </svg>
+    </div>
+
+
+    <!-- 整合腳本區塊 -->
     <script>
         'use strict';
-        (function() { // Start IIFE
+        (function() { // 開始即時執行函式表達式 (IIFE)
 
         // 📦 dataManager.js - 統一優惠資料管理模組
-        // 這部分是您提供的 dataManager.js 內容，直接嵌入到 HTML 中以確保可用性
         const defaultOfferTemplate = {
             id: 0,
             name: '',
@@ -524,17 +1165,15 @@
         };
         // 📦 dataManager.js END
 
-        // --- Global Constants & Data Variables ---
+        // --- 全域常數與資料變數 ---
         const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
         const REVIEWS_KEY = 'melodyReviews';
 
-        // These are declared with 'let' and are now scoped within the IIFE.
         let coffeeBeans = []; 
-        // let specialOffers = []; // Removed
         let reviews = [];
-        let radarChart; // Chart.js instance
+        let radarChart; // Chart.js 實例
 
-        // Default data - serves as fallback if localStorage is empty/invalid
+        // 預設資料 - 作為 localStorage 為空/無效時的備用資料
         const defaultCoffeeBeans = [
             { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, stock: 10, category: 'light', image: './image/image_1.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
             { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, stock: 5, category: 'light', image: './image/image_2.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
@@ -552,6 +1191,61 @@
             { id: 3, name: '早晨提神必備', rating: '⭐️⭐️⭐️⭐️⭐️', content: '每天早上一杯 Melody Bean 的咖啡已經成為我的固定儀式。它總能為我帶來一整天的好心情和清晰思緒。強烈推薦給需要美好早晨的朋友們！' }
         ];
 
+        const knowledgeArticles = {
+            1: {
+                title: '手沖咖啡新手入門：五大關鍵步驟',
+                content: `
+                    <p>想要在家中享受一杯專業級的手沖咖啡，其實並不難！掌握以下五個關鍵步驟，您也能輕鬆沖出美味：</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">1. 新鮮咖啡豆與正確研磨度</h4>
+                    <p class="mb-2">選擇新鮮烘焙的咖啡豆是美味的基礎。研磨度應介於中粗到中等之間，類似砂糖顆粒大小，太細會過度萃取，太粗則萃取不足。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">2. 合適的水溫</h4>
+                    <p class="mb-2">理想水溫通常在 90°C 到 94°C 之間。過熱的水會讓咖啡過於苦澀，溫度不足則無法充分萃取風味。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">3. 悶蒸 (Blooming)</h4>
+                    <p class="mb-2">將少量熱水均勻淋在咖啡粉上，使其完全濕潤，等待約 30-45 秒。這是咖啡粉釋放二氧化碳的過程，有助於後續的風味萃取。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">4. 分段注水</h4>
+                    <p class="mb-2">悶蒸結束後，開始以穩定、緩慢的螺旋狀注水。將總水量分為 2-3 次注入，每次注水都讓咖啡液完全滴濾，這樣可以更均勻地萃取咖啡風味。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">5. 享受您的手沖咖啡</h4>
+                    <p class="mb-2">當咖啡液不再滴落時，即可移除濾杯。一杯香醇的手沖咖啡就完成了！記得在最佳溫度品嚐。</p>
+                    <p class="text-sm mt-4 text-gray-500">提示：實驗不同研磨度、水溫和注水手法，找到最適合您口味的黃金比例。</p>
+                `
+            },
+            2: {
+                title: '咖啡豆的黃金保存法則',
+                content: `
+                    <p>咖啡豆的風味非常脆弱，極易受環境影響。遵循以下法則，讓您的咖啡豆保持最佳狀態：</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">1. 避光、避熱</h4>
+                    <p class="mb-2">光線和高溫是咖啡豆風味的兩大殺手。請務必將咖啡豆存放在陰涼、乾燥且沒有陽光直射的地方。廚房檯面上的陽光直射或靠近爐灶的地方都不適合。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">2. 密封保存</h4>
+                    <p class="mb-2">空氣是造成咖啡豆氧化、風味流失的主因。請使用帶有單向排氣閥的密封罐或專用咖啡袋，盡量排出空氣。避免使用透明或非密封的容器。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">3. 避免潮濕</h4>
+                    <p class="mb-2">濕氣會加速咖啡豆的變質和黴菌生長。避免將咖啡豆存放在潮濕的環境中。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">4. 不建議冷藏（短時間可以）</h4>
+                    <p class="mb-2">冰箱內濕氣重且異味多，容易讓咖啡豆吸收雜味並受潮。若需短期保存（一週內），可放在密封罐中；若需長期保存，可考慮冷凍。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">5. 冷凍保存（長期最佳）</h4>
+                    <p class="mb-2">如果咖啡豆量大且希望長期保存（數週至數月），可以將其分裝於小份量、密封良好的袋子或容器中，放入冷凍庫。取用時直接取出所需份量，不要反覆解凍再冷凍。</p>
+                    <p class="text-sm mt-4 text-gray-500">提示：咖啡豆的最佳賞味期通常在烘焙後 2-4 週內。購買少量、新鮮烘焙的咖啡豆，並盡快享用是最好的方式。</p>
+                `
+            },
+            3: {
+                title: '音樂與咖啡的奇妙共鳴：提升感官體驗',
+                content: `
+                    <p>您是否曾發現，在不同的背景音樂下，同一杯咖啡的味道似乎也產生了微妙的變化？這並非偶然！科學研究表明，聲音會影響我們的味覺感知。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">感官的交響樂</h4>
+                    <p class="mb-2">我們的味覺、嗅覺、視覺和聽覺是相互關聯的。當我們品嚐咖啡時，大腦會整合所有感官接收到的資訊。特定的音樂頻率和節奏，能夠影響我們對咖啡中酸度、甜度或苦味的感受。</p>
+                    <h4 class="font-bold text-lg mt-4 mb-2">常見的搭配建議</h4>
+                    <ul class="list-disc list-inside ml-4 mb-2">
+                        <li class="mb-1"><span class="font-semibold">古典樂 / 爵士樂：</span> 輕柔、和諧的旋律能襯托出咖啡的細膩風味和複雜層次，特別適合花香、果香明顯的淺焙豆。</li>
+                        <li class="mb-1"><span class="font-semibold">搖滾樂 / 流行樂：</span> 節奏感強烈的音樂可能會讓咖啡的風味感覺更為濃烈或苦澀，適合中深焙的濃郁口感。</li>
+                        <li class="mb-1"><span class="font-semibold">大自然音效 (雨聲、鳥鳴)：</span> 寧靜的環境音有助於放鬆心情，讓您更能專注於咖啡本身純粹的風味。</li>
+                    </ul>
+                    <h4 class="font-bold text-lg mt-4 mb-2">實驗您的專屬旋律</h4>
+                    <p class="mb-2">不妨下次沖泡咖啡時，嘗試播放不同風格的音樂。閉上眼睛，感受咖啡在口中與音樂在耳邊的交織。您可能會發現新的風味維度，找到最能提升您品飲體驗的「專屬旋律」。</p>
+                    <p class="text-sm mt-4 text-gray-500">提示：這是一種個人化的體驗，沒有絕對的對錯。盡情享受探索的過程吧！</p>
+                `
+            }
+        };
+
+
         const faqs = [
             { q: '如何保存咖啡豆？', a: '為保持最佳風味，請將咖啡豆存放在不透光、密封的容器中，並置於陰涼乾燥處。建議在開封後一個月內飲用完畢。' },
             { q: '不同烘焙度有什麼差異？', a: '淺焙通常更能展現咖啡豆原有的花果酸質；中焙則達到酸、甜、苦的平衡；深焙會帶來更濃郁的焦糖、巧克力風味，酸度較低。' },
@@ -559,85 +1253,741 @@
             { q: '樂海樂器咖啡的營業時間是？', a: '我們的營業時間為週一至週六，早上9:00至晚間9:00。週日為公休日。歡迎您隨時來店裡坐坐，喝杯咖啡，聊聊音樂。' }
         ];
 
-        // --- Frontend Message Modal Elements (Globally accessible via window) ---
+        // 咖啡機數據 (此物件已不再使用，因咖啡設備區塊已移除)
+        const coffeeMachinesData = {}; 
+
+        // --- 粒子生成與管理 (用於 2D 背景粒子) ---
+        const PARTICLE_LIFETIME_MS = 6000; // 粒子存活時間 (毫秒)
+        const PARTICLE_EMOJI_COFFEE = '☕'; // 咖啡豆 Emoji
+        const PARTICLE_EMOJI_NOTE = '🎶'; // 音符 Emoji
+        const PARTICLE_SPAWN_INTERVAL_MS = 500; // 每隔多久生成一個新粒子 (毫秒)
+
+        let particleTimer; // 用於管理生成粒子的計時器
+
+        /**
+         * 創建並動畫一個單獨的 2D 背景粒子。
+         * @param {HTMLElement} container - 要將粒子附加到的元素。
+         * @param {string} emoji - 粒子的 Emoji 字元。
+         * @param {string} typeClass - 'coffee-bean' 或 'musical-note'。
+         */
+        function createParticle(container, emoji, typeClass) {
+            const particle = document.createElement('span');
+            particle.textContent = emoji;
+            particle.className = `animated-particle ${typeClass}`;
+            
+            // 容器可見區域內的隨機初始位置
+            const containerRect = container.getBoundingClientRect();
+            // 確保粒子在容器內部生成，並考慮其相對位置
+            const startX = Math.random() * containerRect.width;
+            const startY = Math.random() * containerRect.height;
+            
+            // 隨機結束位置 (從起始點偏移)
+            const endXOffset = (Math.random() - 0.5) * 400; // +/- 200px from start
+            const endYOffset = (Math.random() - 0.5) * 400; // +/- 200px from start
+
+            const duration = PARTICLE_LIFETIME_MS + Math.random() * 2000; // 稍微改變持續時間
+            const rotateDuration = 5 + Math.random() * 10; // 稍微改變旋轉持續時間
+
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            particle.style.setProperty('--x-end', `${endXOffset}px`);
+            particle.style.setProperty('--y-end', `${endYOffset}px`);
+            particle.style.setProperty('--duration', `${duration}ms`);
+            particle.style.setProperty('--rotate-duration', `${rotateDuration}s`);
+            particle.style.setProperty('--animation-name', typeClass === 'coffee-bean' ? 'floatAndFadeCoffee' : 'floatAndFadeNote');
+            particle.style.fontSize = `${1 + Math.random() * 0.8}rem`; /* 改變大小 */
+
+            // 將粒子添加到其所在的區塊，這樣它們的定位是相對該區塊的
+            container.appendChild(particle);
+
+            // 動畫結束後移除粒子，保持 DOM 整潔
+            setTimeout(() => {
+                particle.remove();
+            }, duration);
+        }
+
+        /**
+         * 為可見區塊啟動 2D 粒子生成。
+         */
+        function startParticleGeneration() {
+            // 清除任何現有的計時器以避免重複
+            if (particleTimer) clearInterval(particleTimer);
+
+            const sections = ['home', 'flavor-guide', 'our-beans', 'coffee-grounds-magic', 'story', 'knowledge', 'image-gallery', 'faq', 'review', 'contact']; // 更新 sections 列表
+            const sectionElements = sections.map(id => document.getElementById(id)).filter(Boolean); // 獲取實際的元素
+
+            const activeSections = new Set(); // 用於追蹤目前可見的區塊 ID
+
+            // 觀察器用於將區塊從 activeSections 集合中添加/移除
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        activeSections.add(entry.target.id);
+                    } else {
+                        activeSections.delete(entry.target.id);
+                    }
+                });
+            }, { threshold: 0.2 }); // 當區塊 20% 可見時觸發
+
+            sectionElements.forEach(section => {
+                sectionObserver.observe(section);
+            });
+
+            // 僅當至少一個被觀察的區塊可見時才開始生成粒子
+            particleTimer = setInterval(() => {
+                if (activeSections.size > 0) {
+                    // 選擇一個隨機的可見區塊來生成粒子
+                    const currentActiveSections = Array.from(activeSections);
+                    const randomSectionId = currentActiveSections[Math.floor(Math.random() * currentActiveSections.length)];
+                    const container = document.getElementById(randomSectionId);
+                    
+                    if (container) {
+                        // 隨機選擇咖啡豆或音符
+                        if (Math.random() < 0.5) {
+                            createParticle(container, PARTICLE_EMOJI_COFFEE, 'coffee-bean');
+                        } else {
+                            createParticle(container, PARTICLE_EMOJI_NOTE, 'musical-note');
+                        }
+                    }
+                }
+            }, PARTICLE_SPAWN_INTERVAL_MS);
+            console.log('[DEBUG] 2D Particle generation started.');
+        }
+
+        // --- Three.js 相關變數 ---
+        let scene, camera, renderer, coffeeMachineGroup, grinderPart, brewSpout, bodyPart, trayPart; // 新增 bodyPart 和 trayPart
+        let lightSource, ambientLight, directionalLight;
+        let mouse = new THREE.Vector2(); // Store normalized mouse coordinates
+        let raycaster = new THREE.Raycaster(); // For picking objects in 3D scene
+
+        let particleSystem3D, coffeeBeanParticles, coffeeCup, aromaParticles; // 3D 粒子系統及額外物件
+        let targetCameraPosition = new THREE.Vector3();
+        let targetMachinePosition = new THREE.Vector3();
+        let targetLightIntensity = 1.5;
+        let targetLightColor = new THREE.Color(0xffffff);
+
+        const sectionsData = [ // 區塊數據，用於滾動進度指示器和 3D 模型互動
+            { id: 'home', title: '首頁', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'flavor-guide', title: '風味探索', cameraPos: { x: 0, y: 0.6, z: 1.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.8, lightColor: 0xFFA07A, hotspot: 'grinder' }, // 更近看研磨器
+            { id: 'our-beans', title: '精選咖啡豆', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 2.2, lightColor: 0xFFFACD, hotspot: 'body' }, // 看咖啡機主體
+            { id: 'coffee-grounds-magic', title: '咖啡渣魔法', cameraPos: { x: 0, y: -0.6, z: 1.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.0, lightColor: 0x8B4513, hotspot: 'spout' }, // 看出水口
+            { id: 'story', title: '我們的故事', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'knowledge', title: '咖啡知識', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'image-gallery', title: '咖啡藝廊', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'faq', title: '常見問題', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'review', title: '顧客回饋', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
+            { id: 'contact', title: '聯絡我們', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: 0, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null }
+        ];
+        let currentActiveSectionIndex = 0;
+
+
+        /**
+         * 初始化 Three.js 場景、攝影機和渲染器。
+         */
+        function initThreeJS() {
+            const canvas = document.getElementById('three-canvas');
+            if (!canvas) {
+                console.error('Three.js canvas element not found!');
+                return;
+            }
+
+            scene = new THREE.Scene();
+            
+            // 設定攝影機
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // 設定渲染器
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true }); // alpha: true 允許透明背景
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // 燈光設定
+            ambientLight = new THREE.AmbientLight(0x404040, 2); // 柔和的環境光，讓模型有基本亮度
+            scene.add(ambientLight);
+
+            directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // 方向光，模擬主光源
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            lightSource = directionalLight; // 將方向光作為主要控制對象
+
+            // 建立可愛風格咖啡機模型
+            createCuteCoffeeMachine();
+
+            // 建立 3D 粒子系統 (用於蒸氣和咖啡渣)
+            createParticleSystem3D();
+
+            // 建立額外漂浮物件 (咖啡豆, 咖啡杯, 香氣粒子)
+            createFloatingElements();
+
+            // 視窗大小改變時調整渲染器
+            window.addEventListener('resize', onWindowResize, false);
+
+            // 滑鼠移動事件監聽器 (在 Three.js canvas 上)
+            canvas.addEventListener('mousemove', onCanvasMouseMove);
+            // 滑鼠點擊事件監聽器
+            canvas.addEventListener('click', onCanvasClick);
+            // 滑鼠移出 canvas 時重置旋轉
+            canvas.addEventListener('mouseleave', () => {
+                mouse.x = 0;
+                mouse.y = 0;
+            });
+
+            // 設置初始相機和咖啡機位置
+            setSectionView(sectionsData[0]); // Start with 'home' view
+
+            console.log('[DEBUG] Three.js initialized.');
+        }
+
+        /**
+         * 建立可愛風格的咖啡機 3D 模型。
+         */
+        function createCuteCoffeeMachine() {
+            coffeeMachineGroup = new THREE.Group();
+
+            // 主體 (圓潤長方體)
+            const bodyGeometry = new THREE.BoxGeometry(1.8, 2.2, 1.2);
+            // Updated color: 暖色調的淺棕色，更自然
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xD2B48C, roughness: 0.6, metalness: 0.05 }); 
+            bodyPart = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            bodyPart.position.set(0, 0, 0); 
+            bodyPart.name = 'body'; // Set name for raycasting
+            coffeeMachineGroup.add(bodyPart);
+
+            // 研磨器 (圓頂形狀)
+            const grinderGeometry = new THREE.SphereGeometry(0.6, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2); // 半球形
+            // Keep existing good brown color
+            const grinderMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7, metalness: 0.1 }); 
+            grinderPart = new THREE.Mesh(grinderGeometry, grinderMaterial);
+            grinderPart.position.set(0, 1.1 + 0.3, 0); 
+            grinderPart.name = 'grinder'; // Set name for raycasting
+            coffeeMachineGroup.add(grinderPart);
+
+            // 出水口 (更粗短的圓柱體，強調俏皮)
+            const spoutGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.5, 16);
+            // Updated color: 溫潤的銀色或淺灰，更優雅
+            const spoutMaterial = new THREE.MeshStandardMaterial({ color: 0xC0C0C0, roughness: 0.3, metalness: 0.8 }); 
+            brewSpout = new THREE.Mesh(spoutGeometry, spoutMaterial);
+            brewSpout.position.set(0, -0.9, 0.6); 
+            brewSpout.rotation.x = Math.PI / 2; 
+            brewSpout.name = 'spout'; // Set name for raycasting
+            coffeeMachineGroup.add(brewSpout);
+
+            // 控制面板 (圓角方塊按鈕)
+            const panelGeometry = new THREE.BoxGeometry(1.0, 0.5, 0.1);
+            // Updated color: 使用 CSS 中的深咖啡文字色，保持一致性
+            const panelMaterial = new THREE.MeshStandardMaterial({ color: 0x3F2E2E, roughness: 0.5, metalness: 0.1 }); 
+            const panel = new THREE.Mesh(panelGeometry, panelMaterial);
+            panel.position.set(0, 0.5, 0.61); 
+            panel.name = 'panel'; // Give a name for potential future interaction
+            coffeeMachineGroup.add(panel);
+            
+            // 小按鈕 (點綴)
+            const buttonGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+            // Updated color: 沉穩的紅棕色
+            const buttonMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A }); 
+            const button1 = new THREE.Mesh(buttonGeometry, buttonMaterial);
+            button1.position.set(-0.3, 0.5, 0.65);
+            button1.name = 'button1';
+            const button2 = new THREE.Mesh(buttonGeometry, buttonMaterial);
+            button2.position.set(0.3, 0.5, 0.65);
+            button2.name = 'button2';
+            coffeeMachineGroup.add(button1);
+            coffeeMachineGroup.add(button2);
+
+            // 咖啡杯托盤 (細長方塊)
+            const trayGeometry = new THREE.BoxGeometry(1.5, 0.1, 0.8);
+            // Keep existing light grey, but ensure it works with new colors
+            const trayMaterial = new THREE.MeshStandardMaterial({ color: 0xD3D3D3, roughness: 0.5, metalness: 0.5 }); 
+            trayPart = new THREE.Mesh(trayGeometry, trayMaterial);
+            trayPart.position.set(0, -1.2, 0.2);
+            trayPart.name = 'tray'; // Set name for raycasting
+            coffeeMachineGroup.add(trayPart);
+            
+            // 將整個咖啡機組件添加到場景中
+            scene.add(coffeeMachineGroup);
+
+            // 設定咖啡機初始位置，讓它在畫面中央偏左，為內容留出空間
+            coffeeMachineGroup.position.set(sectionsData[0].machineTargetPos.x, sectionsData[0].machineTargetPos.y, sectionsData[0].machineTargetPos.z);
+            coffeeMachineGroup.rotation.y = Math.PI / 8; // 輕微角度
+        }
+
+        /**
+         * 建立 3D 粒子系統用於蒸氣或咖啡渣。
+         */
+        function createParticleSystem3D() {
+            const particleCount = 200;
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            const pMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                sizeAttenuation: true
+            });
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3 + 0] = (Math.random() - 0.5) * 0.5;
+                positions[i * 3 + 1] = (Math.random() * 0.5);
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+                colors[i * 3 + 0] = 1; 
+                colors[i * 3 + 1] = 1;
+                colors[i * 3 + 2] = 1;
+            }
+
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            particleSystem3D = new THREE.Points(particles, pMaterial);
+            particleSystem3D.visible = false; // 預設隱藏
+            scene.add(particleSystem3D);
+        }
+
+        /**
+         * 創建額外漂浮的 3D 元素。
+         */
+        function createFloatingElements() {
+            // 咖啡豆粒子
+            const beanParticleCount = 50;
+            const beanGeometry = new THREE.SphereGeometry(0.05, 8, 8); // 小球模擬咖啡豆
+            const beanMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.8 });
+            coffeeBeanParticles = new THREE.Group();
+            for (let i = 0; i < beanParticleCount; i++) {
+                const bean = new THREE.Mesh(beanGeometry, beanMaterial.clone());
+                bean.position.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8
+                );
+                bean.userData.speed = Math.random() * 0.005 + 0.001; // 隨機速度
+                bean.userData.axis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize(); // 隨機旋轉軸
+                coffeeBeanParticles.add(bean);
+            }
+            coffeeBeanParticles.visible = false;
+            scene.add(coffeeBeanParticles);
+
+            // 咖啡杯模型 (簡化為圓柱體，增加可愛感)
+            const cupBodyGeometry = new THREE.CylinderGeometry(0.4, 0.3, 0.8, 20);
+            const cupHandleGeometry = new THREE.TorusGeometry(0.15, 0.05, 8, 16); // 更小的把手
+            const cupMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.1, metalness: 0.1 });
+            coffeeCup = new THREE.Group();
+            const cupBody = new THREE.Mesh(cupBodyGeometry, cupMaterial);
+            const cupHandle = new THREE.Mesh(cupHandleGeometry, cupMaterial);
+            cupHandle.position.set(0.45, 0, 0);
+            cupHandle.rotation.y = Math.PI / 2;
+            coffeeCup.add(cupBody);
+            coffeeCup.add(cupHandle);
+            coffeeCup.position.set(0, -1.5, 0); // 初始位置
+            coffeeCup.visible = false;
+            scene.add(coffeeCup);
+
+            // 香氣粒子 (較為抽象的雲霧效果)
+            const aromaParticleCount = 100;
+            const aromaGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+            const aromaMaterial = new THREE.MeshStandardMaterial({ color: 0xF5DEB3, transparent: true, opacity: 0.5 }); // 淺米色半透明
+            aromaParticles = new THREE.Group();
+            for (let i = 0; i < aromaParticleCount; i++) {
+                const aroma = new THREE.Mesh(aromaGeometry, aromaMaterial.clone());
+                aroma.position.set(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                );
+                aroma.userData.initialPos = aroma.position.clone();
+                aroma.userData.speed = Math.random() * 0.001 + 0.0001;
+                aroma.userData.offset = Math.random() * Math.PI * 2;
+                aromaParticles.add(aroma);
+            }
+            aromaParticles.visible = false;
+            scene.add(aromaParticles);
+        }
+
+        /**
+         * 更新 3D 粒子系統的狀態 (蒸氣或咖啡渣)。
+         * @param {string} type - 'steam' 或 'grounds' 或 'none'。
+         */
+        function updateParticleSystem3D(type) {
+            const positions = particleSystem3D.geometry.attributes.position.array;
+            const colors = particleSystem3D.geometry.attributes.color.array;
+            
+            const baseColor = new THREE.Color();
+            const material = particleSystem3D.material;
+            const particleCount = positions.length / 3;
+
+            if (type === 'steam') {
+                particleSystem3D.visible = true;
+                material.size = 0.08;
+                material.opacity = 0.8;
+                material.blending = THREE.AdditiveBlending;
+                baseColor.set(0xF0F8FF); // 淺藍白色
+                particleSystem3D.position.copy(grinderPart.position); // 從研磨器位置發出
+                particleSystem3D.position.y += 0.3; // 稍高一點
+                particleSystem3D.userData.velocity = new THREE.Vector3(0, 0.005, 0); // 向上漂浮
+                particleSystem3D.userData.spread = 0.002;
+                particleSystem3D.userData.colorRandomness = 0.05;
+                particleSystem3D.userData.decay = 0.0005;
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3 + 0] = (Math.random() - 0.5) * 0.5;
+                    positions[i * 3 + 1] = Math.random() * 0.5;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+                    colors[i * 3 + 0] = baseColor.r;
+                    colors[i * 3 + 1] = baseColor.g;
+                    colors[i * 3 + 2] = baseColor.b;
+                }
+            } else if (type === 'grounds') {
+                particleSystem3D.visible = true;
+                material.size = 0.03;
+                material.opacity = 0.9;
+                material.blending = THREE.NormalBlending;
+                baseColor.set(0x5A4444); // 深棕色
+                particleSystem3D.position.copy(brewSpout.position); // 從出水口下方發出
+                particleSystem3D.position.y -= 0.5; // 稍低一點
+                particleSystem3D.userData.velocity = new THREE.Vector3(0, -0.005, 0); // 向下掉落
+                particleSystem3D.userData.spread = 0.005;
+                particleSystem3D.userData.colorRandomness = 0.1;
+                particleSystem3D.userData.decay = 0.0001;
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3 + 0] = (Math.random() - 0.5) * 0.5;
+                    positions[i * 3 + 1] = Math.random() * 0.5;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+                    colors[i * 3 + 0] = baseColor.r;
+                    colors[i * 3 + 1] = baseColor.g;
+                    colors[i * 3 + 2] = baseColor.b;
+                }
+            } else {
+                particleSystem3D.visible = false;
+            }
+            particleSystem3D.geometry.attributes.position.needsUpdate = true;
+            particleSystem3D.geometry.attributes.color.needsUpdate = true;
+        }
+
+        /**
+         * 在動畫循環中更新 3D 粒子位置和顏色。
+         */
+        function animateParticles3D() {
+            if (!particleSystem3D || !particleSystem3D.visible) return;
+
+            const positions = particleSystem3D.geometry.attributes.position.array;
+            const colors = particleSystem3D.geometry.attributes.color.array;
+            const velocity = particleSystem3D.userData.velocity;
+            const spread = particleSystem3D.userData.spread;
+            const colorRandomness = particleSystem3D.userData.colorRandomness;
+            const decay = particleSystem3D.userData.decay;
+            const particleCount = positions.length / 3;
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3 + 0] += (Math.random() - 0.5) * spread; // 橫向隨機擴散
+                positions[i * 3 + 1] += velocity.y + (Math.random() - 0.5) * spread; // 縱向移動 + 隨機擴散
+                positions[i * 3 + 2] += (Math.random() - 0.5) * spread; // 深度隨機擴散
+
+                // 隨機調整顏色
+                colors[i * 3 + 0] = Math.max(0, colors[i * 3 + 0] - decay + (Math.random() - 0.5) * colorRandomness);
+                colors[i * 3 + 1] = Math.max(0, colors[i * 3 + 1] - decay + (Math.random() - 0.5) * colorRandomness);
+                colors[i * 3 + 2] = Math.max(0, colors[i * 3 + 2] - decay + (Math.random() - 0.5) * colorRandomness);
+
+                // 如果粒子超出範圍或透明度過低，重置其位置和顏色
+                if (positions[i * 3 + 1] > 1.5 || positions[i * 3 + 1] < -1.5 || colors[i * 3 + 0] <= 0.1) {
+                    positions[i * 3 + 0] = (Math.random() - 0.5) * 0.5;
+                    positions[i * 3 + 1] = (particleSystem3D.userData.velocity.y > 0) ? 0 : 0.5; // 如果向上，從底部開始；如果向下，從頂部開始
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
+                    const baseColor = particleSystem3D.material.color;
+                    colors[i * 3 + 0] = baseColor.r + (Math.random() - 0.5) * 0.1;
+                    colors[i * 3 + 1] = baseColor.g + (Math.random() - 0.5) * 0.1;
+                    colors[i * 3 + 2] = baseColor.b + (Math.random() - 0.5) * 0.1;
+                }
+            }
+            particleSystem3D.geometry.attributes.position.needsUpdate = true;
+            particleSystem3D.geometry.attributes.color.needsUpdate = true;
+        }
+
+        /**
+         * 更新漂浮元素的動畫。
+         */
+        function animateFloatingElements() {
+            if (coffeeBeanParticles.visible) {
+                coffeeBeanParticles.children.forEach(bean => {
+                    bean.position.x += Math.sin(performance.now() * bean.userData.speed + bean.id) * 0.001;
+                    bean.position.y += Math.cos(performance.now() * bean.userData.speed + bean.id) * 0.001;
+                    bean.position.z += Math.sin(performance.now() * bean.userData.speed * 0.8 + bean.id) * 0.001;
+                    bean.rotation.x += bean.userData.speed * 5;
+                    bean.rotation.y += bean.userData.speed * 5;
+                });
+            }
+
+            // 咖啡杯可以做輕微的浮動
+            if (coffeeCup.visible) {
+                 coffeeCup.position.y = -1.0 + Math.sin(performance.now() * 0.001) * 0.05; // 輕微上下浮動
+                 coffeeCup.rotation.y += 0.001; // 輕微自轉
+            }
+
+            if (aromaParticles.visible) {
+                aromaParticles.children.forEach(aroma => {
+                    aroma.position.x = aroma.userData.initialPos.x + Math.sin(performance.now() * aroma.userData.speed + aroma.userData.offset) * 0.2;
+                    aroma.position.y = aroma.userData.initialPos.y + Math.cos(performance.now() * aroma.userData.speed * 1.2 + aroma.userData.offset) * 0.2;
+                    aroma.position.z = aroma.userData.initialPos.z + Math.sin(performance.now() * aroma.userData.speed * 0.9 + aroma.userData.offset) * 0.2;
+                });
+            }
+        }
+
+
+        /**
+         * 處理視窗大小改變。
+         */
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            console.log('[DEBUG] Window resized, Three.js canvas updated.');
+        }
+
+        /**
+         * 處理滑鼠移動事件，用於 3D 模型旋轉。
+         * 僅在 Three.js canvas 上觸發。
+         */
+        function onCanvasMouseMove(event) {
+            // 計算正規化後的滑鼠座標 (-1 到 +1) 相對於 canvas
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        }
+
+        /**
+         * 處理滑鼠點擊事件，用於 3D 模型互動。
+         */
+        function onCanvasClick(event) {
+            // update the picking ray with the camera and pointer position
+            raycaster.setFromCamera(mouse, camera);
+
+            // calculate objects intersecting the picking ray
+            const intersects = raycaster.intersectObjects(coffeeMachineGroup.children, true);
+
+            if (intersects.length > 0) {
+                const clickedObject = intersects[0].object;
+                console.log('Clicked 3D object:', clickedObject.name);
+
+                let targetSectionId = null;
+                switch (clickedObject.name) {
+                    case 'grinder':
+                        targetSectionId = 'flavor-guide';
+                        break;
+                    case 'spout':
+                        targetSectionId = 'coffee-grounds-magic';
+                        break;
+                    case 'body':
+                    case 'tray':
+                    case 'panel':
+                    case 'button1':
+                    case 'button2':
+                        targetSectionId = 'our-beans';
+                        break;
+                    default:
+                        // No specific action for other parts or if not recognized
+                        break;
+                }
+
+                if (targetSectionId) {
+                    // Scroll to the corresponding section
+                    scrollToSection(targetSectionId);
+                }
+            }
+        }
+
+        /**
+         * 平滑過渡 Three.js 攝影機、咖啡機位置和燈光。
+         * @param {Object} targetData - 目標攝影機、咖啡機位置和燈光數據。
+         */
+        function setSectionView(targetData) {
+            const duration = 1000; // milliseconds for transition
+            const easing = 0.05; // Smoothing factor for lerp
+
+            targetCameraPosition.set(targetData.cameraPos.x, targetData.cameraPos.y, targetData.cameraPos.z);
+            targetMachinePosition.set(targetData.machineTargetPos.x, targetData.machineTargetPos.y, targetData.machineTargetPos.z);
+            targetLightIntensity = targetData.lightIntensity;
+            targetLightColor.setHex(targetData.lightColor);
+
+            // 重置所有動畫相關的狀態和隱藏額外漂浮物件
+            grinderPart.rotation.y = 0; 
+            if (brewSpout && brewSpout.material) brewSpout.material.emissive.setHex(0x000000); 
+            updateParticleSystem3D('none'); 
+            coffeeBeanParticles.visible = false;
+            coffeeCup.visible = false;
+            aromaParticles.visible = false;
+
+            // 根據當前區塊執行特定動畫
+            switch (targetData.id) {
+                case 'flavor-guide':
+                    updateParticleSystem3D('steam'); 
+                    coffeeBeanParticles.visible = true; 
+                    break;
+                case 'our-beans':
+                    lightSource.intensity = 2.5; 
+                    coffeeBeanParticles.visible = true; 
+                    coffeeBeanParticles.children.forEach(bean => {
+                        const colors = [0x8B4513, 0x693C1A, 0x4A2C0F, 0x2A1B0C]; // 淺到深咖啡色
+                        bean.material.color.setHex(colors[Math.floor(Math.random() * colors.length)]);
+                    });
+                    break;
+                case 'coffee-grounds-magic':
+                    lightSource.intensity = 0.8; 
+                    updateParticleSystem3D('grounds'); 
+                    aromaParticles.visible = true; 
+                    break;
+                case 'story':
+                    coffeeCup.visible = true;
+                    coffeeCup.position.set(0.5, -1.0, 0); 
+                    break;
+            }
+        }
+
+        /**
+         * 主動畫循環，用於更新 3D 場景。
+         */
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 平滑過渡攝影機位置和咖啡機位置
+            camera.position.lerp(targetCameraPosition, 0.05);
+            coffeeMachineGroup.position.lerp(targetMachinePosition, 0.05);
+            lightSource.intensity += (targetLightIntensity - lightSource.intensity) * 0.05;
+            lightSource.color.lerp(targetLightColor, 0.05);
+
+            // 咖啡機基礎浮動動畫 (小範圍的上下移動)
+            const time = performance.now() * 0.0005;
+            coffeeMachineGroup.position.y += Math.sin(time * 0.5) * 0.005; 
+
+            // 滑鼠控制旋轉 (僅在 'home' 或通用狀態下進行微調，當聚焦特定部件時則不干預)
+            if (currentActiveSectionIndex === 0 || sectionsData[currentActiveSectionIndex].hotspot === null) {
+                const targetRotationY = mouse.x * 0.5; // X軸移動影響Y軸旋轉 (左右)
+                const targetRotationX = mouse.y * 0.5; // Y軸移動影響X軸旋轉 (上下)
+                coffeeMachineGroup.rotation.y += (targetRotationY - coffeeMachineGroup.rotation.y) * 0.08;
+                coffeeMachineGroup.rotation.x += (targetRotationX - coffeeMachineGroup.rotation.x) * 0.08;
+            }
+
+
+            // 持續執行研磨器動畫（如果處於風味探索區塊）
+            if (sectionsData[currentActiveSectionIndex].id === 'flavor-guide') {
+                grinderPart.rotation.y += 0.05;
+            }
+
+            animateParticles3D(); // 更新 3D 粒子動畫
+            animateFloatingElements(); // 更新額外漂浮物件動畫
+
+            renderer.render(scene, camera);
+        }
+
+        /**
+         * 捲動到指定區塊並觸發 Three.js 動畫。
+         * @param {string} sectionId - 目標區塊的 ID。
+         */
+        function scrollToSection(sectionId) {
+            const targetSectionElement = document.getElementById(sectionId);
+            if (targetSectionElement) {
+                targetSectionElement.scrollIntoView({ behavior: 'smooth' });
+                const sectionIndex = sectionsData.findIndex(s => s.id === sectionId);
+                if (sectionIndex !== -1) {
+                    currentActiveSectionIndex = sectionIndex; // Update current active section
+                    setSectionView(sectionsData[currentActiveSectionIndex]);
+                }
+            } else {
+                console.warn(`Section with ID '${sectionId}' not found.`);
+            }
+        }
+
+        // --- 前台訊息彈窗元素 (透過 window 全域存取) ---
         const frontMessageModal = document.getElementById('frontMessageModal');
+        const frontModalIcon = document.getElementById('frontModalIcon'); // Get icon element
         const frontModalTitle = document.getElementById('frontModalTitle');
         const frontModalMessage = document.getElementById('frontModalMessage');
 
         /**
-         * Shows the custom frontend message modal.
-         * @param {string} title - The title of the message.
-         * @param {string} message - The message content.
-         * @param {string} type - 'success' or 'error' to change title color.
+         * 顯示自訂的前台訊息彈窗。
+         * @param {string} title - 訊息標題。
+         * @param {string} message - 訊息內容。
+         * @param {string} type - 'success', 'error' 或 'info' 以改變圖示和標題顏色。
          */
         window.showFrontMessageModal = function(title, message, type = 'info') {
             frontModalTitle.textContent = title;
-            frontModalMessage.textContent = message;
-            frontModalTitle.classList.remove('front-modal-success', 'front-modal-error');
-            if (type === 'success') {
-                frontModalTitle.classList.add('front-modal-success');
-            } else if (type === 'error') {
-                frontModalTitle.classList.add('front-modal-error');
+            frontModalMessage.innerHTML = message; // 允許 HTML 內容
+
+            // Reset icon and title colors
+            frontModalIcon.className = 'mb-4 text-5xl'; // Reset classes
+            frontModalTitle.classList.remove('front-modal-success', 'front-modal-error', 'front-modal-info'); // Remove all possible color classes
+
+            // Set icon and color based on type
+            let iconClass = '';
+            switch (type) {
+                case 'success':
+                    iconClass = 'fas fa-check-circle icon-success';
+                    frontModalTitle.classList.add('front-modal-success');
+                    break;
+                case 'error':
+                    iconClass = 'fas fa-times-circle icon-error';
+                    frontModalTitle.classList.add('front-modal-error');
+                    break;
+                case 'info':
+                default:
+                    iconClass = 'fas fa-info-circle icon-info';
+                    frontModalTitle.classList.add('front-modal-info'); 
+                    break;
             }
-            frontMessageModal.style.display = 'flex';
+            frontModalIcon.className += ` ${iconClass}`; // Append icon classes
+
+            frontMessageModal.classList.add('active'); // Add active class to show with animation
         };
 
         /**
-         * Closes the custom frontend message modal.
+         * 關閉自訂的前台訊息彈窗。
          */
         window.closeFrontMessageModal = function() {
-            frontMessageModal.style.display = 'none';
+            frontMessageModal.classList.remove('active'); // Remove active class to hide with animation
         };
 
 
-        // --- Core Data Loading & Rendering Functions (Globally exposed) ---
+        // --- 核心資料載入與渲染函式 (全域公開) ---
 
         /**
-         * Loads data from localStorage or uses default data if localStorage is empty/invalid.
-         * Then, triggers all necessary rendering functions. Exposed globally.
+         * 從 localStorage 載入資料，如果 localStorage 為空/無效則使用預設資料。
+         * 然後，觸發所有必要的渲染函式。全域公開。
          */
         window.loadAndRenderAllData = function() {
-            console.log('--- Starting loadAndRenderAllData (Frontend Display) ---');
+            console.log('--- 開始載入與渲染所有資料 (前台展示) ---');
             try {
-                // Load Coffee Beans: Prioritize localStorage, fallback to defaults
+                // 載入咖啡豆：優先使用 localStorage，否則回退到預設值
                 let storedCoffeeBeans = null;
                 try {
                     const coffeeBeansJson = localStorage.getItem(COFFEE_BEANS_KEY);
                     if (coffeeBeansJson) {
                         storedCoffeeBeans = JSON.parse(coffeeBeansJson);
-                        console.log('[DEBUG] Parsed coffee beans from localStorage:', storedCoffeeBeans);
+                        console.log('[除錯] 從 localStorage 解析咖啡豆資料:', storedCoffeeBeans);
                     } else {
-                        console.log('[DEBUG] localStorage for coffee beans is empty.');
+                        console.log('[除錯] localStorage 中的咖啡豆資料為空。');
                     }
                 } catch (e) {
-                    console.error('[ERROR] Error parsing stored coffee beans from localStorage. Falling back to default data.', e);
-                    // Fallback to default if parsing fails
+                    console.error('[錯誤] 解析 localStorage 中的咖啡豆資料時出錯。回退到預設資料。', e);
+                    // 如果解析失敗則回退到預設值
                 }
                 if (Array.isArray(storedCoffeeBeans) && storedCoffeeBeans.length > 0) {
-                    // Ensure loaded data has all expected fields, merge with default template if necessary
-                    // This handles cases where localStorage might have old schema
+                    // 確保載入的資料包含所有預期欄位，必要時與預設模板合併
+                    // 這處理了 localStorage 可能有舊架構的情況
                     coffeeBeans = storedCoffeeBeans.map(bean => ({
-                        stock: 0, // Default for new 'stock' field if missing from old data
-                        ...defaultCoffeeBeans[0], // Use a template from default to ensure all keys exist
-                        ...bean // Overlay existing values from localStorage
+                        stock: 0, // 如果舊資料中缺少 'stock' 欄位，則預設為 0
+                        ...defaultCoffeeBeans[0], // 使用預設模板中的一個來確保所有鍵都存在
+                        ...bean // 覆蓋 localStorage 中的現有值
                     }));
-                    console.log('[DEBUG] Successfully loaded and merged coffee beans from localStorage:', coffeeBeans);
+                    console.log('[除錯] 成功從 localStorage 載入並合併咖啡豆資料:', coffeeBeans);
                 } else {
-                    coffeeBeans = [...defaultCoffeeBeans]; // Use spread to avoid modifying default array directly
-                    localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(defaultCoffeeBeans)); // Always re-save defaults if localStorage is empty/invalid
-                    console.log('[DEBUG] localStorage for coffee beans was empty or invalid. Using and re-saving default data:', coffeeBeans);
+                    coffeeBeans = [...defaultCoffeeBeans]; // 使用展開運算符避免直接修改預設陣列
+                    localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(defaultCoffeeBeans)); // 如果 localStorage 為空/無效，則始終重新儲存預設值
+                    console.log('[除錯] localStorage 中的咖啡豆資料為空或無效。正在使用並重新儲存預設資料:', coffeeBeans);
                 }
-                console.log('[DEBUG] Coffee beans data after loading logic:', coffeeBeans); // Crucial log
+                console.log('[除錯] 載入邏輯後的咖啡豆資料:', coffeeBeans); // 關鍵日誌
 
-                // Removed specialOffers loading as the section is being removed
-                // specialOffers = window.OfferDataManager.loadOffersFromLocalStorage();
-                // if (specialOffers.length === 0) {
-                //     specialOffers = window.OfferDataManager.mergeWithDefaultSchema(window.OfferDataManager.DEFAULT_SPECIAL_OFFERS, window.OfferDataManager.defaultOfferTemplate);
-                //     window.OfferDataManager.saveOffersToLocalStorage(specialOffers);
-                // }
-                // console.log('[DEBUG] Special offers data after loading logic (using OfferDataManager):', specialOffers);
-
-                // Load Reviews (always from localStorage for user-submitted content)
+                // 載入評論 (始終從 localStorage 載入用戶提交的內容)
                 let storedReviews = null;
                 try {
                     const reviewsJson = localStorage.getItem(REVIEWS_KEY);
@@ -645,22 +1995,21 @@
                         storedReviews = JSON.parse(reviewsJson);
                     }
                 } catch (e) {
-                    console.error('[ERROR] Error parsing stored reviews from localStorage:', e);
+                    console.error('[錯誤] 解析 localStorage 中的評論時出錯:', e);
                 }
-                reviews = Array.isArray(storedReviews) ? storedReviews : [...defaultReviews]; // Use defaultReviews if localStorage is empty/invalid
-                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); // Ensure defaults are saved if not present
-                console.log('[DEBUG] Loaded reviews (from localStorage or default):', reviews);
+                reviews = Array.isArray(storedReviews) ? storedReviews : [...defaultReviews]; // 如果 localStorage 為空/無效，則使用 defaultReviews
+                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews)); // 確保如果不存在則儲存預設值
+                console.log('[除錯] 載入評論 (從 localStorage 或預設值):', reviews);
 
-                // --- Trigger rendering for all sections ---
-                console.log('[DEBUG] Triggering render functions...');
-                // window.renderSpecialOffers(); // Removed
+                // --- 觸發所有區塊的渲染 ---
+                console.log('[除錯] 觸發渲染函式...');
                 window.renderFaqs(); 
                 window.renderReviews(); 
                 window.updateFlavorGuideSelect();
-                console.log('[DEBUG] Render functions triggered.');
+                console.log('[除錯] 渲染函式已觸發。');
                 
             } catch (error) {
-                console.error('[CRITICAL ERROR] An unhandled error occurred during loadAndRenderAllData:', error);
+                console.error('[嚴重錯誤] 載入與渲染所有資料時發生未處理的錯誤:', error);
                 const mainContent = document.querySelector('main');
                 if (mainContent) {
                     mainContent.innerHTML = `
@@ -671,66 +2020,21 @@
                     `;
                 }
             }
-            console.log('--- Finished loadAndRenderAllData (Frontend Display) ---');
+            console.log('--- 完成載入與渲染所有資料 (前台展示) ---');
         };
 
-        // Removed renderSpecialOffers function as the section is being removed
-        // /**
-        //  * Renders the list of special offers. Exposed globally.
-        //  */
-        // window.renderSpecialOffers = function() {
-        //     try {
-        //         const specialOffersList = document.getElementById('special-offers-list');
-        //         if (!specialOffersList) {
-        //             console.error('[ERROR] specialOffersList element not found!');
-        //             return;
-        //         }
-        //         console.log('[DEBUG] Rendering special offers. Current specialOffers data before clearing:', specialOffers);
-        //         console.log('[DEBUG] Number of offers to render:', specialOffers.length);
-        //         specialOffersList.innerHTML = ''; // Clear existing content
-        //         if (Array.isArray(specialOffers) && specialOffers.length === 0) {
-        //             specialOffersList.innerHTML = '<p class="text-center col-span-full text-lg text-gray-600">目前沒有特別優惠。</p>';
-        //             console.warn('[DEBUG] No special offers to render. Displaying "no offers" message.');
-        //         } else {
-        //             specialOffers.forEach((offer, index) => {
-        //                 console.log(`[DEBUG] Rendering offer #${index + 1}:`, offer);
-        //                 const offerCard = document.createElement('div');
-        //                 offerCard.className = 'card p-6 flex flex-col items-center text-center fade-in-up';
-        //                 offerCard.innerHTML = `
-        //                     <img src="${offer.image}" alt="${offer.name} 圖片載入失敗" class="w-full h-40 object-cover rounded-md mb-4"
-        //                          onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%20fill%3D%22%23333%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E%E5%9C%96%E7%89%87%E8%BC%89%E5%85%A5%E5%A4%B1%E6%95%97%3C%2Ftext%3E%3C%2Fsvg%3E'; this.style.objectFit='contain';">
-        //                     <h3 class="text-xl font-serif mb-2">${offer.name}</h3>
-        //                     <p class="text-gray-600 mb-3">${offer.description}</p>
-        //                     <div class="mt-auto">
-        //                         <span class="offer-price-old">NT$${offer.originalPrice}</span>
-        //                         <span class="offer-price-new">NT$${offer.specialPrice}</span>
-        //                     </div>
-        //                 `;
-        //                 specialOffersList.appendChild(offerCard);
-        //             });
-        //             console.log(`[DEBUG] Successfully rendered ${specialOffers.length} offer cards.`);
-        //         }
-        //     } catch (error) {
-        //         console.error('[ERROR] Error rendering special offers:', error);
-        //         const specialOffersList = document.getElementById('special-offers-list');
-        //         if (specialOffersList) {
-        //             specialOffersList.innerHTML = '<div class="error-message col-span-full">載入優惠活動時發生錯誤。</div>';
-        //         }
-        //     }
-        // };
-
         /**
-         * Renders the FAQ items and attaches accordion functionality. Exposed globally.
+         * 渲染常見問題項目並附加手風琴功能。全域公開。
          */
         window.renderFaqs = function() {
             try {
                 const faqContainer = document.getElementById('faq-container');
                 if (!faqContainer) {
-                    console.error('[ERROR] faqContainer element not found!');
+                    console.error('[錯誤] faqContainer 元素未找到！');
                     return;
                 }
-                console.log('[DEBUG] Rendering FAQs. faqs length:', faqs.length);
-                faqContainer.innerHTML = ''; // Clear existing content before re-rendering
+                console.log('[除錯] 渲染常見問題。常見問題長度:', faqs.length);
+                faqContainer.innerHTML = ''; // 渲染前清除現有內容
                 if (Array.isArray(faqs) && faqs.length === 0) {
                      faqContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full">目前沒有常見問題。</p>';
                 } else {
@@ -748,7 +2052,7 @@
                         faqContainer.appendChild(item);
                     });
                 }
-                // Re-attach accordion event listeners after rendering
+                // 渲染後重新附加手風琴事件監聽器
                 const newFaqButtons = document.querySelectorAll('.accordion-button');
                 newFaqButtons.forEach(button => {
                     button.addEventListener('click', () => {
@@ -761,9 +2065,9 @@
                         }
                     });
                 });
-                console.log(`[DEBUG] Rendered ${faqs.length} FAQ items.`);
+                console.log(`[除錯] 已渲染 ${faqs.length} 個常見問題項目。`);
             } catch (error) {
-                console.error('[ERROR] Error rendering FAQs:', error);
+                console.error('[錯誤] 渲染常見問題時出錯:', error);
                 if (faqContainer) {
                     faqContainer.innerHTML = '<div class="error-message">載入常見問題時發生錯誤。</div>';
                 }
@@ -771,24 +2075,24 @@
         };
 
         /**
-         * Renders the customer reviews. Exposed globally.
+         * 渲染客戶評論。全域公開。
          */
         window.renderReviews = function() {
             try {
                 const reviewList = document.getElementById('review-list');
                 if (!reviewList) {
-                    console.error('[ERROR] reviewList element not found!');
+                    console.error('[錯誤] reviewList 元素未找到！');
                     return;
                 }
                 reviewList.innerHTML = '';
                 // 如果 reviews 為空，顯示提示訊息
                 if (Array.isArray(reviews) && reviews.length === 0) {
                     reviewList.innerHTML = '<p class="text-center text-gray-500">目前還沒有顧客回饋，期待您的第一則評論！</p>';
-                    console.log('[DEBUG] No reviews to render.');
+                    console.log('[除錯] 沒有評論可渲染。');
                 } else {
                     reviews.forEach(review => {
                         const item = document.createElement('div');
-                        item.className = 'card p-6';
+                        item.className = 'card p-6 mb-4 border-b border-gray-200 pb-4'; /* 新增邊框和底部內邊距 */
                         item.innerHTML = `
                             <div class="flex items-center mb-2">
                                 <span class="font-semibold text-lg mr-2">${review.name}</span>
@@ -798,10 +2102,10 @@
                         `;
                         reviewList.appendChild(item);
                     });
-                    console.log(`[DEBUG] Rendered ${reviews.length} review items.`);
+                    console.log(`[除錯] 已渲染 ${reviews.length} 個評論項目。`);
                 }
             } catch (error) {
-                console.error('[ERROR] Error rendering reviews:', error);
+                console.error('[錯誤] 渲染評論時出錯:', error);
                 if (reviewList) {
                     reviewList.innerHTML = '<div class="error-message">載入顧客回饋時發生錯誤。</div>';
                 }
@@ -809,7 +2113,7 @@
         };
 
         /**
-         * Populates the flavor guide select box and initializes/updates the radar chart. Exposed globally.
+         * 填充風味指南選擇框並初始化/更新雷達圖。全域公開。
          */
         window.updateFlavorGuideSelect = function() {
             try {
@@ -818,12 +2122,12 @@
                 const beanDetailsDisplay = document.getElementById('bean-details-display');
 
                 if (!flavorSelect) {
-                    console.error('[ERROR] flavorSelect element not found!');
+                    console.error('[錯誤] flavorSelect 元素未找到！');
                     return;
                 }
-                console.log('[DEBUG] Updating flavor guide select. coffeeBeans length:', coffeeBeans.length);
+                console.log('[除錯] 更新風味指南選擇器。咖啡豆數量:', coffeeBeans.length);
 
-                // Re-populate options based on potentially updated coffeeBeans
+                // 根據可能更新的咖啡豆重新填充選項
                 flavorSelect.innerHTML = '<option value="" disabled selected>選擇一款咖啡豆來查看風味圖譜：</option>';
                 if (Array.isArray(coffeeBeans)) {
                     coffeeBeans.forEach(bean => {
@@ -836,10 +2140,10 @@
 
                 const ctx = document.getElementById('flavorRadarChart')?.getContext('2d');
                 if (ctx) {
-                    // Destroy old chart if it exists to prevent reinitialization issues
-                    if (radarChart) { // radarChart is a global variable
+                    // 如果圖表存在則銷毀舊圖表以防止重新初始化問題
+                    if (radarChart) { // radarChart 是一個全域變數
                         radarChart.destroy();
-                        console.log('[DEBUG] Destroyed existing radar chart.');
+                        console.log('[除錯] 已銷毀現有的雷達圖。');
                     }
                     radarChart = new Chart(ctx, {
                         type: 'radar',
@@ -877,31 +2181,33 @@
                             }
                         }
                     });
-                    console.log('[DEBUG] New radar chart created.');
+                    console.log('[除錯] 已創建新的雷達圖。');
                 } else {
-                    console.error('[ERROR] flavorRadarChart canvas context not found!');
+                    console.error('[錯誤] flavorRadarChart 畫布上下文未找到！');
                 }
 
-                // Remove and re-add event listener to prevent duplicates
+                // 移除並重新添加事件監聽器以防止重複
                 flavorSelect.removeEventListener('change', window.handleFlavorSelectChange); 
                 flavorSelect.addEventListener('change', window.handleFlavorSelectChange);
 
-                // Trigger change to load the first item's data or display message if no data
+                // 觸發更改以載入第一個項目的資料或在沒有資料時顯示訊息
                 if(Array.isArray(coffeeBeans) && coffeeBeans.length > 0) {
-                    flavorSelect.value = coffeeBeans[0].id; // Set first item as default selected
+                    flavorSelect.value = coffeeBeans[0].id; // 設置第一個項目為預設選定
                     flavorSelect.dispatchEvent(new Event('change'));
-                    console.log('[DEBUG] Flavor select initialized with first coffee bean.');
+                    console.log('[除錯] 風味選擇器已用第一種咖啡豆初始化。');
                 } else {
                     if(lifestyleSuggestionP) {
                         lifestyleSuggestionP.textContent = '目前沒有咖啡豆數據可供選擇。';
-                        console.log('[DEBUG] No coffee beans, setting flavor guide message.');
+                        console.log('[除錯] 沒有咖啡豆，正在設置風味指南訊息。');
                     }
                     if (beanDetailsDisplay) {
-                        beanDetailsDisplay.classList.add('hidden'); // Hide details if no beans
+                        beanDetailsDisplay.classList.remove('is-visible'); // 確保在無資料時隱藏動畫和內容
+                        beanDetailsDisplay.style.opacity = '0';
+                        beanDetailsDisplay.style.pointerEvents = 'none';
                     }
                 }
             } catch (error) {
-                console.error('[ERROR] Error updating flavor guide:', error);
+                console.error('[錯誤] 更新風味指南時出錯:', error);
                 if (flavorSelect) {
                     flavorSelect.innerHTML = '<option value="" disabled selected>載入風味指南時發生錯誤。</option>';
                 }
@@ -910,22 +2216,27 @@
                     lifestyleSuggestionP.classList.add('error-message');
                 }
                 if (beanDetailsDisplay) {
-                    beanDetailsDisplay.classList.add('hidden');
+                    beanDetailsDisplay.classList.remove('is-visible');
+                    beanDetailsDisplay.style.opacity = '0';
+                    beanDetailsDisplay.style.pointerEvents = 'none';
                 }
             }
         };
 
         /**
-         * Handles the change event for the flavor select dropdown.
-         * Updates the radar chart, lifestyle suggestion, and bean details based on the selected coffee bean. Exposed globally.
+         * 處理風味選擇下拉選單的更改事件。
+         * 根據選定的咖啡豆更新雷達圖、生活提案和咖啡豆詳細資訊。全域公開。
          */
         window.handleFlavorSelectChange = function(e) {
             try {
                 const selectedBean = Array.isArray(coffeeBeans) ? coffeeBeans.find(b => b.id == e.target.value) : undefined;
-                if (selectedBean && radarChart) {
+                const beanDetailsDisplay = document.getElementById('bean-details-display');
+                const brewingVisualizer = document.getElementById('brewing-visualizer');
+                const coffeeLiquid = brewingVisualizer?.querySelector('.brewing-liquid');
+
+                if (selectedBean && radarChart && beanDetailsDisplay) {
                     // Get references inside the handler to ensure they are available
                     const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
-                    const beanDetailsDisplay = document.getElementById('bean-details-display');
                     const detailName = document.getElementById('detail-name');
                     const detailCountry = document.getElementById('detail-country');
                     const detailVariety = document.getElementById('detail-variety');
@@ -937,23 +2248,37 @@
                     const detailStock = document.getElementById('detail-stock');
                     const stockStatus = document.getElementById('stock-status');
 
-                    // Update radar chart
+                    // Step 1: Hide the actual details and show brewing animation
+                    beanDetailsDisplay.style.opacity = '0';
+                    beanDetailsDisplay.style.pointerEvents = 'none';
+                    if (brewingVisualizer && coffeeLiquid) {
+                        brewingVisualizer.classList.add('active'); // Make brewing visualizer visible
+                        coffeeLiquid.style.height = '0%'; // Reset liquid fill
+                        setTimeout(() => {
+                            coffeeLiquid.style.height = '80%'; // Start liquid fill animation
+                        }, 50); // Small delay to ensure CSS reset takes effect
+                    }
+
+                    // Update radar chart immediately
                     const flavorData = selectedBean.flavorProfile && typeof selectedBean.flavorProfile === 'object' 
                                         ? Object.values(selectedBean.flavorProfile) 
-                                        : [0, 0, 0, 0, 0]; // Default to zeros if missing or invalid
-
+                                        : [0, 0, 0, 0, 0];
                     radarChart.data.datasets[0].data = flavorData;
                     radarChart.data.datasets[0].label = selectedBean.name;
                     radarChart.update();
                     
-                    // Update lifestyle suggestion
-                    if(lifestyleSuggestionP) {
-                        lifestyleSuggestionP.textContent = selectedBean.lifestyle || '無生活提案。'; // Provide fallback
-                        lifestyleSuggestionP.classList.remove('error-message');
-                    }
+                    // After brewing animation, show actual details and hide animation
+                    setTimeout(() => {
+                        if (brewingVisualizer) {
+                            brewingVisualizer.classList.remove('active'); // Hide brewing visualizer
+                        }
 
-                    // Update bean details display
-                    if (beanDetailsDisplay) {
+                        // Step 2: Populate and show the actual bean details
+                        if (lifestyleSuggestionP) {
+                            lifestyleSuggestionP.textContent = selectedBean.lifestyle || '無生活提案。';
+                            lifestyleSuggestionP.classList.remove('error-message');
+                        }
+
                         detailName.textContent = selectedBean.name || 'N/A';
                         detailCountry.textContent = selectedBean.country || 'N/A';
                         detailVariety.textContent = selectedBean.variety || 'N/A';
@@ -962,14 +2287,13 @@
                         detailExpiry.textContent = selectedBean.expiryDate || 'N/A';
                         detailFlavor.textContent = selectedBean.flavor || 'N/A';
                         detailPrice.textContent = selectedBean.price || '---';
-                        detailStock.textContent = selectedBean.stock || 0; // Display stock value
+                        detailStock.textContent = selectedBean.stock || 0;
                         
-                        // Update stock status based on stock value
-                        stockStatus.className = 'stock-indicator'; // Reset classes
+                        stockStatus.className = 'stock-indicator';
                         if (selectedBean.stock === 0) {
                             stockStatus.textContent = '已售罄';
                             stockStatus.classList.add('stock-out-of-stock');
-                        } else if (selectedBean.stock > 0 && selectedBean.stock <= 5) { // Assuming low stock is <= 5
+                        } else if (selectedBean.stock > 0 && selectedBean.stock <= 5) {
                             stockStatus.textContent = '庫存緊張';
                             stockStatus.classList.add('stock-low-stock');
                         } else {
@@ -977,58 +2301,83 @@
                             stockStatus.classList.add('stock-in-stock');
                         }
 
-                        // Show the details block
-                        beanDetailsDisplay.classList.remove('hidden');
-                    }
-                    console.log('[DEBUG] Flavor select changed. Updated radar chart, lifestyle suggestion, and bean details for:', selectedBean.name);
+                        beanDetailsDisplay.style.opacity = '1'; // Make details visible
+                        beanDetailsDisplay.style.pointerEvents = 'auto'; // Re-enable pointer events
+                        beanDetailsDisplay.classList.add('is-visible'); // Trigger fade-in-up if it applies
+                        console.log('[除錯] 風味選擇已變更。已更新雷達圖、生活提案和咖啡豆詳細資訊:', selectedBean.name);
+
+                    }, 1800); // Wait for brewing animation to complete (1.5s transition + 0.3s buffer)
+
                 } else if (!selectedBean) {
-                    console.warn('[WARNING] Selected bean not found for ID:', e.target.value);
+                    console.warn('[警告] 未找到 ID 為的選定咖啡豆:', e.target.value);
                     const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
                     const beanDetailsDisplay = document.getElementById('bean-details-display');
+                    const brewingVisualizer = document.getElementById('brewing-visualizer');
 
                     if (lifestyleSuggestionP) {
                         lifestyleSuggestionP.textContent = '無法找到選定的咖啡豆風味數據。';
                         lifestyleSuggestionP.classList.add('error-message');
                     }
+                    // If no bean is selected or found, hide both the visualizer and details
+                    if (brewingVisualizer) brewingVisualizer.classList.remove('active');
                     if (beanDetailsDisplay) {
-                        beanDetailsDisplay.classList.add('hidden'); // Hide details if no bean selected or found
+                        beanDetailsDisplay.style.opacity = '0';
+                        beanDetailsDisplay.style.pointerEvents = 'none';
                     }
                 }
             } catch (error) {
-                console.error('[ERROR] Error handling flavor select change:', error);
+                console.error('[錯誤] 處理風味選擇變更時出錯:', error);
                 const lifestyleSuggestionP = document.querySelector('#lifestyle-suggestion p');
                 const beanDetailsDisplay = document.getElementById('bean-details-display');
+                const brewingVisualizer = document.getElementById('brewing-visualizer');
 
                 if (lifestyleSuggestionP) {
                     lifestyleSuggestionP.textContent = '載入選定咖啡豆風味時發生錯誤。';
                     lifestyleSuggestionP.classList.add('error-message');
                 }
+                if (brewingVisualizer) brewingVisualizer.classList.remove('active');
                 if (beanDetailsDisplay) {
-                    beanDetailsDisplay.classList.add('hidden');
+                    beanDetailsDisplay.style.opacity = '0';
+                    beanDetailsDisplay.style.pointerEvents = 'none';
                 }
             }
         };
 
 
-        // --- Event Listeners & Initialization ---
+        // --- 事件監聽器與初始化 ---
         document.addEventListener('DOMContentLoaded', () => {
+            const loadingOverlay = document.getElementById('loading-overlay');
             const reviewForm = document.getElementById('review-form');
             const inquiryForm = document.getElementById('inquiry-form');
-            // const refreshOffersBtn = document.getElementById('refresh-offers-btn'); // Removed
             const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
+            const backToTopBtn = document.getElementById('back-to-top-btn');
+            const scrollDownBtn = document.getElementById('scroll-down-btn');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main > section');
 
-            // --- Event Listener for Local Storage Changes (for cross-tab sync) ---
+            // --- 載入動畫隱藏 ---
+            window.addEventListener('load', () => {
+                if (loadingOverlay) {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500); // 配合 CSS 過渡時間
+                }
+            });
+
+
+            // --- LocalStorage 變更的事件監聽器 (用於跨分頁同步) ---
             window.addEventListener('storage', (event) => {
-                console.log('[DEBUG] Storage event fired!', event.key, event.oldValue, event.newValue, event.url);
+                console.log('[除錯] 儲存事件觸發！', event.key, event.oldValue, event.newValue, event.url);
 
-                // Only react to coffee beans and reviews changes
+                // 僅對咖啡豆和評論的變更做出反應
                 if (event.key === COFFEE_BEANS_KEY || event.key === REVIEWS_KEY) {
-                    console.log(`[DEBUG] localStorage key '${event.key}' changed. Reloading data.`);
+                    console.log(`[除錯] localStorage 鍵 '${event.key}' 已變更。正在重新載入資料。`);
                     window.loadAndRenderAllData();
                 }
             });
 
-            // --- Review Form Submission ---
+            // --- 評論表單提交 ---
             if(reviewForm) {
                 reviewForm.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -1049,19 +2398,19 @@
                         window.renderReviews();
                         reviewForm.reset();
                         showFrontMessageModal('感謝您', '您的評論已成功送出！', 'success');
-                        console.log('[DEBUG] New review submitted:', newReview);
+                        console.log('[除錯] 已提交新評論:', newReview);
                     }
                     catch (error) {
-                        console.error('[ERROR] Error submitting review:', error);
+                        console.error('[錯誤] 提交評論時出錯:', error);
                         showFrontMessageModal('提交錯誤', '提交評論時發生錯誤，請稍後再試。', 'error');
                     }
                 });
-                console.log('[DEBUG] Review form event listener attached.');
+                console.log('[除錯] 評論表單事件監聽器已附加。');
             } else {
-                console.error('[ERROR] Review form element not found!');
+                console.error('[錯誤] 評論表單元素未找到！');
             }
             
-            // --- Inquiry Form Submission ---
+            // --- 詢問表單提交 ---
             if(inquiryForm) {
                 inquiryForm.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -1088,61 +2437,270 @@
 
                         showFrontMessageModal('訊息已準備', '您的訊息已準備就緒，即將透過您的電子郵件應用程式開啟。請在新開啟的視窗中點擊「傳送」按鈕，以完成信件發送。', 'info');
                         inquiryForm.reset();
-                        console.log('[DEBUG] Inquiry form submitted for:', name);
+                        console.log('[除錯] 詢問表單已提交:', name);
                     } catch (error) {
-                        console.error('[ERROR] Error submitting inquiry form:', error);
+                        console.error('[錯誤] 提交詢問表單時出錯:', error);
                         showFrontMessageModal('提交錯誤', '提交詢問時發生錯誤，請稍後再試。', 'error');
                     }
                 });
-                console.log('[DEBUG] Inquiry form event listener attached.');
+                console.log('[除錯] 詢問表單事件監聽器已附加。');
             } else {
-                console.error('[ERROR] Inquiry form element not found!');
+                console.error('[錯誤] 詢問表單元素未找到！');
             }
 
-            // Removed refresh offers button listener as the section is being removed
-            // if (refreshOffersBtn) {
-            //     refreshOffersBtn.addEventListener('click', () => {
-            //         console.log('[DEBUG] Refresh Offers button clicked. Reloading all data.');
-            //         window.loadAndRenderAllData();
-            //         showFrontMessageModal('更新成功', '優惠活動已重新整理！', 'success');
-            //     });
-            // } else {
-            //     console.error('[ERROR] Refresh offers button not found!');
-            // }
-
-            // --- Refresh Coffee Button Listener ---
+            // --- 重新整理咖啡按鈕監聽器 ---
             if (refreshCoffeeBtn) {
                 refreshCoffeeBtn.addEventListener('click', () => {
-                    console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
+                    console.log('[除錯] 重新整理咖啡按鈕已點擊。正在重新載入所有資料。');
                     window.loadAndRenderAllData();
                     showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
                 });
             } else {
-                console.error('[ERROR] Refresh coffee button not found!');
+                console.error('[錯誤] 重新整理咖啡按鈕未找到！');
             }
 
 
-            // --- Scroll Animation Observer ---
+            // --- 滾動動畫觀察器 ---
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
+                        // 只有不重複動畫的元素才取消觀察 (例如：簡單的淡入上滑元素)
+                        if (!entry.target.classList.contains('animate-pulse-on-scroll')) {
+                            observer.unobserve(entry.target);
+                        }
+                    } else {
+                        // 如果是脈衝元素，且它離開視圖，則重置它以便在重新進入時可以再次動畫
+                        if (entry.target.classList.contains('animate-pulse-on-scroll')) {
+                            entry.target.classList.remove('is-visible');
+                        }
                     }
                 });
             }, { threshold: 0.1 });
 
-            document.querySelectorAll('.fade-in-up').forEach(el => {
+            document.querySelectorAll('.fade-in-up, .animate-pulse-on-scroll').forEach(el => {
                 observer.observe(el);
             });
-            console.log('[DEBUG] Scroll animation observer set up.');
+            console.log('[除錯] 滾動動畫觀察器已設置。');
 
-            // --- Initial load of all data and render on page load ---
-            console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
+
+            // --- 導覽列活動狀態監聽器 ---
+            // 監聽所有主要內容區塊，更新導覽列的活動狀態
+            const navObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    const id = entry.target.id;
+                    const navLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                    if (navLink) {
+                        // 當區塊的中心點進入或離開視口時觸發
+                        // 更精確地判斷當前活躍的區塊，避免多個連結同時高亮
+                        if (entry.isIntersecting && entry.intersectionRatio > 0.4) {
+                             navLinks.forEach(link => link.classList.remove('active-nav'));
+                             navLink.classList.add('active-nav');
+                            
+                            // 當滾動改變活躍區塊時，也觸發 3D 模型的視圖切換
+                            const sectionIndex = sectionsData.findIndex(s => s.id === id);
+                            if (sectionIndex !== -1 && currentActiveSectionIndex !== sectionIndex) {
+                                currentActiveSectionIndex = sectionIndex;
+                                setSectionView(sectionsData[currentActiveSectionIndex]);
+                            }
+                        }
+                    }
+                });
+            }, { threshold: 0.4 }); // 區塊可見度達到 40% 時觸發
+
+            sections.forEach(section => {
+                navObserver.observe(section);
+            });
+
+            // 為導覽列連結添加平滑捲動
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    scrollToSection(targetId); // Use our new unified scroll function
+                });
+            });
+
+
+            // --- 返回頂部按鈕邏輯 ---
+            const scrollThreshold = 300; // 滾動多少像素後顯示按鈕
+            if (backToTopBtn) {
+                // 顯示/隱藏按鈕
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > scrollThreshold) { 
+                        backToTopBtn.classList.add('show');
+                    } else {
+                        backToTopBtn.classList.remove('show');
+                    }
+                });
+
+                // 點擊捲動到頂部
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                    // 當回到頂部時，將 3D 模型視圖切換回首頁狀態
+                    scrollToSection('home');
+                });
+                console.log('[除錯] 返回頂部按鈕事件監聽器已附加。');
+            } else {
+                console.error('[錯誤] 返回頂部按鈕未找到！');
+            }
+
+            // --- 首頁滾動提示按鈕邏輯 ---
+            if (scrollDownBtn) {
+                scrollDownBtn.addEventListener('click', () => {
+                    const firstSection = document.querySelector('main > section:nth-of-type(2)'); // Skip home section
+                    if (firstSection) {
+                        scrollToSection(firstSection.id); // Use new unified scroll function
+                    }
+                });
+                console.log('[DEBUG] Scroll down button event listener attached.');
+            } else {
+                console.error('[ERROR] Scroll down button not found!');
+            }
+
+
+            // --- 咖啡小知識彈窗邏輯 ---
+            const coffeeFacts = [
+                "你知道嗎？咖啡曾經在17世紀被土耳其視為非法，因為它會刺激人們討論政治！",
+                "全球每天消耗約22.5億杯咖啡，咖啡是世界上最受歡迎的飲品之一。",
+                "咖啡豆實際上是咖啡果實的種子。",
+                "世界上最昂貴的咖啡是「麝香貓咖啡」，由麝香貓吃下咖啡豆後排泄出來。",
+                "烘焙越深的咖啡豆，咖啡因含量反而越低，因為高溫會分解咖啡因。"
+            ];
+            let lastScrollY = 0;
+            let factDisplayed = false;
+            const factToast = document.getElementById('coffee-fact-toast');
+            const factText = factToast?.querySelector('p');
+            let scrollTriggerTimeout;
+
+            function showRandomCoffeeFact() {
+                if (!factToast || !factText || factDisplayed) return;
+
+                const randomIndex = Math.floor(Math.random() * coffeeFacts.length);
+                factText.textContent = coffeeFacts[randomIndex];
+                factToast.classList.add('show');
+                factDisplayed = true; // Set flag when toast is shown
+
+                setTimeout(() => {
+                    factToast.classList.remove('show');
+                    setTimeout(() => {
+                        factDisplayed = false; // Allow new fact after fade out
+                    }, 500); // After transition ends
+                }, 6000); // Display for 6 seconds
+            }
+
+            // Trigger fact randomly on scroll, but with a debounce and frequency control
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                const scrollDifference = Math.abs(currentScrollY - lastScrollY);
+
+                clearTimeout(scrollTriggerTimeout); // Clear previous timeout on new scroll event
+
+                if (scrollDifference > 100 && !factDisplayed) { // Only consider significant scrolls and if no fact is active
+                    scrollTriggerTimeout = setTimeout(() => {
+                        if (Math.random() < 0.15) { // 15% chance to show a fact after a scroll
+                            showRandomCoffeeFact();
+                        }
+                    }, 200); // Debounce time
+                }
+                lastScrollY = currentScrollY;
+            });
+            console.log('[除錯] 咖啡小知識彈窗事件監聽器已附加。');
+
+
+            // --- 咖啡小學堂「閱讀更多」連結功能 ---
+            const moreInfoLinks = document.querySelectorAll('.more-info-link');
+            moreInfoLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const knowledgeId = this.dataset.knowledgeId;
+                    const article = knowledgeArticles[knowledgeId];
+                    if (article) {
+                        showFrontMessageModal(article.title, article.content);
+                    } else {
+                        showFrontMessageModal('錯誤', '找不到相關知識文章。', 'error');
+                    }
+                });
+            });
+            console.log('[除錯] 知識文章「閱讀更多」連結事件監聽器已附加。');
+
+            // --- 點擊彈窗外部關閉模態框 ---
+            if (frontMessageModal) {
+                frontMessageModal.addEventListener('click', (event) => {
+                    // Only close if the click is directly on the modal background, not on its content
+                    if (event.target === frontMessageModal) {
+                        closeFrontMessageModal();
+                    }
+                });
+                console.log('[除錯] 訊息彈窗外部點擊關閉事件監聽器已附加。');
+            }
+
+
+            // --- 咖啡渣翻轉卡片監聽器 ---
+            document.querySelectorAll('.flip-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                });
+            });
+            console.log('[DEBUG] Coffee grounds flip card event listeners attached.');
+
+            // --- 滾動進度指示器更新 ---
+            const currentChapterText = document.getElementById('current-chapter-text');
+            const chapterCounter = document.getElementById('chapter-counter');
+            const progressCircleFill = document.getElementById('progress-circle-fill');
+            const circleCircumference = 2 * Math.PI * 13; // 半徑為 13
+
+            function updateScrollProgress() {
+                const totalSections = sectionsData.length;
+                
+                // 計算滾動進度條 (基於整個文檔的滾動)
+                const docScrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrolled = window.scrollY;
+                const progress = docScrollHeight > 0 ? (scrolled / docScrollHeight) : 0;
+                progressCircleFill.style.strokeDashoffset = circleCircumference * (1 - progress);
+
+                // 更新章節標題和計數器
+                let currentSectionTitle = sectionsData[0].title;
+                let currentSectionNumber = 1;
+
+                // 根據滾動位置判斷當前活躍區塊
+                for (let i = 0; i < sectionsData.length; i++) {
+                    const sectionElement = document.getElementById(sectionsData[i].id);
+                    if (sectionElement) {
+                        const rect = sectionElement.getBoundingClientRect();
+                        // 當區塊的中心點進入視口時，認為它活躍
+                        if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+                            currentSectionTitle = sectionsData[i].title;
+                            currentSectionNumber = i + 1;
+                            break;
+                        }
+                    }
+                }
+                currentChapterText.textContent = currentSectionTitle;
+                chapterCounter.textContent = `${currentSectionNumber}/${totalSections}`;
+            }
+
+            // 監聽滾動事件以更新進度指示器
+            window.addEventListener('scroll', updateScrollProgress);
+            updateScrollProgress(); // 初始載入時更新一次
+
+
+            // --- Three.js 初始化與啟動動畫 ---
+            initThreeJS();
+            animate(); // 啟動 Three.js 動畫循環
+
+            // --- 頁面載入時初始載入所有資料並渲染 ---
+            console.log('[除錯] DOM 內容已載入。正在初始化資料並渲染。');
             window.loadAndRenderAllData();
+
+            // 初始載入後開始 2D 粒子生成 (與 3D 場景分開)
+            startParticleGeneration();
         });
 
-        })(); // End IIFE
+        })(); // 結束 IIFE
     </script>
 </body>
 </html>
