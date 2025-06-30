@@ -340,7 +340,6 @@
             font-size: 24px;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s, opacity 0.3s, transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -805,10 +804,10 @@
                         <p class="text-gray-600 text-sm">風味：茉莉花、檸檬、佛手柑</p>
                     </div>
                     <div class="card p-4 fade-in-up bean-card" style="transition-delay: 200ms;">
-                        <img src="image/image_3.png" alt="哥倫比亞 薇拉" class="w-full h-48 object-cover rounded-md mb-4">
                         <div class="bean-overlay">
                             <p>哥倫比亞 薇拉：平衡的甜感，帶有核果與巧克力的尾韻，口感順滑。</p>
                         </div>
+                        <img src="image/image_3.png" alt="哥倫比亞 薇拉" class="w-full h-48 object-cover rounded-md mb-4">
                         <h3 class="text-xl font-serif mb-2">哥倫比亞 薇拉</h3>
                         <p class="text-gray-600 text-sm">風味：核桃、可可、焦糖</p>
                     </div>
@@ -875,7 +874,7 @@
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
                     <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
                     <div class="text-gray-700 leading-relaxed">
-                        <div class="mb-4">� 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
+                        <div class="mb-4"> 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
                         <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
                         <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
                     </div>
@@ -1049,27 +1048,27 @@
                     <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題或建議？歡迎隨時與我們聯繫！</p>
                 </div>
                 <div class="bg-white p-8 rounded-lg shadow-lg text-left fade-in-up">
-                    <form id="contact-form" class="space-y-6">
+                    <form id="contact-form" class="space-y-6" action="mailto:Melodybean33427@gmail.com" method="post" enctype="text/plain">
                         <div>
                             <label for="name" class="block text-lg font-medium text-gray-700 mb-2">您的姓名</label>
-                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                            <input type="text" id="name" name="姓名" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                         </div>
                         <div>
                             <label for="email" class="block text-lg font-medium text-gray-700 mb-2">您的電子郵件</label>
-                            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                            <input type="email" id="email" name="電子郵件" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                         </div>
                         <div>
                             <label for="message" class="block text-lg font-medium text-gray-700 mb-2">您的訊息</label>
-                            <textarea id="message" name="message" rows="5" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"></textarea>
+                            <textarea id="message" name="訊息" rows="5" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"></textarea>
                         </div>
                         <button type="submit" class="btn-primary w-full py-3 rounded-md text-lg">發送訊息</button>
                     </form>
                 </div>
                 <div class="mt-12 text-center text-gray-600 fade-in-up">
                     <p class="text-xl mb-2">或直接聯絡我們：</p>
-                    <p class="text-2xl font-bold text-primary mb-2"><i class="fas fa-phone mr-2"></i> (03) 1234-5678</p>
-                    <p class="text-xl"><i class="fas fa-envelope mr-2"></i> info@melodybean.com</p>
-                    <p class="text-xl mt-4"><i class="fas fa-map-marker-alt mr-2"></i> 桃園市中壢區咖啡巷88號</p>
+                    <p class="text-2xl font-bold text-primary mb-2"><i class="fas fa-phone mr-2"></i> (03) 4081932</p>
+                    <p class="text-xl"><i class="fas fa-envelope mr-2"></i> Melodybean33427@gmail.com</p>
+                    <p class="text-xl mt-4"><i class="fas fa-map-marker-alt mr-2"></i> 桃園市中壢區中正路4段141號</p>
                 </div>
             </div>
         </section>
@@ -1171,7 +1170,7 @@
                         <ul class="list-disc list-inside ml-4 space-y-2">
                             <li><strong>濃郁醇厚型咖啡（如曼特寧、義式濃縮）：</strong>搭配藍調、爵士樂或靈魂樂，讓其豐富的層次感更加突出。</li>
                             <li><strong>清新明亮型咖啡（如耶加雪菲、肯亞）：</strong>搭配輕快、高頻的音樂，如古典小品、Chill-hop 或輕柔的流行音樂，襯托其花果香氣。</li>
-                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
+                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
                         </ul>
                         <p class="mt-4">下次品嚐咖啡時，不妨打開您的專屬歌單，讓音樂與咖啡共同為您帶來一場難忘的感官體驗吧！</p>
                     `
@@ -2029,21 +2028,29 @@
                     console.error('[ERROR] Refresh coffee button not found!');
                 }
 
-                // Contact Form Submission
+                // Contact Form Submission (Removed JavaScript interception for mailto link)
+                // The form will now directly open the user's mail client via action="mailto:..."
+                // The showFrontMessageModal is now called directly after form submission to inform the user.
                 const contactForm = document.getElementById('contact-form');
                 if (contactForm) {
                     contactForm.addEventListener('submit', function(e) {
-                        e.preventDefault(); // Prevent default form submission
+                        // We do not preventDefault here, allowing the mailto link to work.
+                        // Instead, we show a success message right away.
                         const name = document.getElementById('name').value;
                         const email = document.getElementById('email').value;
                         const message = document.getElementById('message').value;
 
                         if (name && email && message) {
-                            console.log('Contact Form Data:', { name, email, message });
-                            showFrontMessageModal('訊息已送出', `感謝 ${name}！我們已收到您的訊息，會盡快回覆您。`, 'success');
-                            contactForm.reset(); // Clear the form
+                            console.log('Contact Form Data (will open mail client):', { name, email, message });
+                            // The mailto link will open the email client. Inform the user.
+                            showFrontMessageModal('訊息即將送出', '您的電子郵件客戶端將會開啟，請在該程式中完成發送動作。', 'info');
+                            // Optionally, reset the form after a short delay, as the mailto might take a moment
+                            setTimeout(() => {
+                                contactForm.reset();
+                            }, 500); 
                         } else {
                             showFrontMessageModal('錯誤', '請填寫所有必填欄位。', 'error');
+                            e.preventDefault(); // Prevent mailto if fields are empty
                         }
                     });
                 } else {
@@ -2121,31 +2128,6 @@
                 });
                 console.log('[DEBUG] Back to top button set up.');
 
-                // Navigation Active Link highlighting
-                const sections = document.querySelectorAll('section[id]');
-                const navLinks = document.querySelectorAll('.nav-link');
-
-                const navObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            navLinks.forEach(link => {
-                                link.classList.remove('active-nav');
-                                if (link.getAttribute('href') === `#${entry.target.id}`) {
-                                    link.classList.add('active-nav');
-                                }
-                            });
-                        }
-                    });
-                }, {
-                    rootMargin: '-50% 0px -50% 0px', // When section is in the middle of the viewport
-                    threshold: 0 // Observe as soon as it enters
-                });
-
-                sections.forEach(section => {
-                    navObserver.observe(section);
-                });
-                console.log('[DEBUG] Navigation active link highlighting set up.');
-
                 // Home section scroll down button
                 const scrollDownBtn = document.getElementById('scroll-down-btn');
                 if (scrollDownBtn) {
@@ -2204,4 +2186,3 @@
     </script>
 </body>
 </html>
-�
