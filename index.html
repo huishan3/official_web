@@ -1048,7 +1048,7 @@
                     <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題或建議？歡迎隨時與我們聯繫！</p>
                 </div>
                 <div class="bg-white p-8 rounded-lg shadow-lg text-left fade-in-up">
-                    <form id="contact-form" class="space-y-6" action="mailto:melodybean33427@gmail.com" method="post" enctype="text/plain">
+                    <form id="contact-form" class="space-y-6" action="" method="post" enctype="text/plain">
                         <div>
                             <label for="name" class="block text-lg font-medium text-gray-700 mb-2">您的姓名</label>
                             <input type="text" id="name" name="姓名" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
@@ -2028,29 +2028,39 @@
                     console.error('[ERROR] Refresh coffee button not found!');
                 }
 
-                // Contact Form Submission (Removed JavaScript interception for mailto link)
-                // The form will now directly open the user's mail client via action="mailto:..."
-                // The showFrontMessageModal is now called directly after form submission to inform the user.
+                // Contact Form Submission
                 const contactForm = document.getElementById('contact-form');
                 if (contactForm) {
                     contactForm.addEventListener('submit', function(e) {
-                        // We do not preventDefault here, allowing the mailto link to work.
-                        // Instead, we show a success message right away.
+                        e.preventDefault(); // Prevent default form submission
+
                         const name = document.getElementById('name').value;
                         const email = document.getElementById('email').value;
                         const message = document.getElementById('message').value;
 
                         if (name && email && message) {
-                            console.log('Contact Form Data (will open mail client):', { name, email, message });
-                            // The mailto link will open the email client. Inform the user.
-                            showFrontMessageModal('訊息即將送出', '您的電子郵件客戶端將會開啟，請在該程式中完成發送動作。', 'info');
-                            // Optionally, reset the form after a short delay, as the mailto might take a moment
+                            const recipientEmail = 'melodybean33427@gmail.com';
+                            // Define a clear subject for the email
+                            const subject = encodeURIComponent('來自 Melody Bean 網站的訊息');
+                            // Format the body with placeholders replaced by actual values
+                            const body = encodeURIComponent(`姓名：${name}\n電子郵件：${email}\n訊息：${message}`);
+
+                            // Construct the generic Gmail compose URL
+                            const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${subject}&body=${body}`;
+
+                            // Open in a new tab
+                            window.open(gmailComposeUrl, '_blank');
+
+                            // Show a modal to inform the user about the redirection
+                            showFrontMessageModal('即將跳轉至 Gmail', '您的瀏覽器將開啟 Gmail 郵件撰寫頁面，訊息內容已為您填寫完成，請確認後手動點擊發送。', 'info');
+                            
+                            // Optionally, reset the form after a short delay
                             setTimeout(() => {
                                 contactForm.reset();
                             }, 500); 
+
                         } else {
                             showFrontMessageModal('錯誤', '請填寫所有必填欄位。', 'error');
-                            e.preventDefault(); // Prevent mailto if fields are empty
                         }
                     });
                 } else {
