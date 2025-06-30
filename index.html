@@ -7,12 +7,15 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Three.js 庫 -->
+    <!-- Three.js 庫 (保持 r128 版本，因為它將 THREE 暴露為全域變數) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP for smoother animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <style>
+        /* Define CSS Variables for consistent theming */
         :root {
             --color-bg: #fdfaf5; /* 溫暖米白 */
             --color-surface: #ffffff;
@@ -288,13 +291,12 @@
         }
 
         /* --- 粒子動畫 (咖啡豆 & 音符) --- */
-        @keyframes floatAndFadeCoffee {
-            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.3; } /* 降低峰值透明度以增加細膩感 */
-            80% { opacity: 0.2; } /* 降低結束透明度以增加細膩感 */
-            100% { transform: translate(var(--x-end), var(--y-end)) scale(1.2); opacity: 0; }
-        }
+        /* Three.js 咖啡豆粒子 */
+        /* Three.js 咖啡豆粒子動畫 */
+        /* 注意：此處的動畫效果由 GSAP 在 JS 中控制，CSS Keyframes 僅作備用或通用類別定義 */
+        /* 對於 3D 粒子，GSAP 是首選，因為它可以直接操縱 Three.js 物件的屬性 */
 
+        /* DOM 粒子（音符） */
         @keyframes floatAndFadeNote {
             0% { transform: translate(0, 0) scale(0.7); opacity: 0; }
             20% { opacity: 0.2; } /* 降低峰值透明度以增加細膩感 */
@@ -302,33 +304,24 @@
             100% { transform: translate(var(--x-end), var(--y-end)) scale(1.1); opacity: 0; }
         }
 
-        .animated-particle {
-            position: absolute; /* 相對父元素定位 */
-            font-size: 1.5rem; /* 基礎大小，會縮放 */
-            opacity: 0;
-            pointer-events: none; /* 不阻擋滑鼠事件 */
-            user-select: none; /* 不允許文字選取 */
-            z-index: -1; /* 確保粒子在內容下方 */
-        }
-
-        .animated-particle.coffee-bean {
-            color: var(--color-primary); /* 咖啡色系 */
-            animation: floatAndFadeCoffee var(--duration) ease-out forwards;
-        }
-
-        .animated-particle.musical-note {
-            color: var(--color-highlight); /* 使用新的高亮色作為音符顏色 */
-            animation: floatAndFadeNote var(--duration) ease-out forwards;
-        }
-
-        /* 選項：為粒子增加輕微旋轉 */
         @keyframes rotateParticle {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        .animated-particle.coffee-bean,
+
+        .animated-particle {
+            position: fixed; /* 相對於視窗定位 */
+            font-size: 1.5rem; /* 基礎大小，會縮放 */
+            opacity: 0;
+            pointer-events: none; /* 不阻擋滑鼠事件 */
+            user-select: none; /* 不允許文字選取 */
+            z-index: 999; /* 確保粒子在內容上方，但低於模態框 */
+        }
+
+        /* 僅音符使用 DOM-based 動畫 */
         .animated-particle.musical-note {
-            animation: var(--animation-name) var(--duration) ease-out forwards, rotateParticle var(--rotate-duration) linear infinite;
+            color: var(--color-highlight); /* 高亮色作為音符顏色 */
+            animation: floatAndFadeNote var(--duration) ease-out forwards, rotateParticle var(--rotate-duration) linear infinite;
         }
 
         /* 返回頂部按鈕樣式 */
@@ -449,28 +442,6 @@
             pointer-events: auto; /* 顯示時才允許互動 */
         }
 
-        /* Three.js 互動回饋彈窗 */
-        #three-js-feedback-toast {
-            position: fixed;
-            bottom: 80px; /* Above coffee-fact-toast */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(63, 46, 46, 0.9); /* Darker secondary */
-            color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            font-size: 0.9rem;
-            opacity: 0;
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-            z-index: 997; /* Below coffee-fact-toast */
-            pointer-events: none;
-        }
-        #three-js-feedback-toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
         /* 首頁滾動提示按鈕 */
         #scroll-down-btn {
             position: absolute;
@@ -484,10 +455,6 @@
             animation: bounce 2s infinite; /* 跳動動畫 */
             opacity: 0.8;
             transition: opacity 0.3s;
-        }
-
-        #scroll-down-btn:hover {
-            opacity: 1;
         }
 
         #scroll-down-btn svg {
@@ -650,6 +617,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none; /* Remove default button border */
         }
 
         .brew-step-button:hover {
@@ -724,7 +692,7 @@
 
     <main>
         <!-- Home Section -->
-        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative overflow-hidden" style="background-image: url('./image_0ab81c.jpg');">
+        <section id="home" class="h-screen bg-cover bg-center flex items-center justify-center text-white relative overflow-hidden" style="background-image: url('image/image_2.jpg');">
             <div class="absolute inset-0 bg-black/40"></div>
             <div class="relative text-center z-10 p-6">
                 <h1 class="text-5xl md:text-7xl font-serif mb-4 text-shadow-soft">品味旋律，啜飲人生</h1>
@@ -741,7 +709,7 @@
         <section id="coffee-machine-display" class="py-10 bg-white/50 relative overflow-hidden flex flex-col items-center justify-center">
             <div class="fade-in-up text-center mb-8">
                 <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">咖啡沖泡模擬體驗</h2>
-                <p class="mt-4 text-lg text-gray-600">點擊下方按鈕，一步步體驗從咖啡豆到一杯香醇咖啡的奇妙過程。</p>
+                <p class="mt-4 text-lg text-gray-600">點擊下方按鈕，一步步體驗從咖啡豆到一杯香醇咖啡的奇妙過程！</p>
             </div>
             <div id="threejs-container" class="fade-in-up" style="transition-delay: 200ms;">
                 <canvas id="three-canvas"></canvas>
@@ -821,7 +789,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="card p-4 fade-in-up bean-card">
-                        <img src="./image_0aa5b7.png" alt="GEISHA 水洗" class="w-full h-48 object-cover rounded-md mb-4">
+                        <img src="image/image_1.png" alt="黃金曼特寧" class="w-full h-48 object-cover rounded-md mb-4">
                         <div class="bean-overlay">
                             <p>黃金曼特寧：醇厚濃郁，帶有巧克力和堅果香氣，是經典中的經典。</p>
                         </div>
@@ -829,7 +797,7 @@
                         <p class="text-gray-600 text-sm">風味：黑巧克力、焦糖、低酸度</p>
                     </div>
                     <div class="card p-4 fade-in-up bean-card" style="transition-delay: 100ms;">
-                        <img src="./image_c43738.png" alt="Heirloom 雙重厭氧 A" class="w-full h-48 object-cover rounded-md mb-4">
+                        <img src="image/image_2.png" alt="衣索比亞 耶加雪菲" class="w-full h-48 object-cover rounded-md mb-4">
                         <div class="bean-overlay">
                             <p>耶加雪菲：花香、柑橘與莓果的清新結合，口感明亮活潑。</p>
                         </div>
@@ -837,7 +805,7 @@
                         <p class="text-gray-600 text-sm">風味：茉莉花、檸檬、佛手柑</p>
                     </div>
                     <div class="card p-4 fade-in-up bean-card" style="transition-delay: 200ms;">
-                        <img src="./image_c43415.png" alt="Heirloom 雙重厭氧 B" class="w-full h-48 object-cover rounded-md mb-4">
+                        <img src="image/image_3.png" alt="哥倫比亞 薇拉" class="w-full h-48 object-cover rounded-md mb-4">
                         <div class="bean-overlay">
                             <p>哥倫比亞 薇拉：平衡的甜感，帶有核果與巧克力的尾韻，口感順滑。</p>
                         </div>
@@ -907,7 +875,7 @@
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
                     <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
                     <div class="text-gray-700 leading-relaxed">
-                        <div class="mb-4">🎶 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
+                        <div class="mb-4">� 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
                         <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
                         <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
                     </div>
@@ -933,7 +901,7 @@
                     <h3 class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
                     <div class="card p-8 flex flex-col md:flex-row items-center gap-8">
                         <!-- Updated image path for "咖啡職人" -->
-                        <img src="./image_0ab7c3.jpg" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
+                        <img src="image/image_3.jpg" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
                         <div class="text-left">
                             <h4 class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
                             <p class="text-lg text-primary mt-1">陳師傅</p>
@@ -980,2097 +948,1260 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <!-- Images will be rendered here -->
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 0ms;">
-                        <img src="./image_0aa5b7.png" alt="咖啡豆近照" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_1.png" alt="咖啡師沖泡咖啡" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">細緻的拉花藝術</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 100ms;">
-                        <img src="./image_c43738.png" alt="手沖咖啡" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_2.png" alt="咖啡豆近景" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">新鮮烘焙的咖啡豆</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 200ms;">
-                        <img src="./image_c43415.png" alt="咖啡師工作" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_3.png" alt="陽光下的咖啡杯" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">午後的咖啡時光</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 300ms;">
-                        <img src="./image_7187b9.png" alt="咖啡店內景" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_4.png" alt="咖啡器具展示" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">精緻的咖啡器具</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 400ms;">
-                        <img src="./image_6f497f.png" alt="咖啡與書籍" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_5.png" alt="手沖咖啡過程" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">專注的手沖藝術</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 500ms;">
-                        <img src="./image_0ab81c.jpg" alt="烘焙中的咖啡豆" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_6.png" alt="咖啡與書籍" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">閱讀與咖啡的絕配</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 600ms;">
-                        <img src="./image_0ab7c3.jpg" alt="咖啡杯特寫" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_7.png" alt="咖啡店內景" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">Melody Bean 溫馨一隅</p>
+                        </div>
                     </div>
-                    <div class="rounded-lg overflow-hidden shadow-md fade-in-up gallery-item" style="transition-delay: 700ms;">
-                        <img src="https://placehold.co/400x300/CCCCCC/333333?text=更多咖啡美學" alt="多樣化咖啡器具" class="w-full h-48 object-cover object-center">
+                    <div class="rounded-lg overflow-hidden shadow-md group gallery-item">
+                        <img src="image/image_8.png" alt="咖啡農場風景" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        <div class="p-4 bg-white text-left">
+                            <p class="text-gray-700 font-semibold">咖啡豆的產地風光</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="faq" class="py-20 bg-white/50 relative overflow-hidden">
+        <section id="faq" class="py-20 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">常見問題</h2>
                 </div>
-                <div id="faq-container" class="space-y-4 fade-in-up">
-                </div>
-            </div>
-        </section>
-
-        <section id="review" class="py-20 relative overflow-hidden">
-            <div class="max-w-4xl mx-auto px-6">
-                <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">顧客的溫馨回饋</h2>
-                </div>
-                <div id="review-list" class="space-y-6 fade-in-up">
-                </div>
-                <div class="mt-12 card p-8 fade-in-up">
-                    <h3 class="text-2xl font-serif mb-4 text-center">分享您的品飲心得</h3>
-                    <form id="review-form">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <input type="text" id="reviewer-name" placeholder="您的暱稱" class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" required>
-                            <select class="p-3 w-full border border-gray-300 rounded-md focus:ring-primary focus:border-primary" id="review-rating" required>
-                                <option value="" disabled selected>您會給幾顆星？</option>
-                                <option value="⭐️⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️⭐️</option>
-                                <option value="⭐️⭐️⭐️⭐️">⭐️⭐️⭐️⭐️</option>
-                                <option value="⭐️⭐️⭐️">⭐️⭐️⭐️</option>
-                            </select>
+                <div class="space-y-4">
+                    <div class="card p-6 fade-in-up">
+                        <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
+                            <span class="mr-2">Melody Bean 的咖啡豆來源為何？</span>
+                        </button>
+                        <div class="accordion-content mt-4 text-gray-700">
+                            我們的咖啡豆均來自全球知名的咖啡產區，並與當地優質莊園直接合作，確保每一顆豆子的品質與風味都達到最佳水準。
                         </div>
-                        <textarea class="p-3 w-full border border-gray-300 rounded-md mb-4" id="review-content" placeholder="在這裡寫下您的評論..." required rows="4"></textarea>
-                        <div class="text-center mt-6">
-                            <button type="submit" class="px-8 py-3 rounded-full btn-secondary">送出評論</button>
+                    </div>
+                    <div class="card p-6 fade-in-up" style="transition-delay: 100ms;">
+                        <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
+                            <span class="mr-2">如何確保咖啡豆的新鮮度？</span>
+                        </button>
+                        <div class="accordion-content mt-4 text-gray-700">
+                            Melody Bean 採小批量新鮮烘焙，並在烘焙完成後立即使用單向排氣閥包裝，最大限度地保留咖啡豆的香氣與新鮮度。我們建議您在收到咖啡豆後的兩週內享用，以體驗最佳風味。
                         </div>
-                    </form>
+                    </div>
+                    <div class="card p-6 fade-in-up" style="transition-delay: 200ms;">
+                        <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
+                            <span class="mr-2">咖啡渣還有什麼其他用途？</span>
+                        </button>
+                        <div class="accordion-content mt-4 text-gray-700">
+                            咖啡渣是天然的除臭劑，可用於冰箱、鞋櫃。它也是優良的植物肥料，富含氮，能幫助植物生長。此外，乾燥的咖啡渣也可以用於製作身體去角質磨砂膏。
+                        </div>
+                    </div>
+                    <div class="card p-6 fade-in-up" style="transition-delay: 300ms;">
+                        <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
+                            <span class="mr-2">是否提供客製化烘焙服務？</span>
+                        </button>
+                        <div class="accordion-content mt-4 text-gray-700">
+                            目前我們主要提供精選烘焙度的咖啡豆。若您有特殊需求或大宗採購，歡迎透過聯絡我們頁面與我們聯繫，我們將樂意為您提供客製化諮詢服務。
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="contact" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6 text-center">
-                 <div class="fade-in-up">
+                <div class="fade-in-up">
                     <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">聯絡我們</h2>
-                    <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題、課程詢問或商品訂購需求，都歡迎隨時與我們聯繫！</p>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">有任何問題或建議？歡迎隨時與我們聯繫！</p>
                 </div>
-                <div class="card p-8 fade-in-up">
-                    <div class="md:flex md:justify-around md:items-start">
-                        <div class="mb-8 md:mb-0">
-                            <h3 class="text-2xl font-serif mb-4">店家資訊</h3>
-                            <div class="space-y-2 text-lg">
-                                <p><i class="fa-solid fa-store text-primary mr-2"></i> 樂海樂器咖啡</p>
-                                <p><i class="fa-solid fa-phone text-primary mr-2"></i> 03-4081932</p>
-                                <p><i class="fa-solid fa-location-dot text-primary mr-2"></i> 桃園市中壢區中正路4段141號</p>
-                            </div>
-                            <div class="mt-6">
-                                <a href="tel:03-4081932" class="inline-block px-6 py-3 rounded-full btn-primary text-lg">
-                                    <i class="fa-solid fa-phone mr-2"></i> 立即致電訂購
-                                </a>
-                            </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg text-left fade-in-up">
+                    <form id="contact-form" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-lg font-medium text-gray-700 mb-2">您的姓名</label>
+                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                         </div>
-                         <div class="md:w-1/2">
-                            <h3 class="text-2xl font-serif mb-4">線上詢問</h3>
-                             <form id="inquiry-form">
-                                 <input type="text" id="inquiry-name" placeholder="您的姓名" class="p-3 w-full border border-gray-300 rounded-md mb-4" required>
-                                 <input type="email" id="inquiry-email" placeholder="您的電子郵件" class="p-3 w-full border border-gray-300 rounded-md mb-4" required>
-                                 <textarea class="p-3 w-full border border-gray-300 rounded-md mb-4" id="inquiry-message" placeholder="您的訊息..." required rows="5"></textarea>
-                                 <button type="submit" class="px-8 py-3 rounded-full btn-secondary">送出訊息</button>
-                             </form>
+                        <div>
+                            <label for="email" class="block text-lg font-medium text-gray-700 mb-2">您的電子郵件</label>
+                            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
                         </div>
-                    </div>
+                        <div>
+                            <label for="message" class="block text-lg font-medium text-gray-700 mb-2">您的訊息</label>
+                            <textarea id="message" name="message" rows="5" required class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full py-3 rounded-md text-lg">發送訊息</button>
+                    </form>
+                </div>
+                <div class="mt-12 text-center text-gray-600 fade-in-up">
+                    <p class="text-xl mb-2">或直接聯絡我們：</p>
+                    <p class="text-2xl font-bold text-primary mb-2"><i class="fas fa-phone mr-2"></i> (03) 1234-5678</p>
+                    <p class="text-xl"><i class="fas fa-envelope mr-2"></i> info@melodybean.com</p>
+                    <p class="text-xl mt-4"><i class="fas fa-map-marker-alt mr-2"></i> 桃園市中壢區咖啡巷88號</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-secondary text-white">
-        <div class="max-w-6xl mx-auto py-8 px-6 text-center">
-            <div class="mb-4">
-                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-facebook-square"></i></a>
-                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-2xl mx-3 hover:text-primary transition-colors"><i class="fab fa-line"></i></a>
+    <footer class="bg-secondary text-white py-8">
+        <div class="max-w-6xl mx-auto px-6 text-center text-gray-300">
+            <p>&copy; 2024 Melody Bean. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4 text-2xl">
+                <a href="#" class="hover:text-primary transition-colors"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-primary transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-primary transition-colors"><i class="fab fa-line"></i></a>
             </div>
-            <p>&copy; 2025 Melody Bean. 品味旋律，啜飲人生。 | 樂海樂器咖啡 版權所有.</p>
+            <p class="mt-4 text-sm">品味旋律，啜飲人生。</p>
         </div>
     </footer>
 
-    <!-- Back to top button -->
-    <button id="back-to-top-btn" title="返回頂部">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
-    <!-- Custom message modal (frontend) -->
+    <!-- 自定義訊息彈窗 -->
     <div id="frontMessageModal" class="front-modal">
         <div class="front-modal-content">
-            <button class="front-modal-close-button" onclick="closeFrontMessageModal()">
-                <i class="fas fa-times"></i>
-            </button>
-            <div id="frontModalIcon" class="mb-4 text-5xl"></div>
-            <h3 id="frontModalTitle" class="font-serif text-2xl font-bold mb-4"></h3>
-            <p id="frontModalMessage" class="text-gray-700 mb-6"></p>
-            <button class="px-6 py-2 rounded-full btn-primary" onclick="closeFrontMessageModal()">
-                <i class="fas fa-mug-hot mr-2"></i> 了解
-            </button>
+            <span class="front-modal-close-button" onclick="closeFrontMessageModal()">&times;</span>
+            <div id="frontModalIcon"></div>
+            <h3 id="frontModalTitle" class="text-2xl font-serif mb-4"></h3>
+            <p id="frontModalMessage" class="text-gray-700 mb-4"></p>
+            <button onclick="closeFrontMessageModal()" class="btn-primary px-6 py-2 rounded-full mx-auto">確認</button>
         </div>
     </div>
 
-    <!-- Coffee fact toast -->
-    <div id="coffee-fact-toast">
-        <p></p>
+    <!-- 返回頂部按鈕 -->
+    <button id="back-to-top-btn" aria-label="返回頂部">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- 咖啡小知識彈窗 -->
+    <div id="coffee-fact-toast" class="px-6 py-3 rounded-lg shadow-lg">
+        <p id="toast-message"></p>
     </div>
 
-    <!-- Three.js interaction feedback toast -->
-    <div id="three-js-feedback-toast">
-        <p></p>
+    <!-- Three.js 互動回饋彈窗 -->
+    <div id="three-js-feedback-toast" class="px-6 py-3 rounded-lg shadow-lg">
+        <p id="three-toast-message"></p>
     </div>
 
-    <!-- Scroll progress indicator -->
-    <div id="scroll-progress-indicator">
-        <span id="current-chapter-text">首頁</span>
-        <span id="chapter-counter">1/10</span>
-        <svg id="progress-circle-svg">
-            <circle id="progress-circle-bg" cx="15" cy="15" r="13"></circle>
-            <circle id="progress-circle-fill" cx="15" cy="15" r="13"></circle>
-        </svg>
-    </div>
-
-
-    <!-- Integrated scripts block -->
+    <!-- 將主 JavaScript 區塊的 type="module" 移除，以確保 THREE 能夠全域存取 -->
     <script>
-        'use strict';
-        (function() { // Start Immediately Invoked Function Expression (IIFE)
+        // IIFE for encapsulation
+        (function() {
 
-        // 📦 dataManager.js - Unified Offer Data Management Module
-        // This module is still included for completeness, but its functions related to offers
-        // are no longer called by the frontend (as the offers section is removed).
-        const defaultOfferTemplate = {
-            id: 0,
-            name: '',
-            description: '',
-            originalPrice: 0,
-            specialPrice: 0,
-            image: ''
-        };
+            // Global Variables and Helper Functions
+            const flavorData = [
+                { id: '1', name: '黃金曼特寧', country: '印尼', variety: '阿拉比卡', roast: '中深烘焙', weight: '200g', expiry: '2025/12/31', flavor: '黑巧克力、焦糖、堅果', price: 450, stock: 80, profile: [90, 60, 70, 50, 80], lifestyle: '早晨提神、搭配甜點' },
+                { id: '2', name: '耶加雪菲', country: '衣索比亞', variety: '原生種', roast: '淺中烘焙', weight: '200g', expiry: '2025/11/15', flavor: '茉莉花、檸檬、佛手柑、熱帶水果', price: 580, stock: 120, profile: [40, 95, 60, 85, 70], lifestyle: '午後放鬆、閱讀時光' },
+                { id: '3', name: '哥倫比亞 薇拉', country: '哥倫比亞', variety: '卡杜拉', roast: '中度烘焙', weight: '200g', expiry: '2026/01/20', flavor: '核桃、可可、焦糖、奶油', price: 420, stock: 30, profile: [70, 70, 85, 60, 90], lifestyle: '工作專注、朋友聚會' },
+                { id: '4', name: '瓜地馬拉 薇薇特南果', country: '瓜地馬拉', variety: '波旁', roast: '中度烘焙', weight: '200g', expiry: '2025/10/01', flavor: '柑橘、花香、奶油、烤杏仁', price: 480, stock: 10, profile: [60, 80, 75, 70, 75], lifestyle: '週末早午餐、創意發想' },
+                { id: '5', name: '巴西 喜拉朵', country: '巴西', variety: '阿拉比卡', roast: '中深烘焙', weight: '200g', expiry: '2026/02/10', flavor: '黑巧克力、堅果、焦糖', price: 380, stock: 0, profile: [85, 55, 90, 45, 85], lifestyle: '任何時刻、大眾化口味' },
+                { id: '6', name: '肯亞 AA', country: '肯亞', variety: 'SL28/SL34', roast: '中度烘焙', weight: '200g', expiry: '2025/09/05', flavor: '黑醋栗、柑橘、莓果、酒香', price: 620, stock: 55, profile: [50, 90, 65, 95, 60], lifestyle: '獨享、品鑑、特殊節日' }
+            ];
 
-        const SPECIAL_OFFERS_KEY = 'melodySpecialOffers';
-
-        // Add default offer data to ensure consistency between front and back end
-        const DEFAULT_SPECIAL_OFFERS = [
-            { id: 101, name: '預設優惠：系統初始體驗包', description: '這是系統預設的優惠，如果localStorage中沒有數據，將會顯示此優惠。', originalPrice: 500, specialPrice: 400, image: 'https://placehold.co/400x200/b58863/FFFFFF?text=Default+Offer' }
-        ];
-
-        /**
-         * 🧠 mergeWithDefaultSchema
-         * Fills in missing fields for each data item to match the default format
-         * @param {Array<Object>} dataArray - Original offer data
-         * @param {Object} defaultTemplate - Field template
-         * @returns {Array<Object>}
-         */
-        function mergeWithDefaultSchema(dataArray, defaultTemplate) {
-            if (!Array.isArray(dataArray)) return [];
-            return dataArray.map(item => ({
-                ...defaultTemplate,
-                ...item
-            }));
-        }
-
-        /**
-         * 📥 loadOffersFromLocalStorage
-         * Loads offer data from localStorage and ensures field format consistency
-         * @returns {Array<Object>}
-         */
-        function loadOffersFromLocalStorage() {
-            try {
-                const rawData = JSON.parse(localStorage.getItem(SPECIAL_OFFERS_KEY));
-                return mergeWithDefaultSchema(rawData || [], defaultOfferTemplate);
-            } catch (e) {
-                console.error('[優惠資料載入失敗]', e);
-                return [];
-            }
-        }
-
-        /**
-         * 📤 saveOffersToLocalStorage
-         * Saves offer data to localStorage
-         * @param {Array<Object>} offers
-         */
-        function saveOffersToLocalStorage(offers) {
-            try {
-                localStorage.setItem(SPECIAL_OFFERS_KEY, JSON.stringify(offers));
-            } catch (e) {
-                console.error('[優惠資料儲存失敗]', e);
-            }
-        }
-
-        /**
-         * 🗑 clearOffers
-         * Clears offer data from localStorage
-         */
-        function clearOffers() {
-            localStorage.removeItem(SPECIAL_OFFERS_KEY);
-        }
-
-        // ✅ Globally expose the module for front and back end calls
-        window.OfferDataManager = {
-            loadOffersFromLocalStorage,
-            saveOffersToLocalStorage,
-            clearOffers,
-            mergeWithDefaultSchema,
-            defaultOfferTemplate,
-            DEFAULT_SPECIAL_OFFERS // Export unified default offer data
-        };
-        // 📦 dataManager.js END
-
-        // --- Global Constants and Data Variables ---
-        const COFFEE_BEANS_KEY = 'melodyCoffeeBeans';
-        const REVIEWS_KEY = 'melodyReviews';
-
-        let coffeeBeans = []; 
-        let reviews = [];
-        let radarChart; // Chart.js instance
-
-        // Default data - serves as fallback if localStorage is empty/invalid
-        const defaultCoffeeBeans = [
-            { id: 1, name: 'GEISHA 水洗（114g）', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬、百香果', roast: '淺焙', weight: '114g', expiryDate: '2025-10-12', price: 280, stock: 10, category: 'light', image: './image_0aa5b7.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '這款咖啡充滿複雜的香氣與明亮的風味，適合在靜謐的午後細細品味，或搭配輕盈的甜點。' },
-            { id: 2, name: 'Heirloom 雙重厭氧（227g）- 批次A', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-28', price: 600, stock: 5, category: 'light', image: './image_c43738.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '甜美而豐富的口感，是開啟美好一天的理想選擇，與早餐糕點搭配尤佳。' },
-            { id: 3, name: 'Heirloom 雙重厭氧（227g）- 批次B', country: '衣索比亞', variety: 'Heirloom', flavor: '茉莉、橙花、蜂蜜、水蜜桃', roast: '淺焙', weight: '227g', expiryDate: '2025-10-31', price: 600, stock: 8, category: 'light', image: './image_c43415.png', flavorProfile: { acidity: 4, body: 3, sweetness: 5, aroma: 5, finish: 4 }, lifestyle: '相同的風味，不同的採收批次，確保每一杯都有始終如一的甜蜜與芬芳。' },
-            { id: 4, name: 'GEISHA（227g）中淺焙', country: '衣索比亞', variety: 'GEISHA', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 12, category: 'medium', image: './image_7187b9.png', flavorProfile: { acidity: 3, body: 3, sweetness: 3, aroma: 4, finish: 3 }, lifestyle: '平衡的風味與較低的酸度，適合日常飲用，無論是搭配閱讀或工作，都能帶來愉悅感受。' },
-            { id: 5, name: 'GEISHA 水洗（227g）2280m', country: '衣索比亞', variety: 'GEISHA 水洗', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '中淺焙', weight: '227g', expiryDate: '2025-11-05', price: 580, stock: 0, category: 'light', image: './image_6f497f.png', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '高海拔的獨特風味，帶來更為清新的口感與芬芳。' },
-            { id: 6, name: '衣索比亞 淺焙（227g）', country: '衣索比亞', variety: '', flavor: '接骨木花、茉莉花橙花、白玫瑰、百合花蘋果、野莓果醬、檸檬', roast: '淺焙', weight: '227g', expiryDate: '2025-11-01', price: 540, stock: 7, category: 'light', image: 'https://placehold.co/400x300/6b8e23/FFFFFF?text=衣索比亞_淺焙', flavorProfile: { acidity: 4, body: 2, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '輕盈的花果調性，是下午茶時光的完美伴侶，能為您的休憩時刻增添一抹亮色。' },
-            { id: 7, name: '哥斯大黎加 Geisha 白蜜（114g）', country: '哥斯大黎加', variety: 'Geisha（藝妓）', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '114g', expiryDate: '2025-08-15', price: 800, stock: 3, category: 'light', image: 'https://placehold.co/400x300/a07654/FFFFFF?text=哥斯大黎加_藝妓', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '此款藝妓咖啡風味精緻優雅，適合在重要時刻或與好友分享，搭配簡約的甜點以突顯其豐富層次。' },
-            { id: 8, name: '哥斯大黎加 淺焙（227g）', country: '哥斯大黎加', variety: '', flavor: '百合花、野薑花、檸檬草、柑橘、紅色莓果、蜂蜜', roast: '淺焙', weight: '227g', expiryDate: '2025-08-15', price: 1800, stock: 1, category: 'light', image: 'https://placehold.co/400x300/3f2e2e/FFFFFF?text=哥斯大黎加_淺焙', flavorProfile: { acidity: 5, body: 3, sweetness: 4, aroma: 5, finish: 4 }, lifestyle: '大容量包裝讓您能更長時間地享受藝妓咖啡的迷人魅力，每日品飲或作為珍貴贈禮皆宜。' }
-        ];
-
-        // REMOVED DEFAULT REVIEWS as per user request: "不要有預設留言"
-        const defaultReviews = []; 
-
-        const knowledgeArticles = {
-            1: {
-                title: '手沖咖啡新手入門：五大關鍵步驟',
-                content: `
-                    <p>想要在家中享受一杯專業級的手沖咖啡，其實並不難！掌握以下五個關鍵步驟，您也能輕鬆沖出美味：</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">1. 新鮮咖啡豆與正確研磨度</h4>
-                    <p class="mb-2">選擇新鮮烘焙的咖啡豆是美味的基礎。研磨度應介於中粗到中等之間，類似砂糖顆粒大小，太細會過度萃取，太粗則萃取不足。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">2. 合適的水溫</h4>
-                    <p class="mb-2">理想水溫通常在 90°C 到 94°C 之間。過熱的水會讓咖啡過於苦澀，溫度不足則無法充分萃取風味。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">3. 悶蒸 (Blooming)</h4>
-                    <p class="mb-2">將少量熱水均勻淋在咖啡粉上，使其完全濕潤，等待約 30-45 秒。這是咖啡粉釋放二氧化碳的過程，有助於後續的風味萃取。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">4. 分段注水</h4>
-                    <p class="mb-2">悶蒸結束後，開始以穩定、緩慢的螺旋狀注水。將總水量分為 2-3 次注入，每次注水都讓咖啡液完全滴濾，這樣可以更均勻地萃取咖啡風味。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">5. 享受您的手沖咖啡</h4>
-                    <p class="mb-2">當咖啡液不再滴落時，即可移除濾杯。一杯香醇的手沖咖啡就完成了！記得在最佳溫度品嚐。</p>
-                    <p class="text-sm mt-4 text-gray-500">提示：實驗不同研磨度、水溫和注水手法，找到最適合您口味的黃金比例。</p>
-                `,
-                modalIcon: 'fas fa-hand-holding-water' // 新增圖標
-            },
-            2: {
-                title: '咖啡豆的黃金保存法則',
-                content: `
-                    <p>咖啡豆的風味非常脆弱，極易受環境影響。遵循以下法則，讓您的咖啡豆保持最佳狀態：</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">1. 避光、避熱</h4>
-                    <p class="mb-2">光線和高溫是咖啡豆風味的兩大殺手。請務必將咖啡豆存放在陰涼、乾燥且沒有陽光直射的地方。廚房檯面上的陽光直射或靠近爐灶的地方都不適合。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">2. 密封保存</h4>
-                    <p class="mb-2">空氣是造成咖啡豆氧化、風味流失的主因。請使用帶有單向排氣閥的密封罐或專用咖啡袋，盡量排出空氣。避免使用透明或非密封的容器。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">3. 避免潮濕在濕度高的環境下，咖啡豆容易受潮並失去風味。請確保儲存環境的乾燥。</h4>
-                    <p class="mb-2">濕氣會加速咖啡豆的變質和黴菌生長。避免將咖啡豆存放在潮濕的環境中。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">4. 不建議冷藏（短時間可以）</h4>
-                    <p class="mb-2">冰箱內濕氣重且異味多，容易讓咖啡豆吸收雜味並受潮。若需短期保存（一週內），可放在密封罐中；若需長期保存，可考慮冷凍。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">5. 冷凍保存（長期最佳）</h4>
-                    <p class="mb-2">如果咖啡豆量大且希望長期保存（數週至數月），可以將其分裝於小份量、密封良好的袋子或容器中，放入冷凍庫。取用時直接取出所需份量，不要反覆解凍再冷凍。</p>
-                    <p class="text-sm mt-4 text-gray-500">提示：咖啡豆的最佳賞味期通常在烘焙後 2-4 週內。購買少量、新鮮烘焙的咖啡豆，並盡快享用是最好的方式。</p>
-                `,
-                modalIcon: 'fas fa-box-open' // 新增圖標
-            },
-            3: {
-                title: '音樂與咖啡的奇妙共鳴：提升感官體驗',
-                content: `
-                    <p>您是否曾發現，在不同的背景音樂下，同一杯咖啡的味道似乎也產生了微妙的變化？這並非偶然！科學研究表明，聲音會影響我們的味覺感知。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">感官的交響樂</h4>
-                    <p class="mb-2">我們的味覺、嗅覺、視覺和聽覺是相互關聯的。當我們品嚐咖啡時，大腦會整合所有感官接收到的資訊。特定的音樂頻率和節奏，能夠影響我們對咖啡中酸度、甜度或苦味的感受。</p>
-                    <h4 class="font-bold text-lg mt-4 mb-2">常見的搭配建議</h4>
-                    <ul class="list-disc list-inside ml-4 mb-2">
-                        <li class="mb-1"><span class="font-semibold">古典樂 / 爵士樂：</span> 輕柔、和諧的旋律能襯托出咖啡的細膩風味和複雜層次，特別適合花香、果香明顯的淺焙豆。</li>
-                        <li class="mb-1"><span class="font-semibold">搖滾樂 / 流行樂：</span> 節奏感強烈的音樂可能會讓咖啡的風味感覺更為濃烈或苦澀，適合中深焙的濃郁口感。</li>
-                        <li class="mb-1"><span class="font-semibold">大自然音效 (雨聲、鳥鳴)：</span> 寧靜的環境音有助於放鬆心情，讓您更能專注於咖啡本身純粹的風味。</li>
-                    </ul>
-                    <h4 class="font-bold text-lg mt-4 mb-2">實驗您的專屬旋律</h4>
-                    <p class="mb-2">不妨下次沖泡咖啡時，嘗試播放不同風格的音樂。閉上眼睛，感受咖啡在口中與音樂在耳邊的交織。您可能會發現新的風味維度，找到最能提升您品飲體驗的「專屬旋律」。</p>
-                    <p class="text-sm mt-4 text-gray-500">提示：這是一種個人化的體驗，沒有絕對的對錯。盡情享受探索的過程吧！</p>
-                `,
-                modalIcon: 'fas fa-music' // 新增圖標
-            }
-        };
-
-
-        const faqs = [
-            { q: '如何保存咖啡豆？', a: '為保持最佳風味，請將咖啡豆存放在不透光、密封的容器中，並置於陰涼乾燥處。建議在開封後一個月內飲用完畢。' },
-            { q: '不同烘焙度有什麼差異？', a: '淺焙通常更能展現咖啡豆原有的花果酸質；中焙則達到酸、甜、苦的平衡；深焙會帶來更濃郁的焦糖、巧克力風味，酸度較低。' },
-            { q: '網站上的商品如何訂購？', a: '本網站目前僅供商品與品牌展示。若您對任何商品有興趣或需要訂購，歡迎直接致電 03-4081932 與我們聯繫，我們將有專人為您服務。' },
-            { q: '樂海樂器咖啡的營業時間是？', a: '我們的營業時間為週一至週六，早上9:00至晚間9:00。週日為公休日。歡迎您隨時來店裡坐坐，喝杯咖啡，聊聊音樂。' }
-        ];
-
-        // Coffee machine data (this object is no longer used as the coffee equipment section has been removed)
-        const coffeeMachinesData = {}; 
-
-        // --- Particle Generation and Management (for 2D background particles) ---
-        const PARTICLE_LIFETIME_MS = 6000; // Particle lifetime (milliseconds)
-        const PARTICLE_EMOJI_COFFEE = '☕'; // Coffee bean Emoji
-        const PARTICLE_EMOJI_NOTE = '🎶'; // Musical note Emoji
-        const PARTICLE_SPAWN_INTERVAL_MS = 500; // How often a new particle is generated (milliseconds)
-
-        let particleTimer; // Timer for managing particle generation
-
-        /**
-         * Creates and animates a single 2D background particle.
-         * @param {HTMLElement} container - The element to which the particle will be attached.
-         * @param {string} emoji - The Emoji character of the particle.
-         * @param {string} typeClass - 'coffee-bean' or 'musical-note'.
-         */
-        function createParticle(container, emoji, typeClass) {
-            const particle = document.createElement('span');
-            particle.textContent = emoji;
-            particle.className = `animated-particle ${typeClass}`;
-            
-            // Random initial position within the visible area of the container
-            const containerRect = container.getBoundingClientRect();
-            // Ensure particles are generated inside the container, considering their relative position
-            const startX = Math.random() * containerRect.width;
-            const startY = Math.random() * containerRect.height;
-            
-            // Random end position (offset from start point)
-            const endXOffset = (Math.random() - 0.5) * 400; // +/- 200px from start
-            const endYOffset = (Math.random() - 0.5) * 400; // +/- 200px from start
-
-            const duration = PARTICLE_LIFETIME_MS + Math.random() * 2000; // Slightly vary duration
-            const rotateDuration = 5 + Math.random() * 10; // Slightly vary rotation duration
-
-            particle.style.left = `${startX}px`;
-            particle.style.top = `${startY}px`;
-            particle.style.setProperty('--x-end', `${endXOffset}px`);
-            particle.style.setProperty('--y-end', `${endYOffset}px`);
-            particle.style.setProperty('--duration', `${duration}ms`);
-            particle.style.setProperty('--rotate-duration', `${rotateDuration}s`);
-            particle.style.setProperty('--animation-name', typeClass === 'coffee-bean' ? 'floatAndFadeCoffee' : 'floatAndFadeNote');
-            particle.style.fontSize = `${1 + Math.random() * 0.8}rem`; /* Vary size */
-
-            // Add the particle to its respective section, so its positioning is relative to that section
-            container.appendChild(particle);
-
-            // Remove particle after animation ends to keep DOM clean
-            setTimeout(() => {
-                particle.remove();
-            }, duration);
-        }
-
-        /**
-         * Starts 2D particle generation for visible sections.
-         */
-        function startParticleGeneration() {
-            // Clear any existing timers to avoid duplication
-            if (particleTimer) clearInterval(particleTimer);
-
-            const sections = ['home', 'coffee-machine-display', 'flavor-guide', 'our-beans', 'coffee-grounds-magic', 'story', 'knowledge', 'image-gallery', 'faq', 'review', 'contact']; // Updated sections list
-            const sectionElements = sections.map(id => document.getElementById(id)).filter(Boolean); // Get actual elements
-
-            const activeSections = new Set(); // Track currently visible section IDs
-
-            // Observer to add/remove sections from the activeSections set
-            const sectionObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible'); // Add is-visible class
-                        activeSections.add(entry.target.id);
-                    } else {
-                        entry.target.classList.remove('is-visible'); // Remove is-visible class
-                        activeSections.delete(entry.target.id);
-                    }
-                });
-            }, { threshold: 0.2 }); // Trigger when 20% of the section is visible
-
-            sectionElements.forEach(section => {
-                sectionObserver.observe(section);
-            });
-
-            // Observer for section titles with pulse animation
-            const pulseObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const titleElement = entry.target;
-                    if (titleElement.classList.contains('animate-pulse-on-scroll')) {
-                        if (entry.isIntersecting) {
-                            titleElement.classList.add('is-pulsing'); // Add class to start pulse animation
-                        } else {
-                            titleElement.classList.remove('is-pulsing'); // Remove class to stop pulse animation
-                        }
-                    }
-                });
-            }, { threshold: 0.5 }); // More aggressive threshold for titles
-
-            document.querySelectorAll('.animate-pulse-on-scroll').forEach(el => {
-                pulseObserver.observe(el);
-            });
-
-
-            // Start generating particles only if at least one observed section is visible
-            particleTimer = setInterval(() => {
-                if (activeSections.size > 0) {
-                    // Choose a random visible section to generate particles
-                    const currentActiveSections = Array.from(activeSections);
-                    const randomSectionId = currentActiveSections[Math.floor(Math.random() * currentActiveSections.length)];
-                    const container = document.getElementById(randomSectionId);
-                    
-                    if (container) {
-                        // Randomly choose coffee bean or musical note
-                        if (Math.random() < 0.5) {
-                            createParticle(container, PARTICLE_EMOJI_COFFEE, 'coffee-bean');
-                        } else {
-                            createParticle(container, PARTICLE_EMOJI_NOTE, 'musical-note');
-                        }
-                    }
+            const knowledgeArticles = {
+                1: {
+                    title: "手沖咖啡新手入門：五大關鍵步驟",
+                    content: `
+                        <p>手沖咖啡是一門藝術，也是一種享受。以下是五個關鍵步驟，幫助您在家也能沖出香醇好咖啡：</p>
+                        <ol class="list-decimal list-inside ml-4 mt-2 space-y-2">
+                            <li><strong>準備器具：</strong>手沖壺、濾杯、濾紙、磨豆機、電子秤、計時器、咖啡杯。</li>
+                            <li><strong>水溫控制：</strong>建議水溫介於 88°C 至 92°C 之間，視咖啡豆烘焙程度調整。淺焙豆適合高溫，深焙豆適合稍低溫。</li>
+                            <li><strong>黃金比例：</strong>咖啡粉與水的比例通常為 1:15 到 1:18。例如，15克咖啡粉搭配 225-270毫升水。</li>
+                            <li><strong>悶蒸：</strong>將咖啡粉倒入濾杯，輕輕搖勻。第一次注水時，水量約為咖啡粉的兩倍（例如15克咖啡粉注入30毫升水），均勻潤濕所有咖啡粉，等待 20-30 秒，讓咖啡粉膨脹。這是釋放二氧化碳、提升風味的關鍵步驟。</li>
+                            <li><strong>分段注水：</strong>悶蒸後，分 2-3 次緩慢、穩定地以畫圓方式注水，避免直接沖擊濾紙壁。每次注水之間可稍作停頓，等待水位下降。總沖泡時間控制在 2-3 分鐘內。</li>
+                        </ol>
+                        <p class="mt-4">多加練習，您會發現手沖咖啡的無限樂趣！</p>
+                    `
+                },
+                2: {
+                    title: "咖啡豆的完美保存指南",
+                    content: `
+                        <p>正確保存咖啡豆是維持其新鮮風味的關鍵。咖啡豆最大的敵人是：<strong>光線、空氣、濕氣、高溫</strong>。</p>
+                        <ul class="list-disc list-inside ml-4 mt-2 space-y-2">
+                            <li><strong>密封容器：</strong>使用不透光、密封性良好的咖啡豆罐或帶有單向排氣閥的包裝袋。單向排氣閥能讓咖啡豆排出的二氧化碳逸出，同時阻擋外界空氣進入。</li>
+                            <li><strong>避光：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
+                            <li><strong>避免潮濕：</strong>濕氣會加速咖啡豆變質。切勿將咖啡豆存放在潮濕的環境，如水槽旁或冰箱冷藏室（除非是真空包裝且確定不會頻繁取出導致溫差凝結水珠）。</li>
+                            <li><strong>適宜溫度：</strong>室溫存放即可，避免高溫環境，如爐具旁。若想長期保存未開封的咖啡豆，可考慮冷凍，但務必使用真空密封包裝，且取出後一次用完，避免重複解凍。</li>
+                            <li><strong>研磨後儘快沖泡：</strong>咖啡豆一旦研磨成粉，接觸空氣的面積會大幅增加，風味流失速度加快。建議喝多少磨多少，享受最新鮮的風味。</li>
+                        </ul>
+                        <p class="mt-4">遵循這些小撇步，讓您的每一杯咖啡都保有最佳風味！</p>
+                    `
+                },
+                3: {
+                    title: "音樂與咖啡：一場感官的交響曲",
+                    content: `
+                        <p>您是否曾注意到，在某些咖啡館裡，特定的背景音樂總能讓咖啡喝起來特別美味？這並非偶然！科學研究表明，音樂確實可以影響我們對味覺的感知。</p>
+                        <h4 class="font-semibold mt-4 mb-2">音樂如何影響咖啡體驗：</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>情緒引導：</strong>輕柔、舒緩的音樂，如古典樂或輕爵士，能營造放鬆的氛圍，讓您更能細細品味咖啡的細膩層次。</li>
+                            <li><strong>風味聯想：</strong>某些音樂的節奏、音高和音色，可能與咖啡的特定風味特徵產生聯想。例如，高音調的音樂可能讓您感覺到咖啡的酸質更明亮，而低沉的音符則可能增強其醇厚度。</li>
+                            <li><strong>分散注意力：</strong>適當的背景音樂可以分散對環境噪音的注意力，讓您的味覺和嗅覺感官更專注於咖啡本身。</li>
+                        </ul>
+                        <h4 class="font-semibold mt-4 mb-2">推薦搭配：</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2">
+                            <li><strong>濃郁醇厚型咖啡（如曼特寧、義式濃縮）：</strong>搭配藍調、爵士樂或靈魂樂，讓其豐富的層次感更加突出。</li>
+                            <li><strong>清新明亮型咖啡（如耶加雪菲、肯亞）：</strong>搭配輕快、高頻的音樂，如古典小品、Chill-hop 或輕柔的流行音樂，襯托其花果香氣。</li>
+                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
+                        </ul>
+                        <p class="mt-4">下次品嚐咖啡時，不妨打開您的專屬歌單，讓音樂與咖啡共同為您帶來一場難忘的感官體驗吧！</p>
+                    `
                 }
-            }, PARTICLE_SPAWN_INTERVAL_MS);
-            console.log('[DEBUG] 2D Particle generation started.');
-        }
-
-        // --- Three.js Related Variables ---
-        let scene, camera, renderer, coffeeMachineGroup, grinderPart, brewSpout, bodyPart, trayPart;
-        let ambientLight, directionalLight, lightSource; 
-        let coffeeBeanBag, pouringBeansGroup, glassCoffeeCup, coffeePourStream, coffeeLiquid, cremaLayer, steamParticles; 
-        let idleCoffeeBeans; 
-
-        let mouse = new THREE.Vector2(); 
-        let raycaster = new THREE.Raycaster(); 
-
-        let targetCameraPosition = new THREE.Vector3();
-        let targetMachinePosition = new THREE.Vector3();
-        let targetLightIntensity = 1.5;
-        let targetLightColor = new THREE.Color(0xffffff);
-
-        // Animation state flags
-        let isGrinding = false;
-        let isBrewing = false;
-        let isPouringBeans = false;
-        let currentBrewingStep = 0; 
-
-        const sectionsData = [ // Section data for scroll progress indicator and 3D model interaction
-            { id: 'home', title: '首頁', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'coffee-machine-display', title: '咖啡機展示', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null }, 
-            { id: 'flavor-guide', title: '風味探索', cameraPos: { x: 0, y: 0.6, z: 1.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.8, lightColor: 0xFFA07A, hotspot: 'grinder' },
-            { id: 'our-beans', title: '精選咖啡豆', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 2.2, lightColor: 0xFFFACD, hotspot: 'body' },
-            { id: 'coffee-grounds-magic', title: '咖啡渣魔法', cameraPos: { x: 0, y: -0.6, z: 1.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.0, lightColor: 0x8B4513, hotspot: 'spout' },
-            { id: 'story', title: '我們的故事', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'knowledge', title: '咖啡知識', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'image-gallery', title: '咖啡藝廊', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'faq', title: '常見問題', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'review', title: '顧客回饋', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null },
-            { id: 'contact', title: '聯絡我們', cameraPos: { x: 0, y: 0, z: 2.5 }, machineTargetPos: { x: 0, y: -0.2, z: 0 }, lightIntensity: 1.5, lightColor: 0xffffff, hotspot: null }
-        ];
-        let currentActiveSectionIndex = 0;
-
-
-        /**
-         * Initializes the Three.js scene, camera, and renderer.
-         */
-        function initThreeJS() {
-            const canvas = document.getElementById('three-canvas');
-            if (!canvas) {
-                console.error('Three.js canvas element not found!');
-                return;
-            }
-
-            scene = new THREE.Scene();
-            
-            // Set up camera
-            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000); 
-            
-            // Set up renderer for 4K quality
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio * 2 || 2); // Double pixel ratio for higher quality
-            renderer.shadowMap.enabled = true; // Enable shadows for more realism
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
-
-            // Lighting setup: Warm & Cinematic
-            ambientLight = new THREE.AmbientLight(0x404040, 2); 
-            scene.add(ambientLight);
-
-            directionalLight = new THREE.DirectionalLight(0xFFE0B3, 2.5); // Warm, strong light
-            directionalLight.position.set(2, 3, 2);
-            directionalLight.castShadow = true; // Enable shadow casting for directional light
-            directionalLight.shadow.mapSize.width = 1024; // Shadow map resolution
-            directionalLight.shadow.mapSize.height = 1024;
-            directionalLight.shadow.camera.near = 0.5;
-            directionalLight.shadow.camera.far = 50;
-            directionalLight.shadow.camera.left = -5;
-            directionalLight.shadow.camera.right = 5;
-            directionalLight.shadow.camera.top = 5;
-            directionalLight.shadow.camera.bottom = -5;
-            scene.add(directionalLight);
-
-            lightSource = directionalLight; // Assign to lightSource
-
-            // Create coffee machine model
-            createCuteCoffeeMachine();
-            // Create a wooden counter
-            createWoodenCounter();
-
-            // Create other scene elements
-            createCoffeeBeanBag();
-            createPouringBeans(); // Group for beans being poured
-            createGlassCup();
-            createCoffeePourStream();
-            createCremaLayer();
-            createSteamParticles();
-
-            // Event listener for window resize
-            window.addEventListener('resize', onWindowResize, false);
-
-            // Mouse move listener for rotation
-            canvas.addEventListener('mousemove', (event) => {
-                const rect = renderer.domElement.getBoundingClientRect();
-                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            });
-            // Reset rotation when mouse leaves canvas
-            canvas.addEventListener('mouseleave', () => {
-                mouse.x = 0;
-                mouse.y = 0;
-            });
-
-            // Initial call to resetAllAnimations to ensure default state (beans visible, buttons enabled correctly, camera reset)
-            resetAllAnimations(); 
-            
-            // Adjust camera for initial view if needed
-            camera.position.z = 2.5; 
-
-            console.log('[DEBUG] Three.js initialized.');
-        }
-
-        /**
-         * Creates a cute-style 3D coffee machine model.
-         */
-        function createCuteCoffeeMachine() {
-            coffeeMachineGroup = new THREE.Group();
-
-            // Main Body (rounded cuboid) - Matte Dark Blue
-            const bodyGeometry = new THREE.BoxGeometry(1.8, 2.2, 1.2, 8, 8, 8);
-            const bodyMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x2C3E50, // Matte Dark Blue (similar to a very dark charcoal blue)
-                roughness: 0.8,   // High roughness for matte finish
-                metalness: 0.1,   // Minimal metallic reflection
-                clearcoat: 0.0,   // No clearcoat for a true matte look
-                clearcoatRoughness: 0.0 // No clearcoat
-            }); 
-            bodyPart = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            bodyPart.position.set(0, 0, 0); 
-            bodyPart.receiveShadow = true; // Enable body to receive shadows
-            bodyPart.castShadow = true;    // Enable body to cast shadows
-            coffeeMachineGroup.add(bodyPart);
-
-            // Grinder (domed shape)
-            const grinderGeometry = new THREE.SphereGeometry(0.6, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2);
-            const grinderMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x8B4513, // Darker brown for grinder
-                roughness: 0.6, 
-                metalness: 0.05 
-            }); 
-            grinderPart = new THREE.Mesh(grinderGeometry, grinderMaterial);
-            grinderPart.position.set(0, 1.1 + 0.3, 0); 
-            grinderPart.name = 'grinder'; // Set name for raycasting
-            grinderPart.receiveShadow = true;
-            grinderPart.castShadow = true;
-            coffeeMachineGroup.add(grinderPart);
-
-            // Brew Spout (thicker, shorter cylinder) - Silver and more prominent
-            const spoutGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.5, 32);
-            const spoutMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xE0E0E0, // Brighter Silver
-                roughness: 0.1,   // Very smooth for polished metal
-                metalness: 0.9,   // Highly metallic
-                clearcoat: 0.8,   // Strong clearcoat for high shine
-                clearcoatRoughness: 0.1 // Slight clearcoat roughness for subtle reflections
-            }); 
-            brewSpout = new THREE.Mesh(spoutGeometry, spoutMaterial);
-            brewSpout.position.set(0, -0.9, 0.6); 
-            brewSpout.rotation.x = Math.PI / 2; 
-            brewSpout.name = 'spout'; // Set name for raycasting
-            brewSpout.receiveShadow = true;
-            brewSpout.castShadow = true;
-            coffeeMachineGroup.add(brewSpout);
-
-            // Control Panel (rounded rectangle buttons)
-            const panelGeometry = new THREE.BoxGeometry(1.0, 0.5, 0.1);
-            const panelMaterial = new THREE.MeshStandardMaterial({ color: 0x3F2E2E, roughness: 0.5, metalness: 0.1 }); 
-            const panel = new THREE.Mesh(panelGeometry, panelMaterial);
-            panel.position.set(0, 0.5, 0.61); 
-            panel.name = 'panel'; 
-            panel.receiveShadow = true;
-            panel.castShadow = true;
-            coffeeMachineGroup.add(panel);
-            
-            // Small Buttons (accents)
-            const buttonGeometry = new THREE.SphereGeometry(0.1, 32, 16); 
-            const buttonMaterial = new THREE.MeshStandardMaterial({ color: 0xA52A2A, roughness: 0.3 }); 
-            const button1 = new THREE.Mesh(buttonGeometry, buttonMaterial);
-            button1.position.set(-0.3, 0.5, 0.65);
-            button1.name = 'button1';
-            button1.receiveShadow = true;
-            button1.castShadow = true;
-            const button2 = new THREE.Mesh(buttonGeometry, buttonMaterial);
-            button2.position.set(0.3, 0.5, 0.65);
-            button2.name = 'button2';
-            button2.receiveShadow = true;
-            button2.castShadow = true;
-            coffeeMachineGroup.add(button1);
-            coffeeMachineGroup.add(button2);
-
-            // Coffee Cup Tray (slender cuboid)
-            const trayGeometry = new THREE.BoxGeometry(1.5, 0.1, 0.8, 8, 8, 8); 
-            const trayMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xD3D3D3, 
-                roughness: 0.5, 
-                metalness: 0.5,
-                clearcoat: 0.3 // Slightly reflective surface
-            }); 
-            trayPart = new THREE.Mesh(trayGeometry, trayMaterial);
-            trayPart.position.set(0, -1.2, 0.2);
-            trayPart.name = 'tray'; 
-            trayPart.receiveShadow = true;
-            trayPart.castShadow = true;
-            coffeeMachineGroup.add(trayPart);
-            
-            // Add the entire coffee machine group to the scene
-            scene.add(coffeeMachineGroup);
-
-            coffeeMachineGroup.position.set(sectionsData[1].machineTargetPos.x, sectionsData[1].machineTargetPos.y, sectionsData[1].machineTargetPos.z);
-            coffeeMachineGroup.rotation.y = Math.PI / 8; // Slight angle
-        }
-
-        /**
-         * Creates a simple wooden counter for the scene.
-         */
-        function createWoodenCounter() {
-            const counterGeometry = new THREE.BoxGeometry(4, 0.1, 2); // Wide and thin
-            const counterMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x8B4513, // Saddle Brown for wood base
-                roughness: 0.7,   // Slightly rough wood grain
-                metalness: 0.0,
-                // For a more realistic wood, you'd load a texture here:
-                // map: new THREE.TextureLoader().load('path/to/wood_texture.jpg')
-            });
-            const counter = new THREE.Mesh(counterGeometry, counterMaterial);
-            counter.position.set(0, -1.35, -0.2); // Position below machine and slightly back
-            counter.receiveShadow = true; // Counter receives shadows
-            scene.add(counter);
-        }
-
-        /**
-         * Creates a simple coffee bean bag model.
-         */
-        function createCoffeeBeanBag() {
-            coffeeBeanBag = new THREE.Group();
-            const bagBodyGeometry = new THREE.CylinderGeometry(0.3, 0.4, 0.8, 32); // Slightly tapered
-            const bagBodyMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x8B4513, // Brown sack color
-                roughness: 0.8, // Fabric-like roughness
-                metalness: 0 
-            });
-            const bagBodyMesh = new THREE.Mesh(bagBodyGeometry, bagBodyMaterial);
-            bagBodyMesh.castShadow = true;
-            bagBodyMesh.receiveShadow = true;
-            coffeeBeanBag.add(bagBodyMesh);
-
-            // Simulate the opening/top part of the bag
-            const bagTopGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.1, 32);
-            const bagTopMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x7A3E1F, // Slightly darker brown for the inner part of the bag
-                roughness: 0.7, 
-                metalness: 0 
-            });
-            const bagTopMesh = new THREE.Mesh(bagTopGeometry, bagTopMaterial);
-            bagTopMesh.position.y = 0.4; // Position above the bag body
-            bagTopMesh.castShadow = true;
-            bagTopMesh.receiveShadow = true;
-            coffeeBeanBag.add(bagTopMesh);
-
-            coffeeBeanBag.position.set(-2, 1.5, 0); // Start off-screen
-            coffeeBeanBag.rotation.z = Math.PI / 4; // Tilted slightly
-            coffeeBeanBag.visible = false;
-            scene.add(coffeeBeanBag);
-        }
-
-        /**
-         * Creates the group for individual coffee beans during pouring simulation.
-         */
-        function createPouringBeans() {
-            pouringBeansGroup = new THREE.Group();
-            const beanGeometry = new THREE.SphereGeometry(0.05, 16, 16); // Small spheres for beans
-            const beanMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x6F4E37, // Coffee bean brown
-                roughness: 0.7,   // Matte finish
-                metalness: 0.05   // Slight metallic sheen
-            }); 
-            
-            // Generate a pool of beans that can be reused for pouring
-            for (let i = 0; i < 100; i++) { // More beans for a dense pour
-                const bean = new THREE.Mesh(beanGeometry, beanMaterial.clone());
-                bean.visible = false; // Hide initially
-                bean.userData.initialX = (Math.random() - 0.5) * 0.2; // Start spread
-                bean.userData.initialZ = (Math.random() - 0.5) * 0.2;
-                bean.userData.fallSpeed = 0.02 + Math.random() * 0.02; // Varying fall speed
-                bean.userData.rotationSpeed = new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.2,
-                    (Math.random() - 0.5) * 0.2,
-                    (Math.random() - 0.5) * 0.2
-                );
-                bean.castShadow = true;
-                bean.receiveShadow = true;
-                pouringBeansGroup.add(bean);
-            }
-            scene.add(pouringBeansGroup);
-
-            // Static coffee beans in grinder top (for "Add Beans" state)
-            idleCoffeeBeans = new THREE.Group();
-            for (let i = 0; i < 25; i++) { // More beans for a fuller hopper
-                const bean = new THREE.Mesh(beanGeometry, beanMaterial.clone());
-                bean.position.set(
-                    (Math.random() - 0.5) * 0.4, // Tightly packed
-                    grinderPart.position.y + 0.1 + (Math.random() * 0.2), // Inside the grinder opening, higher fill
-                    (Math.random() - 0.5) * 0.4
-                );
-                bean.castShadow = true;
-                bean.receiveShadow = true;
-                idleCoffeeBeans.add(bean);
-            }
-            idleCoffeeBeans.visible = true; // Set to true initially
-            scene.add(idleCoffeeBeans);
-        }
-
-        /**
-         * Creates a realistic glass coffee cup.
-         */
-        function createGlassCup() {
-            glassCoffeeCup = new THREE.Group();
-
-            const cupBodyGeometry = new THREE.CylinderGeometry(0.4, 0.3, 0.8, 32);
-            // MeshStandardMaterial for solid white ceramic look
-            const cupBodyMaterial = new THREE.MeshStandardMaterial({
-                color: 0xF5F5F5, // Off-white for ceramic
-                roughness: 0.6, // Slightly matte, like ceramic glaze
-                metalness: 0.0,
-            });
-            const cupBodyMesh = new THREE.Mesh(cupBodyGeometry, cupBodyMaterial);
-            cupBodyMesh.name = 'glassCoffeeCupBody'; // Name for raycasting
-            cupBodyMesh.castShadow = true;
-            cupBodyMesh.receiveShadow = true;
-            glassCoffeeCup.add(cupBodyMesh);
-
-            // Handle (simple torus)
-            const cupHandleGeometry = new THREE.TorusGeometry(0.15, 0.05, 8, 16);
-            const cupHandleMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xCCCCCC, // Grayish white
-                roughness: 0.3, 
-                metalness: 0.1 
-            });
-            const cupHandleMesh = new THREE.Mesh(cupHandleGeometry, cupHandleMaterial);
-            cupHandleMesh.position.set(0.45, 0, 0);
-            cupHandleMesh.rotation.y = Math.PI / 2;
-            cupHandleMesh.castShadow = true;
-            cupHandleMesh.receiveShadow = true;
-            glassCoffeeCup.add(cupHandleMesh);
-
-            glassCoffeeCup.position.set(0, -1.0, 0.6); // Position cup correctly under spout
-            glassCoffeeCup.visible = false;
-            scene.add(glassCoffeeCup);
-        }
-
-        /**
-         * Creates the coffee pour stream.
-         */
-        function createCoffeePourStream() {
-            const pourGeometry = new THREE.CylinderGeometry(0.06, 0.08, 0.01, 16); 
-            const pourMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x3A2418, // Dark, rich brown for coffee liquid
-                roughness: 0.3, 
-                transparent: true, 
-                opacity: 0.95, // Less transparent
-                metalness: 0.0 
-            }); 
-            coffeePourStream = new THREE.Mesh(pourGeometry, pourMaterial);
-            coffeePourStream.position.set(brewSpout.position.x, brewSpout.position.y - brewSpout.geometry.parameters.height / 2 - (pourGeometry.parameters.height / 2), brewSpout.position.z);
-            coffeePourStream.scale.y = 0.01; // Start very thin
-            coffeePourStream.visible = false;
-            coffeePourStream.castShadow = true;
-            scene.add(coffeePourStream);
-
-            // Coffee liquid inside the cup
-            const liquidGeometry = new THREE.CylinderGeometry(0.38, 0.28, 0.01, 32); // Slightly wider than cup interior
-            const liquidMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0x21140B, // Even darker coffee color for bulk liquid
-                roughness: 0.2,
-                metalness: 0.0 
-            }); 
-            coffeeLiquid = new THREE.Mesh(liquidGeometry, liquidMaterial);
-            coffeeLiquid.position.set(0, - (glassCoffeeCup.children[0].geometry.parameters.height / 2) + liquidGeometry.parameters.height / 2, 0);
-            coffeeLiquid.visible = false;
-            coffeeLiquid.castShadow = true;
-            glassCoffeeCup.add(coffeeLiquid); // Add liquid as a child of the cup
-        }
-
-        /**
-         * Creates the crema layer on top of the coffee.
-         */
-        function createCremaLayer() {
-            const cremaGeometry = new THREE.CylinderGeometry(0.39, 0.29, 0.01, 32); // Slightly wider and very thin
-            const cremaMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xD4A017, // Golden brown for crema
-                roughness: 0.9,   // Foamy/bubbly look
-                metalness: 0.0,
-                transparent: true,
-                opacity: 0.85 // Slightly less transparent for richer crema
-            });
-            cremaLayer = new THREE.Mesh(cremaGeometry, cremaMaterial);
-            cremaLayer.position.set(0, 0, 0); // Will be positioned dynamically above liquid
-            cremaLayer.visible = false;
-            glassCoffeeCup.add(cremaLayer);
-        }
-
-        /**
-         * Creates the steam particle system.
-         */
-        function createSteamParticles() {
-            const steamCount = 200; // Increased particle count for denser steam
-            const steamGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(steamCount * 3);
-            const opacities = new Float32Array(steamCount); // Store individual opacities
-
-            for (let i = 0; i < steamCount; i++) {
-                // Start positions near the coffee surface
-                positions[i * 3 + 0] = (Math.random() - 0.5) * 0.3; // Spread around cup center
-                positions[i * 3 + 1] = Math.random() * 0.1; // Start very low, near coffee surface
-                positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
-                opacities[i] = Math.random() * 0.4 + 0.1; // Initial random opacity (lower for softer steam)
-            }
-
-            steamGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            steamGeometry.setAttribute('opacity', new THREE.BufferAttribute(opacities, 1)); // Custom attribute for opacity
-
-            const steamMaterial = new THREE.PointsMaterial({
-                color: 0xF0F8FF, // Off-white/light blue for steam
-                size: 0.15, // Larger steam particles
-                transparent: true,
-                opacity: 0.6, // Overall opacity, modified by vertexColors
-                blending: THREE.AdditiveBlending, // For soft blending
-                sizeAttenuation: true // Particles appear smaller when further away
-            });
-            // Use onBeforeCompile to customize shader for per-particle opacity
-            steamMaterial.onBeforeCompile = (shader) => {
-                shader.vertexShader = `
-                    attribute float opacity;
-                    varying float vOpacity;
-                    ${shader.vertexShader}
-                `.replace(
-                    'void main() {',
-                    'void main() { vOpacity = opacity; '
-                );
-                shader.fragmentShader = `
-                    varying float vOpacity;
-                    ${shader.fragmentShader}
-                `.replace(
-                    'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
-                    'gl_FragColor = vec4( outgoingLight, diffuseColor.a * vOpacity );'
-                );
             };
 
-            steamParticles = new THREE.Points(steamGeometry, steamMaterial);
-            steamParticles.position.copy(glassCoffeeCup.position); // Position relative to cup
-            steamParticles.position.y += 0.4; // Start above the liquid
-            steamParticles.visible = false;
-            scene.add(steamParticles);
-        }
-
-
-        /**
-         * Animates the 3D steam particles.
-         */
-        function animateSteamParticles() {
-            if (!steamParticles || !steamParticles.visible) return;
-
-            const positions = steamParticles.geometry.attributes.position.array;
-            const opacities = steamParticles.geometry.attributes.opacity.array;
-            const particleCount = positions.length / 3;
-
-            for (let i = 0; i < particleCount; i++) {
-                // Steam rises and drifts
-                positions[i * 3 + 0] += (Math.random() - 0.5) * 0.003; // Horizontal drift (slower for softer steam)
-                positions[i * 3 + 1] += 0.006 + (Math.random() * 0.003); // Rise upwards (slower)
-                positions[i * 3 + 2] += (Math.random() - 0.5) * 0.003; // Depth drift
-
-                // Fade out as they rise
-                opacities[i] -= 0.005; // Slower fade
-
-                // Reset particle if it goes too high or fades out
-                if (positions[i * 3 + 1] > 1.0 || opacities[i] <= 0) { // Reset height lower for denser steam
-                    positions[i * 3 + 0] = (Math.random() - 0.5) * 0.3; // Reset to near cup top
-                    positions[i * 3 + 1] = Math.random() * 0.1; 
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
-                    opacities[i] = Math.random() * 0.4 + 0.1; // Reset opacity
-                }
-            }
-            steamParticles.geometry.attributes.position.needsUpdate = true;
-            steamParticles.geometry.attributes.opacity.needsUpdate = true;
-        }
-
-
-        /**
-         * Handles window resize.
-         */
-        function onWindowResize() {
-            const canvas = document.getElementById('three-canvas');
-            if (canvas) {
-                // Ensure canvas fills its parent container
-                const container = document.getElementById('threejs-container');
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                console.log('[DEBUG] Window resized, Three.js canvas updated.');
-            }
-        }
-
-        /**
-         * Shows a temporary text feedback toast for Three.js interactions.
-         * @param {string} message - The message to display.
-         */
-        function showThreeJSTextFeedback(message) {
-            const feedbackToast = document.getElementById('three-js-feedback-toast');
-            if (feedbackToast) {
-                feedbackToast.querySelector('p').textContent = message; 
-                feedbackToast.classList.add('show');
-                setTimeout(() => {
-                    feedbackToast.classList.remove('show');
-                }, 2000); 
-            }
-        }
-
-        /**
-         * Resets all animation related flags and hides temporary animation elements.
-         */
-        function resetAllAnimations() {
-            isGrinding = false;
-            isBrewing = false;
-            isPouringBeans = false;
-            currentBrewingStep = 0; 
-
-            grinderPart.rotation.y = 0; 
+            const galleryImages = [
+                "image/image_1.png",
+                "image/image_2.png",
+                "image/image_3.png",
+                "image/image_4.png",
+                "image/image_5.png",
+                "image/image_6.png",
+                "image/image_7.png",
+                "image/image_8.png"
+            ];
             
-            // Hide all temporary animation elements
-            if (pouringBeansGroup) pouringBeansGroup.visible = false;
-            if (coffeeBeanBag) coffeeBeanBag.visible = false;
-            if (coffeePourStream) coffeePourStream.visible = false;
-            if (coffeeLiquid) coffeeLiquid.visible = false;
-            if (cremaLayer) cremaLayer.visible = false;
-            if (glassCoffeeCup) glassCoffeeCup.visible = false; 
-            if (steamParticles) steamParticles.visible = false; 
+            // Function to show custom front-end modal messages
+            window.showFrontMessageModal = function(title, message, type = 'info') {
+                const modal = document.getElementById('frontMessageModal');
+                const modalTitle = document.getElementById('frontModalTitle');
+                const modalMessage = document.getElementById('frontModalMessage');
+                const modalIcon = document.getElementById('frontModalIcon');
 
-            // Ensure static beans are visible for the initial state
-            if (idleCoffeeBeans) idleCoffeeBeans.visible = true; 
+                // Reset classes
+                modalTitle.className = 'text-2xl font-serif mb-4';
+                modalIcon.className = ''; 
 
-            updateBrewingButtons(); 
-            setSectionView(sectionsData.find(s => s.id === 'coffee-machine-display')); 
-            showThreeJSTextFeedback('咖啡機已重置。');
-        }
+                modalTitle.textContent = title;
+                modalMessage.innerHTML = message; // Use innerHTML to allow for basic HTML tags if needed
 
-        /**
-         * Simulates adding beans to the grinder with cinematic animation.
-         */
-        function addBeansToGrinderCinematic() {
-            if (currentBrewingStep !== 0) {
-                showThreeJSTextFeedback('請先重置咖啡機，或等待當前步驟完成！');
-                return;
-            }
-
-            currentBrewingStep = 0.5; // Intermediate step for cinematic pour
-            updateBrewingButtons();
-            showThreeJSTextFeedback('準備投入咖啡豆...');
-
-            // Step 1: Bring in coffee bag
-            coffeeBeanBag.position.set(-2, 0.5, 1); // Start bag slightly above grinder and to the side
-            coffeeBeanBag.rotation.set(0, Math.PI / 2, 0); // Initial rotation
-            coffeeBeanBag.visible = true;
-
-            // Camera focuses on the bag/grinder area
-            targetCameraPosition.set(0, 0.7, 1.2); 
-            targetMachinePosition.set(0, -0.2, 0);
-            targetLightIntensity = 2.0;
-            targetLightColor.setHex(0xFFDDAA); // Warm light
-
-            let bagMoveStart = Date.now();
-            let bagMoveDuration = 1500; // Move into position
-            let bagPourDuration = 2000; // Pour duration
-            let totalAnimationDuration = bagMoveDuration + bagPourDuration + 500; // Total duration with some buffer
-
-            // Hide initial idle beans during the cinematic pour setup
-            idleCoffeeBeans.visible = false;
-
-            // Animate bag moving into position
-            function animateBagMove() {
-                const elapsed = Date.now() - bagMoveStart;
-                const progress = Math.min(1, elapsed / bagMoveDuration);
-
-                coffeeBeanBag.position.x = THREE.MathUtils.lerp(-2, 0.2, progress);
-                coffeeBeanBag.position.y = THREE.MathUtils.lerp(0.5, 0.9, progress); // Move up slightly
-                coffeeBeanBag.rotation.z = THREE.MathUtils.lerp(Math.PI / 4, 0, progress); // Straighten slightly
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateBagMove);
-                } else {
-                    // Bag is in position, start pouring animation
-                    isPouringBeans = true;
-                    // Reset pouring beans and make them visible to simulate flow
-                    pouringBeansGroup.children.forEach(bean => {
-                        bean.position.set(
-                            coffeeBeanBag.position.x + bean.userData.initialX, 
-                            coffeeBeanBag.position.y + 0.1, 
-                            coffeeBeanBag.position.z + bean.userData.initialZ
-                        );
-                        bean.visible = true;
-                    });
-
-                    // Animate bag tilting for pour
-                    let pourStartTime = Date.now();
-                    function animateBagPour() {
-                        const elapsedPour = Date.now() - pourStartTime;
-                        const pourProgress = Math.min(1, elapsedPour / bagPourDuration);
-
-                        coffeeBeanBag.rotation.z = THREE.MathUtils.lerp(0, -Math.PI / 4, pourProgress); // Tilt down
-                        coffeeBeanBag.position.y = THREE.MathUtils.lerp(0.9, 0.8, pourProgress); // Slight dip during pour
-
-                        // Animate individual beans falling
-                        pouringBeansGroup.children.forEach(bean => {
-                            if (bean.visible) {
-                                bean.position.y -= bean.userData.fallSpeed;
-                                bean.rotation.x += bean.userData.rotationSpeed.x;
-                                bean.rotation.y += bean.userData.rotationSpeed.y;
-                                bean.rotation.z += bean.userData.rotationSpeed.z;
-
-                                // Hide bean once it falls below grinder
-                                if (bean.position.y < grinderPart.position.y - 0.2) {
-                                    bean.visible = false;
-                                }
-                            }
-                        });
-
-                        if (pourProgress < 1 || pouringBeansGroup.children.some(b => b.visible)) {
-                            requestAnimationFrame(animateBagPour);
-                        } else {
-                            // Pouring finished
-                            isPouringBeans = false;
-                            coffeeBeanBag.visible = false; // Hide the bag
-                            idleCoffeeBeans.visible = true; // Show the static beans in the grinder
-                            currentBrewingStep = 1; // Beans Added, ready for grinding
-                            updateBrewingButtons();
-                            showThreeJSTextFeedback('咖啡豆已投入研磨槽！');
-                        }
-                    }
-                    animateBagPour();
-                }
-            }
-            animateBagMove();
-        }
-
-        /**
-         * Starts the grinding animation.
-         */
-        function startGrindingAnimation() {
-            if (currentBrewingStep !== 1) {
-                showThreeJSTextFeedback('請先投入咖啡豆！');
-                return;
-            }
-
-            isGrinding = true;
-            idleCoffeeBeans.visible = false; // Hide static beans during grinding
-            showThreeJSTextFeedback('開始研磨咖啡豆...');
-
-            targetCameraPosition.set(0, 0.6, 0.8); // Closer focus on grinder
-            targetLightIntensity = 2.5; // Brighter for grinding action
-            targetLightColor.setHex(0xFFC0CB); // Pinkish light for intense moment
-
-            // Grinding animation loop
-            const grindingDuration = 3000; // milliseconds
-            const startTime = Date.now();
-
-            // Create coffee grounds particles (simplified, not full 3D particle system)
-            const groundGeometry = new THREE.SphereGeometry(0.02, 8, 8); // Very small for grounds
-            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x5A4444, roughness: 0.8 }); // Dark brown
-            const grinderGrounds = new THREE.Group();
-            for (let i = 0; i < 50; i++) {
-                const ground = new THREE.Mesh(groundGeometry, groundMaterial.clone());
-                ground.position.set(
-                    (Math.random() - 0.5) * 0.3, 
-                    grinderPart.position.y - 0.2 + Math.random() * 0.1, // Near grinder exit
-                    (Math.random() - 0.5) * 0.3
-                );
-                ground.visible = false;
-                grinderGrounds.add(ground);
-            }
-            scene.add(grinderGrounds);
-
-            // Animation function for grinding
-            function animateGrinding() {
-                if (!isGrinding) return;
-
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(1, elapsed / grindingDuration);
-
-                grinderPart.rotation.y += 0.2; // Faster rotation
-                bodyPart.position.y = Math.sin(elapsed * 0.01) * 0.01; // Slight vibration for the body
-
-                // Emit grounds
-                if (elapsed % 100 < 50) { // Emit periodically
-                    grinderGrounds.children.forEach(g => {
-                        if (!g.visible) {
-                            g.position.set(
-                                (Math.random() - 0.5) * 0.3, 
-                                grinderPart.position.y - 0.2 + Math.random() * 0.1, 
-                                (Math.random() - 0.5) * 0.3
-                            );
-                            g.visible = true;
-                            g.userData.fallSpeed = 0.01 + Math.random() * 0.01;
-                            g.userData.lifespan = 50 + Math.random() * 50; // Shorter lifespan
-                            g.material.opacity = 1.0;
-                            g.material.transparent = true;
-                            return;
-                        }
-                    });
-                }
-                // Animate grounds falling and fading
-                grinderGrounds.children.forEach(g => {
-                    if (g.visible) {
-                        g.position.y -= g.userData.fallSpeed;
-                        g.material.opacity -= 1 / g.userData.lifespan;
-                        if (g.material.opacity <= 0) {
-                            g.visible = false;
-                        }
-                    }
-                });
-
-
-                if (progress < 1) {
-                    requestAnimationFrame(animateGrinding);
-                } else {
-                    isGrinding = false;
-                    grinderPart.rotation.y = 0; // Stop rotation
-                    bodyPart.position.y = 0; // Reset vibration
-                    grinderGrounds.children.forEach(g => g.visible = false); // Hide grounds
-                    scene.remove(grinderGrounds); // Clean up grounds group
-
-                    currentBrewingStep = 2; // Grinding finished, ready for brewing
-                    updateBrewingButtons();
-                    showThreeJSTextFeedback('咖啡豆研磨完成！');
-                }
-            }
-            animateGrinding();
-        }
-
-        /**
-         * Starts the brewing animation.
-         */
-        function startBrewingAnimation() {
-            if (currentBrewingStep !== 2) {
-                showThreeJSTextFeedback('請先研磨咖啡豆！');
-                return;
-            }
-
-            isBrewing = true;
-            glassCoffeeCup.visible = true; // Show the cup
-            coffeePourStream.visible = true; // Show the pouring stream
-            coffeeLiquid.visible = true; // Show liquid in cup
-            cremaLayer.visible = true; // Show crema layer
-
-            // Set initial liquid levels (very low)
-            coffeePourStream.scale.y = 0.001;
-            coffeeLiquid.scale.y = 0.001;
-            cremaLayer.scale.y = 0.001;
-            coffeeLiquid.position.y = - (glassCoffeeCup.children[0].geometry.parameters.height / 2) + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2);
-            cremaLayer.position.y = coffeeLiquid.position.y + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2) + (cremaLayer.geometry.parameters.height * cremaLayer.scale.y / 2);
-
-
-            targetCameraPosition.set(0, -0.6, 1.2); // Focus on spout/cup
-            targetLightIntensity = 1.8;
-            targetLightColor.setHex(0xA07A50); // Warm brown light
-
-            showThreeJSTextFeedback('正在沖泡咖啡...');
-
-            let pourAnimationStart = Date.now();
-            let pourDuration = 4000; 
-            const maxLiquidHeight = glassCoffeeCup.children[0].geometry.parameters.height * 0.8; 
-            const cupBottomY = - (glassCoffeeCup.children[0].geometry.parameters.height / 2); // Relative to cup group's origin
-
-            function animatePouring() {
-                if (!isBrewing) return;
-
-                const elapsed = Date.now() - pourAnimationStart;
-                const progress = Math.min(1, elapsed / pourDuration);
-
-                // Pour stream grows and falls
-                const pourLength = 1.0; 
-                coffeePourStream.scale.y = pourLength * progress;
-                coffeePourStream.position.y = brewSpout.position.y - brewSpout.geometry.parameters.height / 2 - (pourLength * coffeePourStream.scale.y / 2);
-
-                // Liquid in cup fills up smoothly
-                coffeeLiquid.scale.y = maxLiquidHeight * progress;
-                coffeeLiquid.position.y = cupBottomY + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2);
-                
-                // Crema layer always on top of liquid
-                cremaLayer.position.y = coffeeLiquid.position.y + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2) + (cremaLayer.geometry.parameters.height / 2);
-                cremaLayer.scale.y = progress > 0 ? 1 : 0.001; // Crema appears as soon as liquid starts filling
-
-                // Add subtle wobble to liquid surface
-                const wobbleFactor = Math.sin(performance.now() * 0.01) * 0.005; 
-                coffeeLiquid.scale.x = Math.max(0.01, 1 + wobbleFactor);
-                coffeeLiquid.scale.z = Math.max(0.01, 1 - wobbleFactor);
-                cremaLayer.scale.x = Math.max(0.01, 1 + wobbleFactor * 0.8);
-                cremaLayer.scale.z = Math.max(0.01, 1 - wobbleFactor * 0.8);
-
-
-                if (progress < 1) {
-                    requestAnimationFrame(animatePouring);
-                } else {
-                    isBrewing = false;
-                    coffeePourStream.visible = false; // Hide pour stream
-                    steamParticles.visible = true; // Show steam after pour completes
-                    cremaLayer.visible = true; // Ensure crema is visible
-
-                    currentBrewingStep = 3; // Brewing finished
-                    updateBrewingButtons();
-                    showThreeJSTextFeedback('一杯香醇的咖啡準備好了！');
-
-                    // Steam fades after a short while
-                    setTimeout(() => {
-                         steamParticles.visible = false; 
-                    }, 4000); 
-                }
-            }
-            animatePouring();
-        }
-
-        /**
-         * Updates the state (enabled/disabled) of the brewing simulation buttons.
-         */
-        function updateBrewingButtons() {
-            document.getElementById('btn-add-beans').disabled = currentBrewingStep !== 0;
-            document.getElementById('btn-start-grinding').disabled = currentBrewingStep !== 1;
-            document.getElementById('btn-start-brewing').disabled = currentBrewingStep !== 2;
-            document.getElementById('btn-reset-machine').disabled = currentBrewingStep === 0;
-            console.log('[DEBUG] 沖泡按鈕狀態已更新。目前步驟:', currentBrewingStep);
-        }
-
-        /**
-         * Smoothly transitions Three.js camera, coffee machine position, and lights.
-         * @param {Object} targetData - Target camera, coffee machine position, and light data.
-         */
-        function setSectionView(targetData) {
-            targetCameraPosition.copy(new THREE.Vector3(targetData.cameraPos.x, targetData.cameraPos.y, targetData.cameraPos.z));
-            targetMachinePosition.copy(new THREE.Vector3(targetData.machineTargetPos.x, targetData.machineTargetPos.y, targetData.machineTargetPos.z));
-            targetLightIntensity = targetData.lightIntensity;
-            targetLightColor.setHex(targetData.lightColor);
-
-
-            // Manage visibility of elements based on brewing step/section.
-            if (targetData.id === 'coffee-machine-display') {
-                if (currentBrewingStep === 0) { 
-                    idleCoffeeBeans.visible = true; 
-                    pouringBeansGroup.visible = false;
-                    coffeeBeanBag.visible = false;
-                    glassCoffeeCup.visible = false;
-                    coffeePourStream.visible = false;
-                    coffeeLiquid.visible = false;
-                    cremaLayer.visible = false;
-                    steamParticles.visible = false;
-                } else if (currentBrewingStep === 1) { 
-                    idleCoffeeBeans.visible = true;
-                    pouringBeansGroup.visible = false;
-                    coffeeBeanBag.visible = false;
-                    glassCoffeeCup.visible = false;
-                    coffeePourStream.visible = false;
-                    coffeeLiquid.visible = false;
-                    cremaLayer.visible = false;
-                    steamParticles.visible = false;
-                } else if (currentBrewingStep === 2) { 
-                    idleCoffeeBeans.visible = false; 
-                    pouringBeansGroup.visible = false;
-                    coffeeBeanBag.visible = false;
-                    glassCoffeeCup.visible = true; // Cup is ready for brewing
-                    coffeePourStream.visible = false;
-                    coffeeLiquid.visible = false; 
-                    cremaLayer.visible = false;
-                    steamParticles.visible = false;
-                } else if (currentBrewingStep === 3) { 
-                    idleCoffeeBeans.visible = false;
-                    pouringBeansGroup.visible = false;
-                    coffeeBeanBag.visible = false;
-                    glassCoffeeCup.visible = true;
-                    coffeeLiquid.visible = true; 
-                    coffeeLiquid.scale.y = glassCoffeeCup.children[0].geometry.parameters.height * 0.8; // Ensure it's filled
-                    coffeeLiquid.position.y = - (glassCoffeeCup.children[0].geometry.parameters.height / 2) + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2);
-                    cremaLayer.visible = true;
-                    cremaLayer.position.y = coffeeLiquid.position.y + (coffeeLiquid.geometry.parameters.height * coffeeLiquid.scale.y / 2) + (cremaLayer.geometry.parameters.height / 2);
-                    steamParticles.visible = true;
-                    coffeePourStream.visible = false;
-                } else if (currentBrewingStep === 0.5) { // Intermediate state for cinematic pour
-                    idleCoffeeBeans.visible = false; // Hide idle beans during pour
-                    coffeeBeanBag.visible = true; // Show bag
-                }
-            } else {
-                // If user scrolls away from the coffee machine display section, hide all related elements
-                idleCoffeeBeans.visible = false;
-                pouringBeansGroup.visible = false;
-                coffeeBeanBag.visible = false;
-                glassCoffeeCup.visible = false;
-                coffeePourStream.visible = false;
-                coffeeLiquid.visible = false;
-                cremaLayer.visible = false;
-                steamParticles.visible = false;
-            }
-        }
-
-        /**
-         * Main animation loop for updating the 3D scene.
-         */
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Smoothly interpolate camera and coffee machine positions
-            camera.position.lerp(targetCameraPosition, 0.05);
-            coffeeMachineGroup.position.lerp(targetMachinePosition, 0.05);
-            lightSource.intensity += (targetLightIntensity - lightSource.intensity) * 0.05;
-            lightSource.color.lerp(targetLightColor, 0.05);
-
-            // Coffee machine base floating animation (small up-down movement)
-            const time = performance.now() * 0.0005;
-            if (!isGrinding && !isBrewing && !isPouringBeans) { // Only apply floating if idle
-                 coffeeMachineGroup.position.y += Math.sin(time * 0.5) * 0.005; 
-            }
-           
-            // Mouse control for rotation (only subtle adjustment when not in an active brewing step)
-            if (currentBrewingStep === 0) { 
-                const targetRotationY = mouse.x * 0.15; 
-                const targetRotationX = mouse.y * 0.15; 
-                
-                coffeeMachineGroup.rotation.y += (targetRotationY - coffeeMachineGroup.rotation.y) * 0.08;
-                coffeeMachineGroup.rotation.x += (targetRotationX - coffeeMachineGroup.rotation.x) * 0.08;
-
-                // Clamp rotations to prevent going out of view
-                coffeeMachineGroup.rotation.y = THREE.MathUtils.clamp(coffeeMachineGroup.rotation.y, -Math.PI / 6, Math.PI / 6); 
-                coffeeMachineGroup.rotation.x = THREE.MathUtils.clamp(coffeeMachineGroup.rotation.x, -Math.PI / 12, Math.PI / 12); 
-            } else {
-                // When in a brewing step, return to a fixed viewing angle
-                coffeeMachineGroup.rotation.y += (Math.PI / 8 - coffeeMachineGroup.rotation.y) * 0.05; 
-                coffeeMachineGroup.rotation.x += (0 - coffeeMachineGroup.rotation.x) * 0.05; 
-            }
-
-            // Animate steam particles
-            animateSteamParticles();
-
-            renderer.render(scene, camera);
-        }
-
-        /**
-         * Scrolls to the specified section and triggers Three.js animation.
-         * @param {string} sectionId - The ID of the target section.
-         */
-        function scrollToSection(sectionId) {
-            const targetSectionElement = document.getElementById(sectionId);
-            if (targetSectionElement) {
-                targetSectionElement.scrollIntoView({ behavior: 'smooth' });
-                const sectionIndex = sectionsData.findIndex(s => s.id === sectionId);
-                if (sectionIndex !== -1) {
-                    currentActiveSectionIndex = sectionIndex; 
-                    setSectionView(sectionsData[currentActiveSectionIndex]);
-                }
-            } else {
-                console.warn(`Section with ID '${sectionId}' not found.`);
-            }
-        }
-
-        // --- Frontend Message Modal Elements (accessed globally via window) ---
-        const frontMessageModal = document.getElementById('frontMessageModal');
-        const frontModalIcon = document.getElementById('frontModalIcon'); 
-        const frontModalTitle = document.getElementById('frontModalTitle');
-        const frontModalMessage = document.getElementById('frontModalMessage');
-
-        /**
-         * Displays a custom frontend message modal.
-         * @param {string} title - Message title.
-         * @param {Object|string} content - Message content (can be string or object with text, modalIcon, modalImage).
-         * @param {string} type - 'success', 'error', or 'info' to change icon and title color.
-         */
-        window.showFrontMessageModal = function(title, content, type = 'info') {
-            frontModalTitle.textContent = title;
-            const messageText = typeof content === 'string' ? content : (content.text || '');
-            frontModalMessage.innerHTML = messageText; 
-
-            // Reset icon container HTML and classes
-            frontModalIcon.innerHTML = '';
-            frontModalIcon.className = 'mb-4 text-5xl'; 
-            frontModalTitle.classList.remove('front-modal-success', 'front-modal-error', 'front-modal-info'); 
-
-            // Determine icon/image based on content type
-            if (typeof content === 'object' && content.modalImage) {
-                frontModalIcon.innerHTML = `<img src="${content.modalImage}" alt="${title}" class="w-24 h-24 mx-auto rounded-full object-cover">`;
-            } else if (typeof content === 'object' && content.modalIcon) {
-                frontModalIcon.className += ` ${content.modalIcon} icon-${type}`;
-            } else {
-                // Default icon based on type if no specific icon/image provided in content
-                let defaultIconClass = '';
+                // Set icon and title color based on type
                 switch (type) {
                     case 'success':
-                        defaultIconClass = 'fas fa-check-circle icon-success';
+                        modalIcon.innerHTML = '<i class="fas fa-check-circle icon-success"></i>';
+                        modalTitle.classList.add('front-modal-success');
                         break;
                     case 'error':
-                        defaultIconClass = 'fas fa-times-circle icon-error';
+                        modalIcon.innerHTML = '<i class="fas fa-times-circle icon-error"></i>';
+                        modalTitle.classList.add('front-modal-error');
                         break;
                     case 'info':
                     default:
-                        defaultIconClass = 'fas fa-info-circle icon-info';
+                        modalIcon.innerHTML = '<i class="fas fa-info-circle icon-info"></i>';
+                        modalTitle.classList.add('front-modal-info');
                         break;
                 }
-                frontModalIcon.className += ` ${defaultIconClass}`;
-            }
-            
-            // Set title color based on type
-            switch (type) {
-                case 'success':
-                    frontModalTitle.classList.add('front-modal-success');
-                    break;
-                case 'error':
-                    frontModalTitle.classList.add('front-modal-error');
-                    break;
-                case 'info':
-                default:
-                    frontModalTitle.classList.add('front-modal-info'); 
-                    break;
-            }
+                modal.classList.add('active'); // Show modal
+            };
 
-            frontMessageModal.classList.add('active'); 
-        };
+            window.closeFrontMessageModal = function() {
+                document.getElementById('frontMessageModal').classList.remove('active');
+            };
 
-        /**
-         * Closes the custom frontend message modal.
-         */
-        window.closeFrontMessageModal = function() {
-            frontMessageModal.classList.remove('active'); 
-        };
+            // Three.js Scene, Camera, Renderer, and Objects
+            let scene, camera, renderer, coffeeMachine;
+            // References to individual mesh parts for animation
+            let hopperMesh, grinderMesh, filterStationMesh, cupMesh, spoutMesh; /* Added spoutMesh */
+            let liquidStreamMesh; /* Added liquidStreamMesh */
+            let liquidStreamGeometry; /* Declare liquidStreamGeometry at a higher scope */
 
-        // --- Data Loading and Rendering Functions ---
+            let currentBrewStep = 0; // 0: Idle, 1: Beans Added, 2: Grinding, 3: Brewing
+            let liquidMesh; // To control the coffee liquid level
+            let activeParticles = []; // Store active particle meshes for removal
 
-        /**
-         * Loads coffee beans data from localStorage or uses default data.
-         */
-        function loadCoffeeBeans() {
-            try {
-                const storedBeans = JSON.parse(localStorage.getItem(COFFEE_BEANS_KEY));
-                if (storedBeans && storedBeans.length > 0) {
-                    coffeeBeans = storedBeans.map(bean => {
-                        const mergedBean = { ...defaultCoffeeBeans[0], ...bean };
-                        if (!mergedBean.image || (!mergedBean.image.startsWith('http') && !mergedBean.image.startsWith('./image'))) {
-                            // Try to map to uploaded images first
-                            switch (mergedBean.id) {
-                                case 1: mergedBean.image = './image_0aa5b7.png'; break;
-                                case 2: mergedBean.image = './image_c43738.png'; break;
-                                case 3: mergedBean.image = './image_c43415.png'; break;
-                                case 4: mergedBean.image = './image_7187b9.png'; break;
-                                case 5: mergedBean.image = './image_6f497f.png'; break;
-                                default: mergedBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=咖啡豆_${mergedBean.id}`; // Fallback to placeholder
-                            }
+            // Particle System Configuration
+            const MUSICAL_NOTES_EMOJI = '🎶';
+            const PARTICLE_LIFESPAN = 3000; // milliseconds for DOM particles
+
+            // Function to create and animate a 3D particle (THREE.Mesh based)
+            function createThreeJSParticle(type, worldPosition) {
+                let geometry;
+                let material;
+                let particleMesh;
+
+                if (type === 'coffee_bean') {
+                    geometry = new THREE.SphereGeometry(0.08, 8, 8); // Small sphere for bean
+                    material = new THREE.MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7, metalness: 0.1 }); // Dark brown
+                    particleMesh = new THREE.Mesh(geometry, material);
+                    // Random initial rotation for variety
+                    particleMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+
+                    // Animate falling effect
+                    gsap.to(particleMesh.position, {
+                        y: worldPosition.y - Math.random() * 2 - 1, // Fall downwards
+                        x: worldPosition.x + (Math.random() - 0.5) * 0.5,
+                        z: worldPosition.z + (Math.random() - 0.5) * 0.5,
+                        duration: Math.random() * 1.5 + 1.0, // 1 to 2.5 seconds
+                        ease: "power1.in",
+                        onComplete: () => {
+                            if (particleMesh.parent) scene.remove(particleMesh); // Ensure it's still in scene before removing
+                            activeParticles = activeParticles.filter(p => p !== particleMesh); // Corrected array name
                         }
-                        return mergedBean;
                     });
-                    console.log('[DEBUG] 咖啡豆資料從 localStorage 載入成功:', coffeeBeans);
+                    // Optional: animate rotation during fall
+                    gsap.to(particleMesh.rotation, {
+                        x: "+=" + Math.PI * 4,
+                        y: "+=" + Math.PI * 4,
+                        duration: Math.random() * 1.5 + 1.0,
+                        ease: "linear"
+                    });
+
+                } else if (type === 'coffee_powder') {
+                    geometry = new THREE.SphereGeometry(0.02, 4, 4); // Very small, simpler sphere for powder
+                    material = new THREE.MeshStandardMaterial({ color: 0x6F4E37, roughness: 0.9, metalness: 0.0, transparent: true, opacity: 1.0 }); // Lighter brown/tan
+                    particleMesh = new THREE.Mesh(geometry, material);
+                    
+                    // Animate floating/spreading effect
+                    gsap.to(particleMesh.position, {
+                        y: worldPosition.y - Math.random() * 0.5 - 0.2, // Slightly downwards or sideways
+                        x: worldPosition.x + (Math.random() - 0.5) * 0.3,
+                        z: worldPosition.z + (Math.random() - 0.5) * 0.3,
+                        duration: Math.random() * 0.8 + 0.5, // 0.5 to 1.3 seconds
+                        ease: "power1.out",
+                        onComplete: () => {
+                            if (particleMesh.parent) scene.remove(particleMesh);
+                            activeParticles = activeParticles.filter(p => p !== particleMesh); // Corrected array name
+                        }
+                    });
+                    gsap.to(particleMesh.material, {
+                        opacity: 0,
+                        duration: Math.random() * 0.8 + 0.5,
+                        ease: "power1.out"
+                    });
+
                 } else {
-                    coffeeBeans = defaultCoffeeBeans.map(bean => {
-                        const newBean = { ...bean };
-                        if (!newBean.image || (!newBean.image.startsWith('http') && !newBean.image.startsWith('./image'))) {
-                            // Try to map to uploaded images first
-                            switch (newBean.id) {
-                                case 1: newBean.image = './image_0aa5b7.png'; break;
-                                case 2: newBean.image = './image_c43738.png'; break;
-                                case 3: newBean.image = './image_c43415.png'; break;
-                                case 4: newBean.image = './image_7187b9.png'; break;
-                                case 5: newBean.image = './image_6f497f.png'; break;
-                                default: newBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=咖啡豆_${newBean.id}`; // Fallback to placeholder
-                            }
-                        }
-                        return newBean;
-                    });
-                    saveCoffeeBeans(); 
-                    console.log('[DEBUG] 載入預設咖啡豆資料。');
+                    console.warn("Unhandled 3D particle type provided to createThreeJSParticle. No 3D particle created.");
+                    return null; 
                 }
-            } catch (e) {
-                console.error('[ERROR] 載入咖啡豆資料時發生錯誤，使用預設資料:', e);
-                coffeeBeans = defaultCoffeeBeans.map(bean => {
-                     const newBean = { ...bean };
-                        if (!newBean.image || (!newBean.image.startsWith('http') && !newBean.image.startsWith('./image'))) {
-                            // Try to map to uploaded images first
-                            switch (newBean.id) {
-                                case 1: newBean.image = './image_0aa5b7.png'; break;
-                                case 2: newBean.image = './image_c43738.png'; break;
-                                case 3: newBean.image = './image_c43415.png'; break;
-                                case 4: newBean.image = './image_7187b9.png'; break;
-                                case 5: newBean.image = './image_6f497f.png'; break;
-                                default: newBean.image = `https://placehold.co/400x300/a07654/FFFFFF?text=咖啡豆_${newBean.id}`; // Fallback to placeholder
-                            }
-                        }
-                        return newBean;
+
+                particleMesh.position.copy(worldPosition);
+                scene.add(particleMesh);
+                activeParticles.push(particleMesh); // Add to tracking for removal if needed (Corrected array name)
+                return particleMesh; // Return the 3D mesh
+            }
+
+            // Function to create and animate a DOM-based particle (e.g., for musical notes)
+            function createDOMParticle(emoji, worldPosition) {
+                const particleDiv = document.createElement('div');
+                particleDiv.className = `animated-particle musical-note`; 
+                particleDiv.textContent = emoji;
+                
+                const vector = worldPosition.clone();
+                vector.project(camera);
+
+                const container = document.getElementById('threejs-container');
+                const canvasRect = container.getBoundingClientRect();
+
+                const x = (vector.x * 0.5 + 0.5) * canvasRect.width + canvasRect.left;
+                const y = (-vector.y * 0.5 + 0.5) * canvasRect.height + canvasRect.top;
+
+                particleDiv.style.left = `${x}px`;
+                particleDiv.style.top = `${y}px`;
+
+                const xEnd = (Math.random() - 0.5) * 200 + 'px';
+                const yEnd = (Math.random() * -100 - 150) + 'px';
+                const duration = (Math.random() * 2 + 3) + 's';
+                const rotationDuration = (Math.random() * 5 + 3) + 's';
+
+                particleDiv.style.setProperty('--x-end', xEnd);
+                particleDiv.style.setProperty('--y-end', yEnd);
+                particleDiv.style.setProperty('--duration', duration);
+                particleDiv.style.setProperty('--rotate-duration', rotationDuration);
+                particleDiv.style.setProperty('--animation-name', 'floatAndFadeNote'); 
+
+                document.body.appendChild(particleDiv);
+                
+                setTimeout(() => {
+                    particleDiv.style.opacity = 1;
+                }, 10); 
+
+                setTimeout(() => {
+                    particleDiv.remove();
+                }, PARTICLE_LIFESPAN);
+                // No need to push to a global array for DOM particles, as they self-remove effectively.
+            }
+
+            // Function to show Three.js related toast messages
+            function showThreeJSToast(message, duration = 2000) {
+                const toast = document.getElementById('three-js-feedback-toast');
+                const toastMessage = document.getElementById('three-toast-message');
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            // Function to smoothly animate camera to a new position and lookAt target using GSAP
+            function animateCameraTo(newPosition, newLookAt, duration = 1.5) {
+                return new Promise(resolve => {
+                    gsap.to(camera.position, {
+                        x: newPosition.x,
+                        y: newPosition.y,
+                        z: newPosition.z,
+                        duration: duration,
+                        ease: "power2.inOut",
+                        onUpdate: function() {
+                            camera.lookAt(newLookAt);
+                        },
+                        onComplete: resolve 
                     });
-            }
-        }
-
-        /**
-         * Saves coffee beans data to localStorage.
-         */
-        function saveCoffeeBeans() {
-            try {
-                localStorage.setItem(COFFEE_BEANS_KEY, JSON.stringify(coffeeBeans));
-                console.log('[DEBUG] 咖啡豆資料已儲存到 localStorage。');
-            } catch (e) {
-                console.error('[ERROR] 儲存咖啡豆資料時發生錯誤:', e);
-            }
-        }
-
-        /**
-         * Renders the coffee bean selection dropdown and initial details.
-         */
-        function renderCoffeeBeanSelection() {
-            const flavorSelect = document.getElementById('flavor-select');
-            if (!flavorSelect) return;
-
-            flavorSelect.innerHTML = '<option value="" disabled selected>請選擇咖啡豆...</option>';
-            coffeeBeans.forEach(bean => {
-                const option = document.createElement('option');
-                option.value = bean.id;
-                option.textContent = bean.name;
-                flavorSelect.appendChild(option);
-            });
-            console.log('[DEBUG] 咖啡豆選擇下拉選單已渲染。');
-            if (coffeeBeans.length > 0) {
-                flavorSelect.value = coffeeBeans[0].id;
-                displayBeanDetails(coffeeBeans[0]);
-                updateRadarChart(coffeeBeans[0].flavorProfile);
-            }
-        }
-
-        /**
-         * Displays details of a selected coffee bean.
-         * @param {Object} bean - The coffee bean object.
-         */
-        function displayBeanDetails(bean) {
-            if (!bean) return;
-
-            document.getElementById('detail-name').textContent = bean.name || 'N/A';
-            document.getElementById('detail-country').textContent = bean.country || 'N/A';
-            document.getElementById('detail-variety').textContent = bean.variety || 'N/A';
-            document.getElementById('detail-roast').textContent = bean.roast || 'N/A';
-            document.getElementById('detail-weight').textContent = bean.weight || 'N/A';
-            document.getElementById('detail-expiry').textContent = bean.expiryDate || 'N/A';
-            document.getElementById('detail-flavor').textContent = bean.flavor || 'N/A';
-            document.getElementById('detail-price').textContent = bean.price ? bean.price.toLocaleString() : 'N/A';
-            document.getElementById('detail-stock').textContent = bean.stock !== undefined ? bean.stock : 'N/A';
-            
-            const stockStatusElement = document.getElementById('stock-status');
-            stockStatusElement.className = 'stock-indicator'; 
-            if (bean.stock > 5) {
-                stockStatusElement.textContent = '庫存充足';
-                stockStatusElement.classList.add('stock-in-stock');
-            } else if (bean.stock > 0 && bean.stock <= 5) {
-                stockStatusElement.textContent = '庫存緊張';
-                stockStatusElement.classList.add('stock-low-stock');
-            } else {
-                stockStatusElement.textContent = '已售罄';
-                stockStatusElement.classList.add('stock-out-of-stock');
+                });
             }
 
-            document.getElementById('lifestyle-suggestion').querySelector('p').textContent = bean.lifestyle || '此款咖啡風味獨特，能豐富您的日常，為您帶來愉悅的品飲體驗。';
-            
-            const beanDetailsDisplay = document.getElementById('bean-details-display');
-            beanDetailsDisplay.classList.remove('is-visible');
-            void beanDetailsDisplay.offsetWidth; 
-            beanDetailsDisplay.classList.add('is-visible');
-            console.log(`[DEBUG] 咖啡豆詳細資訊已更新: ${bean.name}`);
-        }
+            // Three.js Initialization
+            function initThreeJS() {
+                const container = document.getElementById('threejs-container');
+                const canvas = document.getElementById('three-canvas');
 
-        /**
-         * Initializes or updates the flavor radar chart.
-         * @param {Object} flavorProfile - Object with acidity, body, sweetness, aroma, finish ratings.
-         */
-        function updateRadarChart(flavorProfile) {
-            const ctx = document.getElementById('flavorRadarChart');
-            if (!ctx) {
-                console.warn('Radar chart canvas not found!');
-                return;
+                // Scene
+                scene = new THREE.Scene();
+                
+                // Camera
+                camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.set(0, 5, 15); // Initial overview position
+                camera.lookAt(0, 2, 0); // Look slightly above the base
+
+                // Renderer
+                renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); 
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.shadowMap.enabled = true; 
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
+
+                // Lights
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); 
+                scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6); 
+                directionalLight.position.set(5, 10, 5);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 1024;
+                directionalLight.shadow.mapSize.height = 1024;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 50;
+                directionalLight.shadow.camera.left = -10;
+                directionalLight.shadow.camera.right = 10;
+                directionalLight.shadow.camera.top = 10;
+                directionalLight.shadow.camera.bottom = -10;
+                scene.add(directionalLight);
+
+                const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+                directionalLight2.position.set(-5, 5, -5);
+                scene.add(directionalLight2);
+
+
+                // --- Create Coffee Machine Geometry ---
+                const machineGroup = new THREE.Group();
+
+                // Base
+                const baseGeometry = new THREE.BoxGeometry(4, 0.5, 3);
+                const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
+                const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                base.position.set(0, 0.25, 0);
+                base.castShadow = true;
+                base.receiveShadow = true;
+                machineGroup.add(base);
+
+                // Main Body
+                const bodyGeometry = new THREE.BoxGeometry(3.5, 4, 2.5);
+                const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x666666, metalness: 0.9, roughness: 0.1 });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(0, 2.5, 0.25);
+                body.castShadow = true;
+                body.receiveShadow = true;
+                machineGroup.add(body);
+
+                // Water Tank (Transparent) - Left side
+                const tankGeometry = new THREE.BoxGeometry(1.2, 3, 1);
+                const tankMaterial = new THREE.MeshStandardMaterial({ color: 0xadd8e6, transparent: true, opacity: 0.6, roughness: 0.3 });
+                const waterTank = new THREE.Mesh(tankGeometry, tankMaterial);
+                waterTank.position.set(-1.8, 2.5, -1); 
+                waterTank.castShadow = true;
+                waterTank.receiveShadow = false; 
+                machineGroup.add(waterTank);
+
+                // Grinder Hopper (Top) - Right side
+                const hopperGeometry = new THREE.CylinderGeometry(0.8, 0.6, 1, 32);
+                const hopperMaterial = new THREE.MeshStandardMaterial({ color: 0x999999, metalness: 0.7, roughness: 0.3 });
+                hopperMesh = new THREE.Mesh(hopperGeometry, hopperMaterial); 
+                hopperMesh.position.set(1.8, 4.75, 0); 
+                hopperMesh.castShadow = true;
+                hopperMesh.receiveShadow = true;
+                machineGroup.add(hopperMesh);
+
+                // Grinder (inside the body, below hopper)
+                const grinderCylinderGeometry = new THREE.CylinderGeometry(0.6, 0.6, 1, 32);
+                const grinderMaterial = new THREE.MeshStandardMaterial({ color: 0x777777, metalness: 0.9, roughness: 0.1 });
+                grinderMesh = new THREE.Mesh(grinderCylinderGeometry, grinderMaterial); 
+                grinderMesh.position.set(1.8, 3.5, 0); 
+                grinderMesh.castShadow = true;
+                grinderMesh.receiveShadow = true;
+                machineGroup.add(grinderMesh);
+
+                // Filter Station (center-front)
+                const filterGeometry = new THREE.ConeGeometry(0.7, 0.5, 32);
+                const filterMaterial = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8, roughness: 0.2 });
+                filterStationMesh = new THREE.Mesh(filterGeometry, filterMaterial); 
+                filterStationMesh.position.set(0, 2.0, 1.2); 
+                filterStationMesh.castShadow = true;
+                filterStationMesh.receiveShadow = true;
+                machineGroup.add(filterStationMesh);
+
+
+                // Coffee Spout
+                const spoutGeometry = new THREE.CylinderGeometry(0.1, 0.2, 0.5, 16);
+                const spoutMaterial = new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.9, roughness: 0.1 });
+                spoutMesh = new THREE.Mesh(spoutGeometry, spoutMaterial); /* Stored as spoutMesh */
+                spoutMesh.rotation.z = Math.PI / 2; 
+                spoutMesh.position.set(0, 1.0, 1.8); 
+                spoutMesh.castShadow = true;
+                spoutMesh.receiveShadow = true;
+                machineGroup.add(spoutMesh);
+
+                // Drip Tray
+                const dripTrayGeometry = new THREE.BoxGeometry(2.5, 0.1, 1.5);
+                const dripTrayMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.7, roughness: 0.3 });
+                const dripTray = new THREE.Mesh(dripTrayGeometry, dripTrayMaterial);
+                dripTray.position.set(0, 0.55, 1.3); 
+                dripTray.castShadow = true;
+                dripTray.receiveShadow = true;
+                machineGroup.add(dripTray);
+
+                // Coffee Cup Placeholder
+                const cupBodyGeometry = new THREE.CylinderGeometry(0.5, 0.6, 1, 32);
+                const cupMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+                cupMesh = new THREE.Mesh(cupBodyGeometry, cupMaterial); 
+                cupMesh.position.set(0, 1.1, 1.3); 
+                cupMesh.castShadow = true;
+                cupMesh.receiveShadow = true;
+                machineGroup.add(cupMesh);
+
+                // Coffee Liquid inside the cup (initially hidden)
+                const liquidGeometry = new THREE.CylinderGeometry(0.45, 0.55, 0.01, 32); 
+                const liquidMaterial = new THREE.MeshStandardMaterial({ color: 0x6F4E37, transparent: true, opacity: 0.0 });
+                liquidMesh = new THREE.Mesh(liquidGeometry, liquidMaterial);
+                liquidMesh.position.set(0, 0.8 + 0.005, 1.3); 
+                machineGroup.add(liquidMesh);
+
+                // Coffee Liquid Stream (initially hidden)
+                // Diameter from spout (0.1) to top of liquid in cup (0.45)
+                liquidStreamGeometry = new THREE.CylinderGeometry(0.1, 0.4, 0.01, 8); // Thin cylinder, wider at bottom
+                const liquidStreamMaterial = new THREE.MeshStandardMaterial({ color: 0x6F4E37, transparent: true, opacity: 0.0, roughness: 0.1 });
+                liquidStreamMesh = new THREE.Mesh(liquidStreamGeometry, liquidStreamMaterial);
+                liquidStreamMesh.position.set(0, 1.5, 1.8); // Position it just below the spout
+                liquidStreamMesh.visible = false; // Initially invisible
+                machineGroup.add(liquidStreamMesh);
+
+
+                // Add machine group to the scene
+                machineGroup.position.y = -0.5; 
+                scene.add(machineGroup);
+                coffeeMachine = machineGroup; 
+
+
+                // Plane for shadows
+                const planeGeometry = new THREE.PlaneGeometry(20, 20);
+                const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.8, metalness: 0.2 });
+                const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+                plane.rotation.x = -Math.PI / 2;
+                plane.position.y = 0;
+                plane.receiveShadow = true;
+                scene.add(plane);
+
+
+                // Mouse interaction for camera control (Orbit Control like)
+                let isDragging = false;
+                let previousMousePosition = { x: 0, y: 0 };
+                const center = new THREE.Vector3(0, 2, 0); 
+                let orbitRadius = camera.position.distanceTo(center); 
+                let spherical = new THREE.Spherical().setFromCartesianCoords(
+                    camera.position.x - center.x, 
+                    camera.position.y - center.y, 
+                    camera.position.z - center.z
+                );
+
+                canvas.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                    e.preventDefault();
+                });
+
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+
+                    const rotationSpeed = 0.005;
+
+                    spherical.phi -= deltaY * rotationSpeed; 
+                    spherical.theta -= deltaX * rotationSpeed; 
+
+                    spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+
+                    camera.position.setFromSpherical(spherical).add(center);
+                    camera.lookAt(center);
+
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                });
+
+                canvas.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+
+                canvas.addEventListener('mouseleave', () => { 
+                    isDragging = false;
+                });
+
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    const newWidth = container.clientWidth;
+                    const newHeight = container.clientHeight;
+                    camera.aspect = newWidth / newHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(newWidth, newHeight);
+                });
+
+                // Animation Loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    renderer.render(scene, camera);
+                }
+                animate(); // Start the animation loop
             }
 
-            const data = {
-                labels: ['酸度 (Acidity)', '醇厚度 (Body)', '甜度 (Sweetness)', '香氣 (Aroma)', '餘韻 (Finish)'],
-                datasets: [{
-                    label: '風味評分 (1-5)',
-                    data: [
-                        flavorProfile.acidity || 0,
-                        flavorProfile.body || 0,
-                        flavorProfile.sweetness || 0,
-                        flavorProfile.aroma || 0,
-                        flavorProfile.finish || 0
-                    ],
-                    backgroundColor: 'rgba(181, 136, 99, 0.5)', 
-                    borderColor: 'rgba(181, 136, 99, 1)',
-                    borderWidth: 1,
-                    pointBackgroundColor: 'rgba(181, 136, 99, 1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
-                }]
-            };
-
-            const options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    r: {
-                        angleLines: {
-                            color: '#ccc'
-                        },
-                        grid: {
-                            color: '#e0e0e0'
-                        },
-                        pointLabels: {
-                            font: {
-                                size: 14,
-                                family: 'Noto Sans TC'
-                            },
-                            color: '#333'
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 5,
-                        ticks: {
-                            stepSize: 1,
-                            display: false 
+            // Function to handle adding beans
+            function addBeans() {
+                if (currentBrewStep === 0) {
+                    showThreeJSToast("咖啡豆已投入料斗。");
+                    // Animate camera to focus on the hopper
+                    animateCameraTo(new THREE.Vector3(1.8, 5.5, 5), hopperMesh.position, 1);
+                    
+                    // Release 3D coffee bean particles after camera moves slightly
+                    setTimeout(() => {
+                        for(let i = 0; i < 15; i++) { // More beans for visibility
+                            setTimeout(() => {
+                                createThreeJSParticle('coffee_bean', new THREE.Vector3(1.8 + (Math.random()-0.5)*0.3, 5.25 + (Math.random()-0.5)*0.3, (Math.random()-0.5)*0.3)); 
+                            }, i * 50); // Faster consecutive drops
                         }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false 
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.r !== null) {
-                                    label += context.parsed.r;
-                                }
-                                return label;
+                    }, 500); // Delay particle release for visual effect
+
+                    currentBrewStep = 1;
+                    document.getElementById('btn-add-beans').disabled = true;
+                    document.getElementById('btn-start-grinding').disabled = false;
+                } else {
+                    showThreeJSToast("請先重置咖啡機。", 3000);
+                }
+            }
+
+            // Function to handle grinding
+            function startGrinding() {
+                if (currentBrewStep === 1) {
+                    showThreeJSToast("咖啡豆正在研磨中...");
+                    animateCameraTo(new THREE.Vector3(1.8, 3.5, 5), grinderMesh.position, 1);
+                    
+                    // Animate grinder rotation (simulate grinding)
+                    gsap.to(grinderMesh.rotation, {
+                        y: "+=" + Math.PI * 4, // Increased rotation for visual "tumbling" feel
+                        duration: 2,
+                        ease: "linear",
+                        repeat: 0
+                    });
+
+                    // Simulate beans entering the grinder from the hopper (few more 3D beans)
+                    setTimeout(() => {
+                         for(let i = 0; i < 5; i++) {
+                            setTimeout(() => {
+                                createThreeJSParticle('coffee_bean', new THREE.Vector3(1.8 + (Math.random()-0.5)*0.2, 4.0 + (Math.random()-0.5)*0.1, (Math.random()-0.5)*0.2)); 
+                            }, i * 100);
+                        }
+                    }, 500); // Start dropping into grinder shortly after camera move
+
+                    // Release ground coffee powder particles from grinder exit after some delay
+                    setTimeout(() => {
+                         for(let i = 0; i < 30; i++) { // More powder particles
+                            setTimeout(() => {
+                                createThreeJSParticle('coffee_powder', new THREE.Vector3(0 + (Math.random()-0.5)*0.2, 1.8 + (Math.random()-0.5)*0.1, 1.2 + (Math.random()-0.5)*0.1)); // Position near filter station/cup
+                            }, i * 50);
+                        }
+                    }, 1500); // Delay particle release to after grinding starts
+
+                    currentBrewStep = 2;
+                    document.getElementById('btn-start-grinding').disabled = true;
+                    document.getElementById('btn-start-brewing').disabled = false;
+                } else if (currentBrewStep === 0) {
+                    showThreeJSToast("請先投入咖啡豆。", 3000);
+                } else if (currentBrewStep === 1) {
+                    showThreeJSToast("請先研磨咖啡豆。", 3000);
+                } else {
+                    showThreeJSToast("請先重置咖啡機。", 3000);
+                }
+            }
+
+            // Function to handle brewing
+            async function startBrewing() { 
+                if (currentBrewStep === 2) {
+                    showThreeJSToast("正在為您沖泡香醇咖啡...");
+                    // Animate camera to filter station, then to cup
+                    await animateCameraTo(new THREE.Vector3(0, 2.5, 4), filterStationMesh.position, 1.0); 
+                    await animateCameraTo(new THREE.Vector3(0, 1.8, 4), cupMesh.position, 1.0); 
+
+                    // Phase 2: Start liquid stream animation
+                    liquidStreamMesh.visible = true;
+                    gsap.to(liquidStreamMesh.material, { opacity: 0.8, duration: 0.3 }); // Fade in stream
+
+                    // Simulate liquid flowing down into the cup - initial scale up
+                    gsap.to(liquidStreamMesh.scale, {
+                        y: 1.0, 
+                        duration: 0.5,
+                        ease: "power1.out"
+                    });
+
+
+                    const maxFillHeight = 0.8; 
+                    const fillDuration = 3000; 
+
+                    // GSAP animation for liquid in cup
+                    gsap.to(liquidMesh.scale, {
+                        y: maxFillHeight,
+                        duration: fillDuration / 1000,
+                        ease: "power1.inOut"
+                    });
+                    gsap.to(liquidMesh.material, {
+                        opacity: 1.0,
+                        duration: fillDuration / 1000,
+                        ease: "power1.inOut"
+                    });
+                    // Position adjustment for liquid in cup
+                    gsap.to(liquidMesh.position, {
+                        y: 0.8 + (liquidMesh.geometry.parameters.height * maxFillHeight) / 2,
+                        duration: fillDuration / 1000,
+                        ease: "power1.inOut",
+                        onUpdate: function() {
+                            // Dynamically adjust liquid stream length as cup fills
+                            const currentLiquidSurfaceY = liquidMesh.position.y + (liquidMesh.geometry.parameters.height * liquidMesh.scale.y) / 2;
+                            const spoutY = spoutMesh.position.y; 
+                            const streamLength = spoutY - currentLiquidSurfaceY;
+                            
+                            // Set stream's length and position it between spout and liquid surface
+                            liquidStreamMesh.scale.y = Math.max(0.01, streamLength / liquidStreamGeometry.parameters.height); // Ensure min length
+                            liquidStreamMesh.position.y = (spoutY + currentLiquidSurfaceY) / 2;
+                        },
+                        onComplete: () => {
+                            showThreeJSToast("咖啡沖泡完成！請享用。");
+                            // Fade out and hide liquid stream
+                            gsap.to(liquidStreamMesh.material, { opacity: 0, duration: 0.5, onComplete: () => { liquidStreamMesh.visible = false; }});
+
+                            for(let i = 0; i < 5; i++) {
+                                setTimeout(() => {
+                                    createDOMParticle(MUSICAL_NOTES_EMOJI, new THREE.Vector3(0 + (Math.random()-0.5)*0.2, 1.8 + (Math.random()-0.5)*0.2, 1.3 + (Math.random()-0.5)*0.2)); 
+                                }, i * 150);
                             }
                         }
-                    }
-                }
-            };
+                    });
 
-            if (radarChart) {
-                radarChart.data = data;
-                radarChart.options = options;
-                radarChart.update();
-                console.log('[DEBUG] 雷達圖已更新。');
-            } else {
-                radarChart = new Chart(ctx, {
+                    currentBrewStep = 3;
+                    document.getElementById('btn-start-brewing').disabled = true;
+                } else if (currentBrewStep === 0) {
+                    showThreeJSToast("請先投入咖啡豆。", 3000);
+                } else if (currentBrewStep === 1) {
+                    showThreeJSToast("請先研磨咖啡豆。", 3000);
+                } else {
+                    showThreeJSToast("請先重置咖啡機。", 3000);
+                }
+            }
+
+            // Function to reset the machine
+            function resetMachine() {
+                showThreeJSToast("咖啡機已重置，請重新開始。");
+                currentBrewStep = 0;
+                document.getElementById('btn-add-beans').disabled = false;
+                document.getElementById('btn-start-grinding').disabled = true;
+                document.getElementById('btn-start-brewing').disabled = true;
+
+                // Reset liquid in cup using GSAP
+                gsap.to(liquidMesh.scale, {
+                    y: 0.01,
+                    duration: 0.5,
+                    ease: "power1.inOut"
+                });
+                gsap.to(liquidMesh.material, {
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: "power1.inOut"
+                });
+                gsap.to(liquidMesh.position, {
+                    y: 0.8 + 0.005,
+                    duration: 0.5,
+                    ease: "power1.inOut"
+                });
+
+                // Hide liquid stream immediately
+                if (liquidStreamMesh) {
+                    gsap.to(liquidStreamMesh.material, { opacity: 0, duration: 0.2, onComplete: () => { liquidStreamMesh.visible = false; }});
+                    liquidStreamMesh.scale.y = 0.01; // Reset scale
+                    liquidStreamMesh.position.y = 1.5; // Reset position
+                }
+
+                // Animate camera back to initial overview position
+                animateCameraTo(new THREE.Vector3(0, 5, 15), new THREE.Vector3(0, 2, 0), 1.5);
+
+                // Remove any lingering 3D particles
+                activeParticles.forEach(p => { // Corrected array name
+                    if (p.parent) scene.remove(p); 
+                });
+                activeParticles = []; // Corrected array name
+
+                // Also remove any remaining DOM particles (musical notes)
+                document.querySelectorAll('.animated-particle').forEach(p => p.remove());
+            }
+
+            // Function to simulate brewing process (for Flavor Guide section)
+            function simulateBrewingProcess() {
+                const brewingVisualizer = document.getElementById('brewing-visualizer');
+                const brewingLiquid = brewingVisualizer.querySelector('.brewing-liquid');
+
+                // Activate brewing visualizer
+                brewingVisualizer.classList.add('active');
+                brewingLiquid.style.height = '0%'; // Reset liquid level
+
+                // Start filling animation
+                setTimeout(() => {
+                    brewingLiquid.classList.add('fill');
+                }, 100); // Small delay to allow CSS reset to apply
+
+                // Deactivate after a delay
+                setTimeout(() => {
+                    brewingVisualizer.classList.remove('active');
+                    brewingLiquid.classList.remove('fill');
+                }, 2000); // Total animation time (1.5s fill + 0.5s buffer)
+            }
+
+
+            // --- END Three.js Setup ---
+
+            // Chart.js instance
+            let flavorRadarChart;
+
+            // Initialize or update Radar Chart
+            function renderFlavorRadarChart(data) {
+                const ctx = document.getElementById('flavorRadarChart').getContext('2d');
+                if (flavorRadarChart) {
+                    flavorRadarChart.destroy(); // Destroy existing chart if it exists
+                }
+
+                // Get computed style for CSS variable
+                const computedStyle = getComputedStyle(document.body);
+                const secondaryColor = computedStyle.getPropertyValue('--color-secondary').trim();
+
+                flavorRadarChart = new Chart(ctx, {
                     type: 'radar',
-                    data: data,
-                    options: options
+                    data: {
+                        labels: ['苦味', '酸度', '醇厚度', '花果香', '堅果/巧克力'],
+                        datasets: [{
+                            label: data.name,
+                            data: data.profile,
+                            backgroundColor: 'rgba(181, 136, 99, 0.6)', // var(--color-primary) with opacity
+                            borderColor: 'rgba(181, 136, 99, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(181, 136, 99, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(181, 136, 99, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                pointLabels: {
+                                    font: {
+                                        size: 14,
+                                        family: "'Noto Sans TC', sans-serif",
+                                        weight: 'bold'
+                                    },
+                                    color: secondaryColor, // Use the fetched CSS variable here
+                                },
+                                ticks: {
+                                    display: false, // Hide the numerical ticks
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide dataset label
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += Math.round(context.parsed.r) + '%';
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000, // Animation duration
+                            easing: 'easeOutQuart'
+                        }
+                    }
                 });
-                console.log('[DEBUG] 雷達圖已初始化。');
             }
-        }
 
-        /**
-         * Loads reviews data from localStorage or uses default data.
-         */
-        function loadReviews() {
-            try {
-                const storedReviews = JSON.parse(localStorage.getItem(REVIEWS_KEY));
-                if (storedReviews && storedReviews.length > 0) {
-                    reviews = storedReviews;
-                    console.log('[DEBUG] 評論資料從 localStorage 載入成功:', reviews);
+            // Function to render coffee bean details
+            function renderBeanDetails(bean) {
+                document.getElementById('detail-name').textContent = bean.name;
+                document.getElementById('detail-country').textContent = bean.country;
+                document.getElementById('detail-variety').textContent = bean.variety;
+                document.getElementById('detail-roast').textContent = bean.roast;
+                document.getElementById('detail-weight').textContent = bean.weight;
+                document.getElementById('detail-expiry').textContent = bean.expiry;
+                document.getElementById('detail-flavor').textContent = bean.flavor;
+                document.getElementById('detail-price').textContent = bean.price;
+                document.getElementById('detail-stock').textContent = bean.stock + ' 包';
+
+                const stockStatusElement = document.getElementById('stock-status');
+                stockStatusElement.className = 'stock-indicator'; // Reset classes
+
+                if (bean.stock > 50) {
+                    stockStatusElement.textContent = '庫存充足';
+                    stockStatusElement.classList.add('stock-in-stock');
+                } else if (bean.stock > 0) {
+                    stockStatusElement.textContent = '庫存緊張';
+                    stockStatusElement.classList.add('stock-low-stock');
                 } else {
-                    reviews = defaultReviews; 
-                    saveReviews(); 
-                    console.log('[DEBUG] 載入預設評論資料 (可能為空)。');
+                    stockStatusElement.textContent = '已售罄';
+                    stockStatusElement.classList.add('stock-out-of-stock');
                 }
-            } catch (e) {
-                console.error('[ERROR] 載入評論資料時發生錯誤，使用預設資料:', e);
-                reviews = defaultReviews;
-            }
-        }
 
-        /**
-         * Saves reviews data to localStorage.
-         */
-        function saveReviews() {
-            try {
-                localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
-                console.log('[DEBUG] 評論資料已儲存到 localStorage。');
-            } catch (e) {
-                console.error('[ERROR] 儲存評論資料時發生錯誤:', e);
-            }
-        }
-
-        /**
-         * Renders the list of reviews.
-         */
-        function renderReviews() {
-            const reviewList = document.getElementById('review-list');
-            if (!reviewList) return;
-
-            reviewList.innerHTML = ''; 
-            if (reviews.length === 0) {
-                reviewList.innerHTML = '<p class="text-center text-gray-500">目前沒有任何評論，快來成為第一個分享心得的人吧！</p>';
-                return;
-            }
-
-            reviews.forEach((review, index) => {
-                const reviewElement = document.createElement('div');
-                reviewElement.className = 'card p-6 flex items-start space-x-4 fade-in-up';
-                reviewElement.style.transitionDelay = `${index * 50}ms`; 
-                reviewElement.innerHTML = `
-                    <div class="flex-shrink-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-xl font-bold">
-                        ${review.name.charAt(0)}
-                    </div>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-semibold text-lg text-secondary">${review.name}</h4>
-                            <span class="text-yellow-500">${review.rating}</span>
-                        </div>
-                        <p class="text-gray-700 leading-relaxed">${review.content}</p>
-                        <p class="text-sm text-gray-500 mt-2">${review.date || new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' })}</p>
-                    </div>
+                document.getElementById('lifestyle-suggestion').innerHTML = `
+                    <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
+                    <p>${bean.lifestyle}</p>
                 `;
-                reviewList.appendChild(reviewElement);
-            });
-            console.log('[DEBUG] 評論列表已渲染。');
-        }
-
-        /**
-         * Handles review form submission.
-         * @param {Event} event - The form submission event.
-         */
-        function handleReviewSubmit(event) {
-            event.preventDefault();
-
-            const reviewerName = document.getElementById('reviewer-name').value.trim();
-            const reviewRating = document.getElementById('review-rating').value;
-            const reviewContent = document.getElementById('review-content').value.trim();
-
-            if (!reviewerName || !reviewRating || !reviewContent) {
-                window.showFrontMessageModal('輸入錯誤', '請填寫所有評論欄位！', 'error');
-                return;
             }
 
-            const newReview = {
-                id: reviews.length > 0 ? Math.max(...reviews.map(r => r.id)) + 1 : 1,
-                name: reviewerName,
-                rating: reviewRating,
-                content: reviewContent,
-                date: new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' })
+            // Function to populate select options
+            function populateFlavorSelect() {
+                const select = document.getElementById('flavor-select');
+                select.innerHTML = '<option value="">請選擇一款咖啡豆</option>'; // Default option
+                flavorData.forEach(bean => {
+                    const option = document.createElement('option');
+                    option.value = bean.id;
+                    option.textContent = bean.name;
+                    select.appendChild(option);
+                });
+            }
+
+            // Function to load all data and render
+            window.loadAndRenderAllData = function() {
+                console.log('[DEBUG] Loading and rendering all data.');
+                populateFlavorSelect();
+                // Set initial selection or default display
+                if (flavorData.length > 0) {
+                    const defaultBean = flavorData[0];
+                    renderFlavorRadarChart(defaultBean);
+                    renderBeanDetails(defaultBean);
+                    document.getElementById('flavor-select').value = defaultBean.id;
+                    document.getElementById('bean-details-display').classList.add('is-visible'); // Make visible on load
+                }
+                console.log('[DEBUG] All data loaded and rendered.');
             };
 
-            reviews.push(newReview);
-            saveReviews();
-            renderReviews();
-            event.target.reset(); 
-            window.showFrontMessageModal('感謝您的評論！', '您的寶貴意見已成功送出！', 'success');
-            console.log('[DEBUG] 新評論已提交:', newReview);
-        }
-
-        /**
-         * Renders FAQ items.
-         */
-        function renderFaqs() {
-            const faqContainer = document.getElementById('faq-container');
-            if (!faqContainer) return;
-
-            faqContainer.innerHTML = '';
-            faqs.forEach((faq, index) => {
-                const faqItem = document.createElement('div');
-                faqItem.className = 'bg-white rounded-lg shadow-md overflow-hidden fade-in-up';
-                faqItem.style.transitionDelay = `${index * 70}ms`; 
-                faqItem.innerHTML = `
-                    <button class="accordion-button w-full text-left p-5 font-semibold text-lg flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors rounded-t-lg">
-                        ${faq.q}
-                    </button>
-                    <div class="accordion-content p-5 text-gray-700 leading-relaxed bg-white">
-                        <p>${faq.a}</p>
-                    </div>
-                `;
-                faqContainer.appendChild(faqItem);
-            });
-
-            // Add event listeners for accordion
-            document.querySelectorAll('.accordion-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const content = button.nextElementSibling;
-                    button.classList.toggle('open');
-                    if (content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    }
-                });
-            });
-            console.log('[DEBUG] FAQ 列表已渲染。');
-        }
-
-        /**
-         * Handles inquiry form submission.
-         * @param {Event} event - The form submission event.
-         */
-        function handleInquirySubmit(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('inquiry-name').value.trim();
-            const email = document.getElementById('inquiry-email').value.trim();
-            const message = document.getElementById('inquiry-message').value.trim();
-
-            if (!name || !email || !message) {
-                window.showFrontMessageModal('輸入錯誤', '請填寫所有聯絡資訊欄位！', 'error');
-                return;
-            }
-            if (!email.includes('@') || !email.includes('.')) {
-                window.showFrontMessageModal('電子郵件格式錯誤', '請輸入有效的電子郵件地址！', 'error');
-                return;
+            // Function to show coffee fact toast
+            function showCoffeeFactToast(message, duration = 3000) {
+                const toast = document.getElementById('coffee-fact-toast');
+                document.getElementById('toast-message').textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
             }
 
-            console.log('[DEBUG] 聯絡表單提交:', { name, email, message });
-            window.showFrontMessageModal('訊息已送出', '感謝您的詢問，我們將盡快與您聯繫！', 'success');
-            event.target.reset(); 
-        }
+            // Event Listeners
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('[DEBUG] DOM Content Loaded. Initializing.');
 
-        /**
-         * Shows a random coffee fact as a toast message.
-         */
-        function showCoffeeFactToast() {
-            const facts = [
-                '咖啡是世界上第二大交易的商品，僅次於石油。',
-                '每天全球消耗約22.5億杯咖啡。',
-                '最早發現咖啡提神作用的是衣索比亞的牧羊人。',
-                '濾掛咖啡是日本人發明的。',
-                '咖啡豆其實是咖啡果實的種子。',
-                '一杯拿鐵的「拿鐵」是義大利語「牛奶」的意思。',
-                '淺烘焙的咖啡含有更多咖啡因，因為烘焙過程會消耗咖啡因。',
-                '貓咪不能喝咖啡，對牠們來說咖啡因是有毒的。',
-                '咖啡渣可以去除冰箱異味、充當肥料。',
-                '喝咖啡可以降低多種疾病的風險，例如肝癌和帕金森氏症。'
-            ];
-            const randomFact = facts[Math.floor(Math.random() * facts.length)];
-            const toast = document.getElementById('coffee-fact-toast');
-            toast.querySelector('p').textContent = randomFact;
-            toast.classList.add('show');
+                // Initialize Three.js scene
+                initThreeJS();
 
-            // Hide after a few seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 5000); 
-            console.log('[DEBUG] 咖啡小知識彈窗顯示。');
-        }
+                // Button listeners for Three.js machine simulation
+                document.getElementById('btn-add-beans').addEventListener('click', addBeans);
+                document.getElementById('btn-start-grinding').addEventListener('click', startGrinding);
+                document.getElementById('btn-start-brewing').addEventListener('click', startBrewing);
+                document.getElementById('btn-reset-machine').addEventListener('click', resetMachine);
 
-        // --- Scroll Progress Indicator & Back to Top Button ---
-        const scrollProgressIndicator = document.getElementById('scroll-progress-indicator');
-        const chapterCounter = document.getElementById('chapter-counter');
-        const currentChapterText = document.getElementById('current-chapter-text');
-        const progressCircleFill = document.getElementById('progress-circle-fill');
-        const backToTopBtn = document.getElementById('back-to-top-btn');
 
-        const sectionElementsArray = sectionsData.map(s => document.getElementById(s.id)).filter(Boolean); 
+                // Flavor Select Change Listener
+                const flavorSelect = document.getElementById('flavor-select');
+                if (flavorSelect) {
+                    flavorSelect.addEventListener('change', (event) => {
+                        const selectedBeanId = event.target.value;
+                        const beanDetailsDisplay = document.getElementById('bean-details-display');
 
-        /**
-         * Updates the scroll progress indicator.
-         */
-        function updateScrollProgress() {
-            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = window.scrollY;
-            const progress = (scrolled / totalHeight);
-
-            // Update circular progress
-            const circumference = 13 * 2 * Math.PI; 
-            progressCircleFill.style.strokeDashoffset = circumference - (progress * circumference);
-
-            // Determine current section
-            let currentSection = sectionsData[0]; 
-            let currentSectionNum = 1;
-            for (let i = 0; i < sectionElementsArray.length; i++) {
-                const section = sectionElementsArray[i];
-                const rect = section.getBoundingClientRect();
-                const viewportMiddle = window.innerHeight / 2;
-
-                if (rect.top <= viewportMiddle && rect.bottom >= viewportMiddle) {
-                    currentSection = sectionsData[i];
-                    currentSectionNum = i + 1;
-                    currentActiveSectionIndex = i; 
-                    break;
+                        if (selectedBeanId) {
+                            const selectedBean = flavorData.find(bean => bean.id === selectedBeanId);
+                            if (selectedBean) {
+                                renderFlavorRadarChart(selectedBean);
+                                renderBeanDetails(selectedBean);
+                                beanDetailsDisplay.classList.add('is-visible'); // Show details with animation
+                                simulateBrewingProcess(); // Trigger brewing visualizer
+                            }
+                        } else {
+                            // If no bean is selected (e.g., "請選擇一款咖啡豆")
+                            if (flavorRadarChart) {
+                                flavorRadarChart.destroy(); // Clear chart
+                            }
+                            // Clear bean details and lifestyle suggestion
+                            document.getElementById('detail-name').textContent = '';
+                            document.getElementById('detail-country').textContent = '';
+                            document.getElementById('detail-variety').textContent = '';
+                            document.getElementById('detail-roast').textContent = '';
+                            document.getElementById('detail-weight').textContent = '';
+                            document.getElementById('detail-expiry').textContent = '';
+                            document.getElementById('detail-flavor').textContent = '';
+                            document.getElementById('detail-price').textContent = '';
+                            document.getElementById('detail-stock').textContent = '';
+                            document.getElementById('stock-status').className = 'stock-indicator';
+                            document.getElementById('stock-status').textContent = '';
+                            document.getElementById('lifestyle-suggestion').innerHTML = `
+                                <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
+                                <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
+                            `;
+                            beanDetailsDisplay.classList.remove('is-visible'); // Hide details
+                        }
+                    });
+                } else {
+                    console.error('[ERROR] Flavor select element not found!');
                 }
-            }
-            currentChapterText.textContent = currentSection.title;
-            chapterCounter.textContent = `${currentSectionNum}/${sectionsData.length}`;
 
-            // Update camera and light based on current section
-            setSectionView(currentSection);
+                // Refresh Coffee Button Listener
+                const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
+                if (refreshCoffeeBtn) {
+                    refreshCoffeeBtn.addEventListener('click', () => {
+                        console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
+                        window.loadAndRenderAllData();
+                        showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
+                    });
+                } else {
+                    console.error('[ERROR] Refresh coffee button not found!');
+                }
 
-            // Show/hide back to top button
-            if (scrolled > window.innerHeight / 2) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        }
+                // Contact Form Submission
+                const contactForm = document.getElementById('contact-form');
+                if (contactForm) {
+                    contactForm.addEventListener('submit', function(e) {
+                        e.preventDefault(); // Prevent default form submission
+                        const name = document.getElementById('name').value;
+                        const email = document.getElementById('email').value;
+                        const message = document.getElementById('message').value;
 
-        // --- Loading Overlay Management ---
-        const loadingOverlay = document.getElementById('loading-overlay');
+                        if (name && email && message) {
+                            console.log('Contact Form Data:', { name, email, message });
+                            showFrontMessageModal('訊息已送出', `感謝 ${name}！我們已收到您的訊息，會盡快回覆您。`, 'success');
+                            contactForm.reset(); // Clear the form
+                        } else {
+                            showFrontMessageModal('錯誤', '請填寫所有必填欄位。', 'error');
+                        }
+                    });
+                } else {
+                    console.error('[ERROR] Contact form not found!');
+                }
 
-        /**
-         * Hides the loading overlay.
-         */
-        function hideLoadingOverlay() {
-            loadingOverlay.style.opacity = '0';
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-            }, 500); 
-            console.log('[DEBUG] 載入畫面已隱藏。');
-        }
-
-        // --- Initialization and Event Listeners ---
-        window.loadAndRenderAllData = function() {
-            loadCoffeeBeans();
-            renderCoffeeBeanSelection();
-            loadReviews();
-            renderReviews();
-            renderFaqs();
-            // Start particle generation only after data is loaded and rendered
-            startParticleGeneration();
-            showCoffeeFactToast(); // Show initial fact after everything loads
-            updateScrollProgress(); // Initial update for scroll progress and 3D view
-        };
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('[DEBUG] DOM 已完全載入。');
-            
-            // Initialize Three.js first
-            initThreeJS();
-            animate(); // Start the Three.js animation loop
-
-            // Attach event listeners after DOM is loaded
-            const flavorSelect = document.getElementById('flavor-select');
-            if (flavorSelect) {
-                flavorSelect.addEventListener('change', (event) => {
-                    const selectedBeanId = parseInt(event.target.value);
-                    const selectedBean = coffeeBeans.find(bean => bean.id === selectedBeanId);
-                    if (selectedBean) {
-                        displayBeanDetails(selectedBean);
-                        updateRadarChart(selectedBean.flavorProfile);
-                    }
+                // Accordion (FAQ) Functionality
+                document.querySelectorAll('.accordion-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        button.classList.toggle('open');
+                        if (button.classList.contains('open')) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                        } else {
+                            content.style.maxHeight = null;
+                        }
+                    });
                 });
-            } else {
-                console.error('[ERROR] Flavor select element not found!');
-            }
+                console.log('[DEBUG] Accordion functionality set up.');
 
-            const reviewForm = document.getElementById('review-form');
-            if (reviewForm) {
-                reviewForm.addEventListener('submit', handleReviewSubmit);
-            } else {
-                console.error('[ERROR] Review form not found!');
-            }
-
-            const inquiryForm = document.getElementById('inquiry-form');
-            if (inquiryForm) {
-                inquiryForm.addEventListener('submit', handleInquirySubmit);
-            } else {
-                console.error('[ERROR] Inquiry form not found!');
-            }
-
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                console.log('[DEBUG] 返回頂部按鈕被點擊。');
-            });
-
-            // Refresh button listener
-            const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
-            if (refreshCoffeeBtn) {
-                refreshCoffeeBtn.addEventListener('click', () => {
-                    console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
-                    window.loadAndRenderAllData(); 
-                    window.showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
+                // Knowledge Section "閱讀更多" Links
+                document.querySelectorAll('.more-info-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const knowledgeId = this.dataset.knowledgeId;
+                        const article = knowledgeArticles[knowledgeId];
+                        if (article) {
+                            showFrontMessageModal(article.title, article.content, 'info');
+                        } else {
+                            showFrontMessageModal('錯誤', '找不到此文章內容。', 'error');
+                        }
+                    });
                 });
-            } else {
-                console.error('[ERROR] Refresh coffee button not found!');
-            }
-            
-            // Event listener for scroll to update progress and 3D view
-            window.addEventListener('scroll', updateScrollProgress);
+                console.log('[DEBUG] Knowledge "閱讀更多" links set up.');
 
-            // Hide loading overlay once all initial setup is done
-            window.addEventListener('load', () => {
-                hideLoadingOverlay();
-                // Initial data load and render
-                window.loadAndRenderAllData();
-            });
+                // Scroll Animation Observer
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            // Add pulsing animation to section titles when they become visible
+                            if (entry.target.classList.contains('animate-pulse-on-scroll')) {
+                                entry.target.classList.add('is-pulsing');
+                            }
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
 
-            // Scroll animation observer for fade-in-up elements
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); 
-                    }
+                document.querySelectorAll('.fade-in-up').forEach(el => {
+                    observer.observe(el);
                 });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.fade-in-up').forEach(el => {
-                observer.observe(el);
-            });
-            console.log('[DEBUG] Scroll animation observer set up.');
-
-            // Add event listener for scroll-down-btn on home section
-            const scrollDownBtn = document.getElementById('scroll-down-btn');
-            if (scrollDownBtn) {
-                scrollDownBtn.addEventListener('click', () => {
-                    const firstSection = document.getElementById('coffee-machine-display');
-                    if (firstSection) {
-                        firstSection.scrollIntoView({ behavior: 'smooth' });
-                    }
+                // Observe section titles for pulsing animation
+                document.querySelectorAll('.section-title.animate-pulse-on-scroll').forEach(el => {
+                    observer.observe(el);
                 });
-            }
 
-            // More Info Links for Knowledge section
-            document.querySelectorAll('.more-info-link').forEach(link => {
-                link.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    const knowledgeId = event.target.dataset.knowledgeId;
-                    const article = knowledgeArticles[knowledgeId];
-                    if (article) {
-                        window.showFrontMessageModal(article.title, { text: article.content, modalIcon: article.modalIcon, modalImage: article.modalImage }, 'info');
+                console.log('[DEBUG] Scroll animation observer set up.');
+
+                // Back to Top Button
+                const backToTopBtn = document.getElementById('back-to-top-btn');
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) { // Show button after scrolling down 300px
+                        backToTopBtn.classList.add('show');
                     } else {
-                        window.showFrontMessageModal('錯誤', '找不到此篇文章內容。', 'error');
+                        backToTopBtn.classList.remove('show');
                     }
                 });
-            });
 
-            // --- Brewing Simulation Button Event Listeners ---
-            document.getElementById('btn-add-beans').addEventListener('click', addBeansToGrinderCinematic); // Changed to cinematic
-            document.getElementById('btn-start-grinding').addEventListener('click', startGrindingAnimation);
-            document.getElementById('btn-start-brewing').addEventListener('click', startBrewingAnimation);
-            document.getElementById('btn-reset-machine').addEventListener('click', resetAllAnimations);
-            
-            updateBrewingButtons(); 
-        }); // ADDED SEMICOLON HERE
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+                console.log('[DEBUG] Back to top button set up.');
 
+                // Navigation Active Link highlighting
+                const sections = document.querySelectorAll('section[id]');
+                const navLinks = document.querySelectorAll('.nav-link');
+
+                const navObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            navLinks.forEach(link => {
+                                link.classList.remove('active-nav');
+                                if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                    link.classList.add('active-nav');
+                                }
+                            });
+                        }
+                    });
+                }, {
+                    rootMargin: '-50% 0px -50% 0px', // When section is in the middle of the viewport
+                    threshold: 0 // Observe as soon as it enters
+                });
+
+                sections.forEach(section => {
+                    navObserver.observe(section);
+                });
+                console.log('[DEBUG] Navigation active link highlighting set up.');
+
+                // Home section scroll down button
+                const scrollDownBtn = document.getElementById('scroll-down-btn');
+                if (scrollDownBtn) {
+                    scrollDownBtn.addEventListener('click', () => {
+                        const targetSection = document.getElementById('coffee-machine-display');
+                        if (targetSection) {
+                            targetSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+                }
+
+                // Initial load of all data and render on page load
+                console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
+                window.loadAndRenderAllData();
+
+
+                // Coffee Grounds Flip Card functionality
+                document.querySelectorAll('.flip-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        card.classList.toggle('flipped');
+                    });
+                });
+                console.log('[DEBUG] Coffee grounds flip card functionality set up.');
+
+                // Coffee Fact Toast (Initial random display)
+                const coffeeFacts = [
+                    "一杯完美的咖啡，98% 是水，所以水的品質非常重要！",
+                    "咖啡是世界上第二大交易商品，僅次於石油。",
+                    "「卡布奇諾」的名字來源於方濟各會修士的帽子顏色。",
+                    "咖啡樹需要大約3-5年的時間才能結果。",
+                    "世界上最昂貴的咖啡是麝香貓咖啡，但其生產方式存在爭議。",
+                    "喝咖啡的最佳時間是上午 9:30 到 11:30，因為此時皮質醇水平較低。",
+                    "咖啡豆實際上是咖啡果實的種子，而不是真正的豆子。"
+                ];
+                function showRandomCoffeeFact() {
+                    const randomFact = coffeeFacts[Math.floor(Math.random() * coffeeFacts.length)];
+                    showCoffeeFactToast(randomFact, 5000); // Show for 5 seconds
+                }
+                // Show a random fact every 30-60 seconds
+                setInterval(showRandomCoffeeFact, Math.random() * 30000 + 30000); // Between 30 and 60 seconds
+                showRandomCoffeeFact(); // Show one on initial load
+                console.log('[DEBUG] Coffee fact toast set up.');
+
+
+                // Simulate page loading
+                const loadingOverlay = document.getElementById('loading-overlay');
+                // Temporarily show loading overlay for 1.5 seconds for demo
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    // Re-enable scrolling after loading
+                    document.body.style.overflow = '';
+                }, 1500); 
+
+            }); // End DOMContentLoaded
         })(); // End IIFE
     </script>
 </body>
 </html>
+�
