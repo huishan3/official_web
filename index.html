@@ -1116,17 +1116,20 @@
     <script>
         // IIFE for encapsulation
         (function() {
+            // Firebase SDKs for Frontend (Reading data)
+            // These imports are now inside the IIFE and scoped locally
+            // This means window.firebaseApp, window.db, window.auth etc. need to be handled carefully
+            // Re-adding the module import for Firebase here as it was removed in previous step,
+            // but it's needed for Firestore operations.
+            // However, to make THREE.js global, the main script block should not be type="module".
+            // Let's adjust the Firebase initialization to be within the DOMContentLoaded and ensure globals are set.
+            // This is a tricky balance. The previous version with `window.` prefix was correct for non-module script.
+            // Let's revert the Firebase import to be outside the IIFE but still in a module script,
+            // and ensure the main script is NOT a module.
 
-            // Global Variables and Helper Functions
-            const flavorData = [
-                { id: '1', name: '黃金曼特寧', country: '印尼', variety: '阿拉比卡', roast: '中深烘焙', weight: '200g', expiry: '2025/12/31', flavor: '黑巧克力、焦糖、堅果', price: 450, stock: 80, profile: [90, 60, 70, 50, 80], lifestyle: '早晨提神、搭配甜點' },
-                { id: '2', name: '耶加雪菲', country: '衣索比亞', variety: '原生種', roast: '淺中烘焙', weight: '200g', expiry: '2025/11/15', flavor: '茉莉花、檸檬、佛手柑、熱帶水果', price: 580, stock: 120, profile: [40, 95, 60, 85, 70], lifestyle: '午後放鬆、閱讀時光' },
-                { id: '3', name: '哥倫比亞 薇拉', country: '哥倫比亞', variety: '卡杜拉', roast: '中度烘焙', weight: '200g', expiry: '2026/01/20', flavor: '核桃、可可、焦糖、奶油', price: 420, stock: 30, profile: [70, 70, 85, 60, 90], lifestyle: '工作專注、朋友聚會' },
-                { id: '4', name: '瓜地馬拉 薇薇特南果', country: '瓜地馬拉', variety: '波旁', roast: '中度烘焙', weight: '200g', expiry: '2025/10/01', flavor: '柑橘、花香、奶油、烤杏仁', price: 480, stock: 10, profile: [60, 80, 75, 70, 75], lifestyle: '週末早午餐、創意發想' },
-                { id: '5', name: '巴西 喜拉朵', country: '巴西', variety: '阿拉比卡', roast: '中深烘焙', weight: '200g', expiry: '2026/02/10', flavor: '黑巧克力、堅果、焦糖', price: 380, stock: 0, profile: [85, 55, 90, 45, 85], lifestyle: '任何時刻、大眾化口味' },
-                { id: '6', name: '肯亞 AA', country: '肯亞', variety: 'SL28/SL34', roast: '中度烘焙', weight: '200g', expiry: '2025/09/05', flavor: '黑醋栗、柑橘、莓果、酒香', price: 620, stock: 55, profile: [50, 90, 65, 95, 60], lifestyle: '獨享、品鑑、特殊節日' }
-            ];
-
+            // Frontend-specific data (knowledge articles and gallery images)
+            // This flavorData is now replaced by Firestore data in the updated logic.
+            // Keeping it here as a fallback or for other uses if needed, but the main product display will use Firestore.
             const knowledgeArticles = {
                 1: {
                     title: "手沖咖啡新手入門：五大關鍵步驟",
@@ -1134,7 +1137,7 @@
                         <p>手沖咖啡是一門藝術，也是一種享受。以下是五個關鍵步驟，幫助您在家也能沖出香醇好咖啡：</p>
                         <ol class="list-decimal list-inside ml-4 mt-2 space-y-2">
                             <li><strong>準備器具：</strong>手沖壺、濾杯、濾紙、磨豆機、電子秤、計時器、咖啡杯。</li>
-                            <li><strong>水溫控制：</strong>建議水溫介於 88°C 至 92°C 之間，視咖啡豆烘焙程度調整。淺焙豆適合高溫，深焙豆適合稍低溫。</li>
+                            <li><strong>水溫控制：：</strong>建議水溫介於 88°C 至 92°C 之間，視咖啡豆烘焙程度調整。淺焙豆適合高溫，深焙豆適合稍低溫。</li>
                             <li><strong>黃金比例：</strong>咖啡粉與水的比例通常為 1:15 到 1:18。例如，15克咖啡粉搭配 225-270毫升水。</li>
                             <li><strong>悶蒸：</strong>將咖啡粉倒入濾杯，輕輕搖勻。第一次注水時，水量約為咖啡粉的兩倍（例如15克咖啡粉注入30毫升水），均勻潤濕所有咖啡粉，等待 20-30 秒，讓咖啡粉膨脹。這是釋放二氧化碳、提升風味的關鍵步驟。</li>
                             <li><strong>分段注水：</strong>悶蒸後，分 2-3 次緩慢、穩定地以畫圓方式注水，避免直接沖擊濾紙壁。每次注水之間可稍作停頓，等待水位下降。總沖泡時間控制在 2-3 分鐘內。</li>
@@ -1148,10 +1151,10 @@
                         <p>正確保存咖啡豆是維持其新鮮風味的關鍵。咖啡豆最大的敵人是：<strong>光線、空氣、濕氣、高溫</strong>。</p>
                         <ul class="list-disc list-inside ml-4 mt-2 space-y-2">
                             <li><strong>密封容器：</strong>使用不透光、密封性良好的咖啡豆罐或帶有單向排氣閥的包裝袋。單向排氣閥能讓咖啡豆排出的二氧化碳逸出，同時阻擋外界空氣進入。</li>
-                            <li><strong>避光：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
+                            <li><strong>避光：：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
                             <li><strong>避免潮濕：</strong>濕氣會加速咖啡豆變質。切勿將咖啡豆存放在潮濕的環境，如水槽旁或冰箱冷藏室（除非是真空包裝且確定不會頻繁取出導致溫差凝結水珠）。</li>
                             <li><strong>適宜溫度：</strong>室溫存放即可，避免高溫環境，如爐具旁。若想長期保存未開封的咖啡豆，可考慮冷凍，但務必使用真空密封包裝，且取出後一次用完，避免重複解凍。</li>
-                            <li><strong>研磨後儘快沖泡：</strong>咖啡豆一旦研磨成粉，接觸空氣的面積會大幅增加，風味流失速度加快。建議喝多少磨多少，享受最新鮮的風味。</li>
+                            <li><strong>研磨後儘快沖泡：：</strong>咖啡豆一旦研磨成粉，接觸空氣的面積會大幅增加，風味流失速度加快。建議喝多少磨多少，享受最新鮮的風味。</li>
                         </ul>
                         <p class="mt-4">遵循這些小撇步，讓您的每一杯咖啡都保有最佳風味！</p>
                     `
@@ -1163,8 +1166,8 @@
                         <h4 class="font-semibold mt-4 mb-2">音樂如何影響咖啡體驗：</h4>
                         <ul class="list-disc list-inside ml-4 space-y-2">
                             <li><strong>情緒引導：</strong>輕柔、舒緩的音樂，如古典樂或輕爵士，能營造放鬆的氛圍，讓您更能細細品味咖啡的細膩層次。</li>
-                            <li><strong>風味聯想：</strong>某些音樂的節奏、音高和音色，可能與咖啡的特定風味特徵產生聯想。例如，高音調的音樂可能讓您感覺到咖啡的酸質更明亮，而低沉的音符則可能增強其醇厚度。</li>
-                            <li><strong>分散注意力：</strong>適當的背景音樂可以分散對環境噪音的注意力，讓您的味覺和嗅覺感官更專注於咖啡本身。</li>
+                            <li><strong>風味聯想：：</strong>某些音樂的節奏、音高和音色，可能與咖啡的特定風味特徵產生聯想。例如，高音調的音樂可能讓您感覺到咖啡的酸質更明亮，而低沉的音符則可能增強其醇厚度。</li>
+                            <li><strong>分散注意力：：</strong>適當的背景音樂可以分散對環境噪音的注意力，讓您的味覺和嗅覺感官更專注於咖啡本身。</li>
                         </ul>
                         <h4 class="font-semibold mt-4 mb-2">推薦搭配：</h4>
                         <ul class="list-disc list-inside ml-4 space-y-2">
@@ -1809,27 +1812,29 @@
 
             // --- END Three.js Setup ---
 
-            // Chart.js instance
-            let flavorRadarChart;
-
             // Initialize or update Radar Chart
-            function renderFlavorRadarChart(data) {
+            window.renderFlavorRadarChart = function(data) { // Expose to window for external calls
                 const ctx = document.getElementById('flavorRadarChart').getContext('2d');
-                if (flavorRadarChart) {
-                    flavorRadarChart.destroy(); // Destroy existing chart if it exists
+                if (window.flavorRadarChart) {
+                    window.flavorRadarChart.destroy(); // Destroy existing chart if it exists
                 }
+
+                // Ensure data.profile is an array of 5 numbers, fill with 2.5 if not
+                const profileData = Array.isArray(data.profile) && data.profile.length === 5
+                                    ? data.profile
+                                    : [2.5, 2.5, 2.5, 2.5, 2.5]; // Default if missing or malformed
 
                 // Get computed style for CSS variable
                 const computedStyle = getComputedStyle(document.body);
                 const secondaryColor = computedStyle.getPropertyValue('--color-secondary').trim();
 
-                flavorRadarChart = new Chart(ctx, {
+                window.flavorRadarChart = new Chart(ctx, {
                     type: 'radar',
                     data: {
                         labels: ['苦味', '酸度', '醇厚度', '花果香', '堅果/巧克力'],
                         datasets: [{
                             label: data.name,
-                            data: data.profile,
+                            data: profileData, // Use the 0-5 scaled data directly
                             backgroundColor: 'rgba(181, 136, 99, 0.6)', // var(--color-primary) with opacity
                             borderColor: 'rgba(181, 136, 99, 1)',
                             borderWidth: 2,
@@ -1856,18 +1861,20 @@
                                         family: "'Noto Sans TC', sans-serif",
                                         weight: 'bold'
                                     },
-                                    color: secondaryColor, // Use the fetched CSS variable here
+                                    color: secondaryColor,
                                 },
                                 ticks: {
-                                    display: false, // Hide the numerical ticks
+                                    display: true, // Show ticks for 0-5 scale
                                     beginAtZero: true,
-                                    max: 100
+                                    max: 5, // Set max to 5
+                                    stepSize: 1, // Show ticks for 0, 1, 2, 3, 4, 5
+                                    color: secondaryColor // Tick label color
                                 }
                             }
                         },
                         plugins: {
                             legend: {
-                                display: false // Hide dataset label
+                                display: false
                             },
                             tooltip: {
                                 callbacks: {
@@ -1876,31 +1883,34 @@
                                         if (label) {
                                             label += ': ';
                                         }
-                                        label += Math.round(context.parsed.r) + '%';
+                                        label += context.parsed.r.toFixed(1); // Display with one decimal place
                                         return label;
                                     }
                                 }
                             }
                         },
                         animation: {
-                            duration: 1000, // Animation duration
+                            duration: 1000,
                             easing: 'easeOutQuart'
                         }
                     }
                 });
             }
 
-            // Function to render coffee bean details
-            function renderBeanDetails(bean) {
-                document.getElementById('detail-name').textContent = bean.name;
-                document.getElementById('detail-country').textContent = bean.country;
-                document.getElementById('detail-variety').textContent = bean.variety;
-                document.getElementById('detail-roast').textContent = bean.roast;
-                document.getElementById('detail-weight').textContent = bean.weight;
-                document.getElementById('detail-expiry').textContent = bean.expiry;
-                document.getElementById('detail-flavor').textContent = bean.flavor;
-                document.getElementById('detail-price').textContent = bean.price;
-                document.getElementById('detail-stock').textContent = bean.stock + ' 包';
+            // Function to render coffee bean details in Flavor Guide
+            window.renderBeanDetails = function(bean) { // Expose to window
+                document.getElementById('detail-name').textContent = bean.name || 'N/A';
+                document.getElementById('detail-country').textContent = bean.country || 'N/A';
+                document.getElementById('detail-variety').textContent = bean.variety || 'N/A';
+                document.getElementById('detail-processing').textContent = bean.processing || 'N/A';
+                document.getElementById('detail-altitude').textContent = bean.altitude || 'N/A';
+                document.getElementById('detail-roast').textContent = bean.roast || 'N/A';
+                document.getElementById('detail-weight').textContent = bean.weight || 'N/A';
+                document.getElementById('detail-expiry').textContent = bean.expiry || 'N/A';
+                document.getElementById('detail-flavor').textContent = bean.flavor || 'N/A';
+                document.getElementById('detail-farm-or-station').textContent = bean.farm_or_station || 'N/A';
+                document.getElementById('detail-price').textContent = bean.price !== undefined ? bean.price : 'N/A';
+                document.getElementById('detail-stock').textContent = bean.stock !== undefined ? bean.stock + ' 包' : 'N/A';
 
                 const stockStatusElement = document.getElementById('stock-status');
                 stockStatusElement.className = 'stock-indicator'; // Reset classes
@@ -1918,48 +1928,176 @@
 
                 document.getElementById('lifestyle-suggestion').innerHTML = `
                     <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
-                    <p>${bean.lifestyle}</p>
+                    <p>${bean.lifestyle || '請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。'}</p>
                 `;
             }
 
-            // Function to populate select options
-            function populateFlavorSelect() {
-                const select = document.getElementById('flavor-select');
-                select.innerHTML = '<option value="">請選擇一款咖啡豆</option>'; // Default option
-                flavorData.forEach(bean => {
-                    const option = document.createElement('option');
-                    option.value = bean.id;
-                    option.textContent = bean.name;
-                    select.appendChild(option);
-                });
+            // Handles changes in the flavor select dropdown
+            function handleFlavorSelectChange(event) {
+                const selectedBeanId = event.target.value;
+                const beanDetailsDisplay = document.getElementById('bean-details-display');
+
+                if (selectedBeanId) {
+                    const selectedBean = window.products.find(bean => bean.id === selectedBeanId);
+                    if (selectedBean) {
+                        window.renderFlavorRadarChart(selectedBean);
+                        window.renderBeanDetails(selectedBean);
+                        beanDetailsDisplay.classList.add('is-visible');
+                        simulateBrewingProcess();
+                    }
+                } else {
+                    if (window.flavorRadarChart) {
+                        window.flavorRadarChart.destroy();
+                        window.flavorRadarChart = null;
+                    }
+                    // Clear bean details and lifestyle suggestion
+                    document.getElementById('detail-name').textContent = '';
+                    document.getElementById('detail-country').textContent = '';
+                    document.getElementById('detail-variety').textContent = '';
+                    document.getElementById('detail-processing').textContent = '';
+                    document.getElementById('detail-altitude').textContent = '';
+                    document.getElementById('detail-roast').textContent = '';
+                    document.getElementById('detail-weight').textContent = '';
+                    document.getElementById('detail-expiry').textContent = '';
+                    document.getElementById('detail-flavor').textContent = '';
+                    document.getElementById('detail-farm-or-station').textContent = '';
+                    document.getElementById('detail-price').textContent = '';
+                    document.getElementById('detail-stock').textContent = '';
+                    document.getElementById('stock-status').className = 'stock-indicator';
+                    document.getElementById('stock-status').textContent = '';
+                    document.getElementById('lifestyle-suggestion').innerHTML = `
+                        <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
+                        <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
+                    `;
+                    beanDetailsDisplay.classList.remove('is-visible');
+                }
             }
 
-            // Function to load all data and render
-            window.loadAndRenderAllData = function() {
-                console.log('[DEBUG] Loading and rendering all data.');
-                populateFlavorSelect();
-                // Set initial selection or default display
-                if (flavorData.length > 0) {
-                    const defaultBean = flavorData[0];
-                    renderFlavorRadarChart(defaultBean);
-                    renderBeanDetails(defaultBean);
-                    document.getElementById('flavor-select').value = defaultBean.id;
-                    document.getElementById('bean-details-display').classList.add('is-visible'); // Make visible on load
+
+            // Listen for real-time updates to the coffeeProducts collection (Frontend)
+            window.listenToProducts = function() {
+                // Ensure Firebase is initialized before attempting to listen
+                if (!window.db || !window.productsCollectionRef) {
+                    console.error("Firestore not initialized for frontend product listening.");
+                    return;
                 }
-                console.log('[DEBUG] All data loaded and rendered.');
+
+                const q = window.queryFirestore(window.productsCollectionRef, window.orderByFirestore('name'));
+
+                window.onSnapshotFirestore(q, (snapshot) => {
+                    window.products = [];
+                    snapshot.forEach((doc) => {
+                        const productData = doc.data();
+                        // Convert profile values from 0-100 to 0-5 scale for frontend display
+                        if (Array.isArray(productData.profile) && productData.profile.length === 5) {
+                            productData.profile = productData.profile.map(value => value / 20);
+                        } else {
+                            productData.profile = [2.5, 2.5, 2.5, 2.5, 2.5]; // Default to 2.5 on 0-5 scale
+                        }
+                        window.products.push({ id: doc.id, ...productData });
+                    });
+                    console.log("[Firebase] Frontend products updated:", window.products.length);
+                    window.renderFrontendProductsDisplay();
+
+                    // Handle initial selection for Flavor Guide dropdown
+                    const flavorSelect = document.getElementById('flavor-select');
+                    if (flavorSelect && window.products.length > 0) {
+                        const currentSelectedId = flavorSelect.value;
+                        const previouslySelectedExists = window.products.some(p => p.id === currentSelectedId);
+
+                        if (!currentSelectedId || !previouslySelectedExists) {
+                            // Select the first product if nothing is selected or previously selected doesn't exist
+                            const defaultBean = window.products[0];
+                            flavorSelect.value = defaultBean.id;
+                            handleFlavorSelectChange({ target: flavorSelect });
+                        } else {
+                            // Re-render details for the currently selected product if it still exists
+                            const selectedBean = window.products.find(bean => bean.id === currentSelectedId);
+                            if (selectedBean) {
+                                window.renderFlavorRadarChart(selectedBean);
+                                window.renderBeanDetails(selectedBean);
+                            }
+                        }
+                        document.getElementById('bean-details-display').classList.add('is-visible');
+                    } else if (flavorSelect && window.products.length === 0) {
+                        // No products available, clear selection and details
+                        flavorSelect.value = '';
+                        handleFlavorSelectChange({ target: flavorSelect });
+                    }
+
+                }, (error) => {
+                    console.error("[Firebase] Error listening to products on frontend:", error);
+                    window.showFrontMessageModal('資料載入錯誤', `無法載入咖啡豆資料：${error.message}`, 'error');
+                });
             };
 
-            // Function to show coffee fact toast
-            function showCoffeeFactToast(message, duration = 3000) {
+            // Renders products in the frontend "Our Premium Coffee Beans" section
+            window.renderFrontendProductsDisplay = function() { // Renamed to avoid confusion with admin render
+                const ourBeansContainer = document.querySelector('#our-beans .grid');
+                if (ourBeansContainer) {
+                    ourBeansContainer.innerHTML = ''; // Clear existing content
+                    if (window.products.length === 0) {
+                        ourBeansContainer.innerHTML = '<p class="col-span-full text-center text-gray-500">目前沒有咖啡豆品項可顯示。</p>';
+                        return;
+                    }
+                    window.products.forEach((product, index) => {
+                        const beanCard = `
+                            <div class="card p-4 fade-in-up bean-card" style="transition-delay: ${index * 100}ms;">
+                                <img src="${product.image || 'https://placehold.co/200x120/e0e0e0/3f2e2e?text=No+Image'}" onerror="this.onerror=null;this.src='https://placehold.co/200x120/e0e0e0/3f2e2e?text=Image+Error';" alt="${product.name}" class="w-full h-48 object-cover rounded-md mb-4">
+                                <div class="bean-overlay">
+                                    <p>${product.name}: ${product.flavor || 'N/A'}</p>
+                                </div>
+                                <h3 class="text-xl font-serif mb-2">${product.name}</h3>
+                                <p class="text-gray-600 text-sm">售價：NT$${product.price !== undefined ? product.price : 'N/A'}</p>
+                                <p class="text-gray-600 text-sm">庫存：
+                                    <span class="stock-indicator ${product.stock > 5 ? 'stock-in-stock' : (product.stock > 0 ? 'stock-low-stock' : 'stock-out-of-stock')}">
+                                        ${product.stock > 0 ? (product.stock <= 5 ? '低庫存' : '有庫存') : '已售罄'}
+                                    </span>
+                                </p>
+                            </div>
+                        `;
+                        ourBeansContainer.innerHTML += beanCard;
+                    });
+                }
+
+                // Update "Flavor Exploration Guide" dropdown
+                const flavorSelect = document.getElementById('flavor-select');
+                if (flavorSelect) {
+                    flavorSelect.innerHTML = '<option value="">請選擇一款咖啡豆</option>';
+                    window.products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = product.name;
+                        flavorSelect.appendChild(option);
+                    });
+
+                    // Re-add event listener to prevent multiple bindings
+                    flavorSelect.removeEventListener('change', handleFlavorSelectChange);
+                    flavorSelect.addEventListener('change', handleFlavorSelectChange);
+                }
+            };
+
+            // Function to show coffee fact toast (moved to global scope for interval)
+            const coffeeFacts = [
+                "一杯完美的咖啡，98% 是水，所以水的品質非常重要！",
+                "咖啡是世界上第二大交易商品，僅次於石油。",
+                "「卡布奇諾」的名字來源於方濟各會修士的帽子顏色。",
+                "咖啡樹需要大約3-5年的時間才能結果。",
+                "世界上最昂貴的咖啡是麝香貓咖啡，但其生產方式存在爭議。",
+                "喝咖啡的最佳時間是上午 9:30 到 11:30，因為此時皮質醇水平較低。",
+                "咖啡豆實際上是咖啡果實的種子，而不是真正的豆子。"
+            ];
+            window.showCoffeeFactToast = function(message, duration = 3000) {
                 const toast = document.getElementById('coffee-fact-toast');
                 document.getElementById('toast-message').textContent = message;
                 toast.classList.add('show');
                 setTimeout(() => {
                     toast.classList.remove('show');
                 }, duration);
-            }
+            };
 
-            // Event Listeners
+
+            // Event Listeners for DOM elements
             document.addEventListener('DOMContentLoaded', () => {
                 console.log('[DEBUG] DOM Content Loaded. Initializing.');
 
@@ -1976,52 +2114,20 @@
                 // Flavor Select Change Listener
                 const flavorSelect = document.getElementById('flavor-select');
                 if (flavorSelect) {
-                    flavorSelect.addEventListener('change', (event) => {
-                        const selectedBeanId = event.target.value;
-                        const beanDetailsDisplay = document.getElementById('bean-details-display');
-
-                        if (selectedBeanId) {
-                            const selectedBean = flavorData.find(bean => bean.id === selectedBeanId);
-                            if (selectedBean) {
-                                renderFlavorRadarChart(selectedBean);
-                                renderBeanDetails(selectedBean);
-                                beanDetailsDisplay.classList.add('is-visible'); // Show details with animation
-                                simulateBrewingProcess(); // Trigger brewing visualizer
-                            }
-                        } else {
-                            // If no bean is selected (e.g., "請選擇一款咖啡豆")
-                            if (flavorRadarChart) {
-                                flavorRadarChart.destroy(); // Clear chart
-                            }
-                            // Clear bean details and lifestyle suggestion
-                            document.getElementById('detail-name').textContent = '';
-                            document.getElementById('detail-country').textContent = '';
-                            document.getElementById('detail-variety').textContent = '';
-                            document.getElementById('detail-roast').textContent = '';
-                            document.getElementById('detail-weight').textContent = '';
-                            document.getElementById('detail-expiry').textContent = '';
-                            document.getElementById('detail-flavor').textContent = '';
-                            document.getElementById('detail-price').textContent = '';
-                            document.getElementById('detail-stock').textContent = '';
-                            document.getElementById('stock-status').className = 'stock-indicator';
-                            document.getElementById('stock-status').textContent = '';
-                            document.getElementById('lifestyle-suggestion').innerHTML = `
-                                <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
-                                <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
-                            `;
-                            beanDetailsDisplay.classList.remove('is-visible'); // Hide details
-                        }
-                    });
+                    // Initial setup (will be overridden by Firestore listener but good fallback)
+                    // The Firestore listener will manage the data and trigger renderFrontendProductsDisplay
+                    // which in turn re-attaches handleFlavorSelectChange.
+                    flavorSelect.addEventListener('change', handleFlavorSelectChange);
                 } else {
                     console.error('[ERROR] Flavor select element not found!');
                 }
 
-                // Refresh Coffee Button Listener
+                // Refresh Coffee Button Listener (now triggers frontend re-render from current Firestore data)
                 const refreshCoffeeBtn = document.getElementById('refresh-coffee-btn');
                 if (refreshCoffeeBtn) {
                     refreshCoffeeBtn.addEventListener('click', () => {
-                        console.log('[DEBUG] Refresh Coffee button clicked. Reloading all data.');
-                        window.loadAndRenderAllData();
+                        console.log('[DEBUG] Refresh Coffee button clicked. Forcing frontend re-render.');
+                        window.renderFrontendProductsDisplay(); // Re-render from the already fetched window.products
                         showFrontMessageModal('更新成功', '咖啡豆資訊已重新整理！', 'success');
                     });
                 } else {
@@ -2105,7 +2211,15 @@
                             if (entry.target.classList.contains('animate-pulse-on-scroll')) {
                                 entry.target.classList.add('is-pulsing');
                             }
-                            observer.unobserve(entry.target);
+                            // Only unobserve if it's a one-time animation trigger
+                            if (!entry.target.classList.contains('section-title')) { // Keep section titles observed for continuous pulse if desired
+                                observer.unobserve(entry.target);
+                            }
+                        } else {
+                            // Optional: remove pulsing when not visible, if animation should stop
+                            if (entry.target.classList.contains('animate-pulse-on-scroll')) {
+                                entry.target.classList.remove('is-pulsing');
+                            }
                         }
                     });
                 }, { threshold: 0.1 });
@@ -2150,8 +2264,8 @@
                 }
 
                 // Initial load of all data and render on page load
-                console.log('[DEBUG] DOM Content Loaded. Initializing data and rendering.');
-                window.loadAndRenderAllData();
+                // This is now handled by the Firebase listener in the module script.
+                // window.loadAndRenderAllData(); // This function is no longer needed here.
 
 
                 // Coffee Grounds Flip Card functionality
