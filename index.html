@@ -663,6 +663,29 @@
         #btn-reset-machine:hover {
             background-color: #E5E7EB; /* Gray-200 */
         }
+
+        /* --- Flavor Guide Specific Styling for Consistent Size --- */
+        #threejs-container {
+            width: 100%;
+            height: 400px; /* Fixed height for the Three.js coffee machine display */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        #flavorRadarChart {
+            height: 350px; /* Fixed height for the radar chart */
+            width: 100%; /* Allow width to be responsive within its column */
+            max-width: 400px; /* Max width to keep it from getting too large on desktop */
+            margin: 0 auto; /* Center the chart */
+        }
+
+        /* Ensure the container for the chart also respects the height */
+        #flavor-guide .md:block canvas {
+            height: 350px; /* Apply fixed height directly to canvas */
+        }
+        /* --- END Flavor Guide Specific Styling --- */
     </style>
 </head>
 <body>
