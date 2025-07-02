@@ -739,8 +739,7 @@
                     <div class="w-full">
                         <label for="flavor-select" class="block text-left mb-2 font-semibold">選擇一款咖啡豆來查看風味圖譜：</label>
                         <select id="flavor-select" class="w-full p-3 border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
-                            <option value="">載入中...</option>
-                        </select>
+                            </select>
                         <div id="lifestyle-suggestion" class="mt-6 text-left p-4 bg-green-50 rounded-lg border border-accent text-gray-700">
                             <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
                             <p>請先選擇一款咖啡豆，我們會為您推薦最適合的品飲時刻與搭配。</p>
@@ -1113,7 +1112,6 @@
         <p id="three-toast-message"></p>
     </div>
 
-    <!-- 將主 JavaScript 區塊的 type="module" 移除，以確保 THREE 能夠全域存取 -->
     <script type="module">
         // Firebase SDK imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
@@ -1121,8 +1119,28 @@
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // Firebase Configuration (from Canvas environment)
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let firebaseConfig = {};
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
+                firebaseConfig = JSON.parse(__firebase_config);
+                // Basic validation for essential keys
+                if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+                    console.error("[Firebase Init Error] __firebase_config is provided but seems incomplete. Please check your Firebase project configuration.");
+                    // Fallback to dummy config to prevent crash, but functionality will be limited
+                    firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+                }
+            } else {
+                console.error("[Firebase Init Error] __firebase_config environment variable is not set or is empty. Firebase will not function correctly.");
+                // Fallback to dummy config to prevent crash
+                firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+            }
+        } catch (e) {
+            console.error("[Firebase Init Error] Failed to parse __firebase_config. Ensure it is valid JSON.", e);
+            // Fallback to dummy config to prevent crash
+            firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+        }
+
+        const appId = typeof __app_id !== 'undefined' && __app_id !== '' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -1151,7 +1169,7 @@
                         <ol class="list-decimal list-inside ml-4 mt-2 space-y-2">
                             <li><strong>準備器具：</strong>手沖壺、濾杯、濾紙、磨豆機、電子秤、計時器、咖啡杯。</li>
                             <li><strong>水溫控制：</strong>建議水溫介於 88°C 至 92°C 之間，視咖啡豆烘焙程度調整。淺焙豆適合高溫，深焙豆適合稍低溫。</li>
-                            <li><strong>黃金比例：</strong>咖啡粉與水的比例通常為 1:15 到 1:18。例如，15克咖啡粉搭配 225-270毫升水。</li>
+                            <li><strong>黃金比例：</strong>咖啡粉與水的比例通常為 1:15 到 1:18。例如，15克咖啡粉注入 225-270毫升水。</li>
                             <li><strong>悶蒸：</strong>將咖啡粉倒入濾杯，輕輕搖勻。第一次注水時，水量約為咖啡粉的兩倍（例如15克咖啡粉注入30毫升水），均勻潤濕所有咖啡粉，等待 20-30 秒，讓咖啡粉膨脹。這是釋放二氧化碳、提升風味的關鍵步驟。</li>
                             <li><strong>分段注水：</strong>悶蒸後，分 2-3 次緩慢、穩定地以畫圓方式注水，避免直接沖擊濾紙壁。每次注水之間可稍作停頓，等待水位下降。總沖泡時間控制在 2-3 分鐘內。</li>
                         </ol>
@@ -1164,7 +1182,7 @@
                         <p>正確保存咖啡豆是維持其新鮮風味的關鍵。咖啡豆最大的敵人是：<strong>光線、空氣、濕氣、高溫</strong>。</p>
                         <ul class="list-disc list-inside ml-4 mt-2 space-y-2">
                             <li><strong>密封容器：</strong>使用不透光、密封性良好的咖啡豆罐或帶有單向排氣閥的包裝袋。單向排氣閥能讓咖啡豆排出的二氧化碳逸出，同時阻擋外界空氣進入。</li>
-                            <li><strong>避光：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
+                            <li><strong>避光：：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
                             <li><strong>避免潮濕：</strong>濕氣會加速咖啡豆變質。切勿將咖啡豆存放在潮濕的環境，如水槽旁或冰箱冷藏室（除非是真空包裝且確定不會頻繁取出導致溫差凝結水珠）。</li>
                             <li><strong>適宜溫度：</strong>室溫存放即可，避免高溫環境，如爐具旁。若想長期保存未開封的咖啡豆，可考慮冷凍，但務必使用真空密封包裝，且取出後一次用完，避免重複解凍。</li>
                             <li><strong>研磨後儘快沖泡：</strong>咖啡豆一旦研磨成粉，接觸空氣的面積會大幅增加，風味流失速度加快。建議喝多少磨多少，享受最新鮮的風味。</li>
@@ -1186,7 +1204,7 @@
                         <ul class="list-disc list-inside ml-4 space-y-2">
                             <li><strong>濃郁醇厚型咖啡（如曼特寧、義式濃縮）：</strong>搭配藍調、爵士樂或靈魂樂，讓其豐富的層次感更加突出。</li>
                             <li><strong>清新明亮型咖啡（如耶加雪菲、肯亞）：</strong>搭配輕快、高頻的音樂，如古典小品、Chill-hop 或輕柔的流行音樂，襯托其花果香氣。</li>
-                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
+                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
                         </ul>
                         <p class="mt-4">下次品嚐咖啡時，不妨打開您的專屬歌單，讓音樂與咖啡共同為您帶來一場難忘的感官體驗吧！</p>
                     `
@@ -2011,6 +2029,12 @@
                     toast.classList.remove('show');
                 }, duration);
             }
+            // Function to show a random coffee fact
+            function showRandomCoffeeFact() {
+                const randomFact = coffeeFacts[Math.floor(Math.random() * coffeeFacts.length)];
+                showCoffeeFactToast(randomFact, 5000); // Show for 5 seconds
+            }
+
 
             // Event Listeners
             document.addEventListener('DOMContentLoaded', () => {
@@ -2248,10 +2272,15 @@
                         });
                     } else {
                         console.log("[Firebase Auth] No user signed in. Signing in anonymously...");
+                        let initialAuthToken = null;
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
+                            initialAuthToken = __initial_auth_token;
+                        } else {
+                            console.warn("[Firebase Auth] __initial_auth_token environment variable is not set or is empty. Attempting anonymous sign-in.");
+                        }
                         try {
-                            // Use __initial_auth_token if available, otherwise sign in anonymously
-                            if (typeof __initial_auth_token !== 'undefined') {
-                                await signInWithCustomToken(auth, __initial_auth_token);
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
                             } else {
                                 await signInAnonymously(auth);
                             }
