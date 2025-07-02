@@ -674,8 +674,8 @@
 </head>
 <body>
     <!-- Loading overlay -->
-    <div id="loading-overlay">
-        <div class="spinner"></div>
+    <div id="loading-overlay" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[1000] transition-opacity duration-500 ease-in-out">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
         <p class="text-xl text-secondary">正在為您準備香醇的咖啡體驗...</p>
     </div>
 
@@ -692,7 +692,21 @@
                 <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
                 <!-- Removed backend link as requested -->
             </div>
-            </div>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-secondary text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-white/90 backdrop-blur-md hidden flex-col items-center py-4 space-y-4">
+            <a href="#flavor-guide" class="hover:text-primary transition-colors nav-link">風味探索</a>
+            <a href="#our-beans" class="hover:text-primary transition-colors nav-link">精選咖啡豆</a>
+            <a href="#coffee-grounds-magic" class="hover:text-primary transition-colors nav-link">咖啡渣魔法</a>
+            <a href="#story" class="hover:text-primary transition-colors nav-link">我們的故事</a>
+            <a href="#knowledge" class="hover:text-primary transition-colors nav-link">咖啡知識</a>
+            <a href="#image-gallery" class="hover:text-primary transition-colors nav-link">咖啡藝廊</a>
+            <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
+        </div>
     </nav>
 
     <main>
@@ -1112,31 +1126,20 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-        // Firebase Configuration (from Canvas environment)
-        let firebaseConfig = {};
-        try {
-            // Check if __firebase_config is defined and not empty
-            if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
-                firebaseConfig = JSON.parse(__firebase_config);
-                // Basic validation for essential keys
-                if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
-                    console.error("[Firebase Init Error] __firebase_config is provided but seems incomplete. Please check your Firebase project configuration.");
-                    // Fallback to dummy config to prevent crash, but functionality will be limited
-                    firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-                }
-            } else {
-                console.error("[Firebase Init Error] __firebase_config environment variable is not set or is empty. Firebase will not function correctly.");
-                // Fallback to dummy config to prevent crash
-                firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-            }
-        } catch (e) {
-            console.error("[Firebase Init Error] Failed to parse __firebase_config. Ensure it is valid JSON.", e);
-            // Fallback to dummy config to prevent crash
-            firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-        }
+        // Firebase Configuration (從使用者提供)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMO_9eufgKuEoJ5Kob5W4SuDikaX-Drqg",
+            authDomain: "product-display-system.firebaseapp.com",
+            projectId: "product-display-system",
+            storageBucket: "product-display-system.firebasestorage.app",
+            messagingSenderId: "253942464889",
+            appId: "1:253942464889:web:1cd581c08faf962ea4efa8",
+            measurementId: "G-NTG56CZC9N"
+        };
 
         // Get the app ID from environment variable, fallback to default if not set
-        const appId = typeof __app_id !== 'undefined' && __app_id !== '' ? __app_id : 'default-app-id';
+        // 使用者提供的 appId 已經是完整的，直接使用
+        const appId = "1:253942464889:web:1cd581c08faf962ea4efa8";
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -1267,7 +1270,7 @@
             let activeParticles = []; // Store active particle meshes for removal
 
             // Particle System Configuration
-            const MUSICAL_NOTES_EMOJI = '�';
+            const MUSICAL_NOTES_EMOJI = '🎵';
             const PARTICLE_LIFESPAN = 3000; // milliseconds for DOM particles
 
             // Function to create and animate a 3D particle (THREE.Mesh based)
@@ -2269,6 +2272,7 @@
                     } else {
                         console.log("[Firebase Auth] No user signed in. Signing in anonymously...");
                         let initialAuthToken = null;
+                        // 這裡使用 __initial_auth_token 環境變數，如果沒有則嘗試匿名登入
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
                             initialAuthToken = __initial_auth_token;
                         } else {
@@ -2292,4 +2296,3 @@
     </script>
 </body>
 </html>
-�
