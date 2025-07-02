@@ -474,63 +474,46 @@
             }
         }
 
-        /* 咖啡渣卡片翻轉效果 */
-        .flip-card {
-            background-color: transparent;
-            width: 100%;
-            height: 250px; /* 固定高度，避免內容高度不一導致跳動 */
-            perspective: 1000px; /* 3D 效果 */
-            cursor: pointer;
-            transition: transform 0.6s;
-        }
-
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        /* 咖啡渣卡片樣式調整 - 移除翻轉特效，直接顯示內容和影片 */
+        .coffee-ground-card {
+            background-color: var(--color-surface);
             border-radius: 0.75rem;
-            overflow: hidden; /* Prevent content overflow during flip */
-        }
-
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden; /* Safari */
-            backface-visibility: hidden;
-            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 1.5rem; /* 增加內邊距 */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-            background-color: var(--color-surface);
+            text-align: center;
+            height: auto; /* 讓高度根據內容自動調整 */
+            min-height: 350px; /* 確保有足夠空間顯示影片和文字 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* 保留懸停效果 */
         }
 
-        .flip-card-back {
-            background-color: var(--color-primary); /* 翻轉後的背景色 */
-            color: white;
-            transform: rotateY(180deg);
-            padding: 1.5rem;
-            text-align: left;
-            font-size: 0.95rem;
+        .coffee-ground-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
-        .flip-card-back h4 {
-            color: white; /* Make sure title is visible on dark background */
+
+        .coffee-ground-card video {
+            width: 100%;
+            height: auto; /* 維持影片比例 */
+            max-height: 200px; /* 限制影片最大高度 */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 1rem; /* 影片下方間距 */
+        }
+
+        .coffee-ground-card h3 {
+            font-size: 1.5rem; /* 標題字體大小 */
             margin-bottom: 0.5rem;
+            color: var(--color-secondary);
         }
-        .flip-card-front img {
-            max-height: 80px; /* Adjust icon size */
-            margin-bottom: 0.75rem;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+
+        .coffee-ground-card p {
+            font-size: 0.95rem; /* 內容字體大小 */
+            color: var(--color-gray-600);
+            line-height: 1.6;
         }
 
         /* 咖啡豆區塊的圖片懸停提示 */
@@ -664,6 +647,29 @@
         #btn-reset-machine:hover {
             background-color: #E5E7EB; /* Gray-200 */
         }
+
+        /* --- Flavor Guide Specific Styling for Consistent Size --- */
+        #threejs-container {
+            width: 100%;
+            height: 400px; /* Fixed height for the Three.js coffee machine display */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        #flavorRadarChart {
+            height: 350px; /* Fixed height for the radar chart */
+            width: 100%; /* Allow width to be responsive within its column */
+            max-width: 400px; /* Max width to keep it from getting too large on desktop */
+            margin: 0 auto; /* Center the chart */
+        }
+
+        /* Ensure the container for the chart also respects the height */
+        #flavor-guide .md:block canvas {
+            height: 350px; /* Apply fixed height directly to canvas */
+        }
+        /* --- END Flavor Guide Specific Styling --- */
     </style>
 </head>
 <body>
@@ -684,7 +690,7 @@
                 <a href="#knowledge" class="hover:text-primary transition-colors nav-link">咖啡知識</a>
                 <a href="#image-gallery" class="hover:text-primary transition-colors nav-link">咖啡藝廊</a>
                 <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
-                <a href="#contact" class="px-4 py-2 rounded-full btn-primary nav-link">聯絡我們</a>
+                <!-- Removed backend link as requested -->
             </div>
             </div>
     </nav>
@@ -697,7 +703,7 @@
                 <h1 class="text-5xl md:text-7xl font-serif mb-4 text-shadow-soft">品味旋律，啜飲人生</h1>
                 <p class="text-xl md:text-2xl max-w-2xl mx-auto">在 Melody Bean，每一顆咖啡豆都承載著一段故事與一首旋律，我們邀請您一同放慢腳步，感受生活中的溫暖與美好。</p>
             </div>
-            <button id="scroll-down-btn" aria-label="向下滾動">
+            <button id="scroll-down-btn" aria-label="Scroll Down">
                 <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 21L4 13H10V3H14V13H20L12 21Z" />
                 </svg>
@@ -823,44 +829,32 @@
                     <p class="mt-4 text-lg text-gray-600 mb-8">別急著丟棄！用過的咖啡渣，其實是生活中的環保寶藏。</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="flip-card fade-in-up">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=肥料" alt="天然植物肥料" class="mb-4">
-                                <h3 class="text-xl font-serif mb-2">天然植物肥料</h3>
-                                <p class="text-gray-600 text-sm">富含氮、磷、鉀，讓您的植物枝繁葉茂。</p>
-                            </div>
-                            <div class="flip-card-back">
-                                <h4 class="font-bold text-lg">DIY 植物肥料</h4>
-                                <p>將乾燥的咖啡渣直接混入盆栽土壤中，或與廚餘堆肥一同發酵，為植物提供天然養分。特別適合喜酸性土壤的植物，如杜鵑、繡球花。</p>
-                            </div>
-                        </div>
+                    <!-- 天然植物肥料 Card -->
+                    <div class="coffee-ground-card fade-in-up">
+                        <video controls autoplay muted loop playsinline class="w-full h-auto max-h-[200px] rounded-lg shadow-xl">
+                            <source src="./video/video_2.mp4" type="video/mp4">
+                            您的瀏覽器不支持影片標籤。
+                        </video>
+                        <h3 class="text-xl font-serif mb-2">天然植物肥料</h3>
+                        <p class="text-gray-600 text-sm">富含氮、磷、鉀，讓您的植物枝繁葉茂。將乾燥的咖啡渣直接混入盆栽土壤中，或與廚餘堆肥一同發酵，為植物提供天然養分。特別適合喜酸性土壤的植物，如杜鵑、繡球花。</p>
                     </div>
-                    <div class="flip-card fade-in-up" style="transition-delay: 100ms;">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=除臭" alt="天然除臭劑" class="mb-4">
-                                <h3 class="text-xl font-serif mb-2">天然除臭劑</h3>
-                                <p class="text-gray-600 text-sm">吸附異味，讓冰箱、鞋櫃恢復清新。</p>
-                            </div>
-                            <div class="flip-card-back">
-                                <h4 class="font-bold text-lg">製作除臭包</h4>
-                                <p>將乾燥咖啡渣裝入透氣小袋或網襪中，放置於冰箱、鞋櫃、衣櫥或煙灰缸，有效吸附濕氣與異味。定期更換以保持效果。</p>
-                            </div>
-                        </div>
+                    <!-- 天然除臭劑 Card -->
+                    <div class="coffee-ground-card fade-in-up" style="transition-delay: 100ms;">
+                        <video controls autoplay muted loop playsinline class="w-full h-auto max-h-[200px] rounded-lg shadow-xl">
+                            <source src="./video/video_3.mp4" type="video/mp4">
+                            您的瀏覽器不支持影片標籤。
+                        </video>
+                        <h3 class="text-xl font-serif mb-2">天然除臭劑</h3>
+                        <p class="text-gray-600 text-sm">吸附異味，讓冰箱、鞋櫃恢復清新。將乾燥咖啡渣裝入透氣小袋或網襪中，放置於冰箱、鞋櫃、衣櫥或煙灰缸，有效吸附濕氣與異味。定期更換以保持效果。</p>
                     </div>
-                    <div class="flip-card fade-in-up" style="transition-delay: 200ms;">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="https://placehold.co/60x60/e0e0e0/3f2e2e?text=去角質" alt="身體去角質" class="mb-4">
-                                <h3 class="text-xl font-serif mb-2">溫和身體去角質</h3>
-                                <p class="text-gray-600 text-sm">天然顆粒溫和去除老廢角質，還您柔滑肌膚。</p>
-                            </div>
-                            <div class="flip-card-back">
-                                <h4 class="font-bold text-lg">DIY 咖啡渣磨砂膏</h4>
-                                <p>將乾燥咖啡渣與少量橄欖油或椰子油混合，加入少許蜂蜜（可選），輕輕按摩身體肌膚後沖洗。咖啡因也有助於緊緻肌膚。敏感肌膚請謹慎使用。</p>
-                            </div>
-                        </div>
+                    <!-- 溫和身體去角質 Card -->
+                    <div class="coffee-ground-card fade-in-up" style="transition-delay: 200ms;">
+                        <video controls autoplay muted loop playsinline class="w-full h-auto max-h-[200px] rounded-lg shadow-xl">
+                            <source src="./video/video_4.mp4" type="video/mp4">
+                            您的瀏覽器不支持影片標籤。
+                        </video>
+                        <h3 class="text-xl font-serif mb-2">溫和身體去角質</h3>
+                        <p class="text-gray-600 text-sm">天然顆粒溫和去除老廢角質，還您柔滑肌膚。將乾燥咖啡渣與少量橄欖油或椰子油混合，加入少許蜂蜜（可選），輕輕按摩身體肌膚後沖洗。咖啡因也有助於緊緻肌膚。敏感肌膚請謹慎使用。</p>
                     </div>
                 </div>
             </div>
@@ -1086,7 +1080,7 @@
         </div>
     </footer>
 
-    <!-- 自定義訊息彈窗 -->
+    <!-- Custom message modal -->
     <div id="frontMessageModal" class="front-modal">
         <div class="front-modal-content">
             <span class="front-modal-close-button" onclick="closeFrontMessageModal()">&times;</span>
@@ -1097,17 +1091,17 @@
         </div>
     </div>
 
-    <!-- 返回頂部按鈕 -->
-    <button id="back-to-top-btn" aria-label="返回頂部">
+    <!-- Back to top button -->
+    <button id="back-to-top-btn" aria-label="Back to Top">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- 咖啡小知識彈窗 -->
+    <!-- Coffee fact toast -->
     <div id="coffee-fact-toast" class="px-6 py-3 rounded-lg shadow-lg">
         <p id="toast-message"></p>
     </div>
 
-    <!-- Three.js 互動回饋彈窗 -->
+    <!-- Three.js interaction feedback toast -->
     <div id="three-js-feedback-toast" class="px-6 py-3 rounded-lg shadow-lg">
         <p id="three-toast-message"></p>
     </div>
@@ -1121,6 +1115,7 @@
         // Firebase Configuration (from Canvas environment)
         let firebaseConfig = {};
         try {
+            // Check if __firebase_config is defined and not empty
             if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
                 firebaseConfig = JSON.parse(__firebase_config);
                 // Basic validation for essential keys
@@ -1140,6 +1135,7 @@
             firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
         }
 
+        // Get the app ID from environment variable, fallback to default if not set
         const appId = typeof __app_id !== 'undefined' && __app_id !== '' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
@@ -1170,7 +1166,7 @@
                             <li><strong>準備器具：</strong>手沖壺、濾杯、濾紙、磨豆機、電子秤、計時器、咖啡杯。</li>
                             <li><strong>水溫控制：</strong>建議水溫介於 88°C 至 92°C 之間，視咖啡豆烘焙程度調整。淺焙豆適合高溫，深焙豆適合稍低溫。</li>
                             <li><strong>黃金比例：</strong>咖啡粉與水的比例通常為 1:15 到 1:18。例如，15克咖啡粉注入 225-270毫升水。</li>
-                            <li><strong>悶蒸：</strong>將咖啡粉倒入濾杯，輕輕搖勻。第一次注水時，水量約為咖啡粉的兩倍（例如15克咖啡粉注入30毫升水），均勻潤濕所有咖啡粉，等待 20-30 秒，讓咖啡粉膨脹。這是釋放二氧化碳、提升風味的關鍵步驟。</li>
+                            <li><strong>悶蒸：：</strong>將咖啡粉倒入濾杯，輕輕搖勻。第一次注水時，水量約為咖啡粉的兩倍（例如15克咖啡粉注入30毫升水），均勻潤濕所有咖啡粉，等待 20-30 秒，讓咖啡粉膨脹。這是釋放二氧化碳、提升風味的關鍵步驟。</li>
                             <li><strong>分段注水：</strong>悶蒸後，分 2-3 次緩慢、穩定地以畫圓方式注水，避免直接沖擊濾紙壁。每次注水之間可稍作停頓，等待水位下降。總沖泡時間控制在 2-3 分鐘內。</li>
                         </ol>
                         <p class="mt-4">多加練習，您會發現手沖咖啡的無限樂趣！</p>
@@ -1182,7 +1178,7 @@
                         <p>正確保存咖啡豆是維持其新鮮風味的關鍵。咖啡豆最大的敵人是：<strong>光線、空氣、濕氣、高溫</strong>。</p>
                         <ul class="list-disc list-inside ml-4 mt-2 space-y-2">
                             <li><strong>密封容器：</strong>使用不透光、密封性良好的咖啡豆罐或帶有單向排氣閥的包裝袋。單向排氣閥能讓咖啡豆排出的二氧化碳逸出，同時阻擋外界空氣進入。</li>
-                            <li><strong>避光：：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
+                            <li><strong>避光：</strong>將咖啡豆存放在陰涼、乾燥且避光的地方，例如櫥櫃內，避免陽光直射。</li>
                             <li><strong>避免潮濕：</strong>濕氣會加速咖啡豆變質。切勿將咖啡豆存放在潮濕的環境，如水槽旁或冰箱冷藏室（除非是真空包裝且確定不會頻繁取出導致溫差凝結水珠）。</li>
                             <li><strong>適宜溫度：</strong>室溫存放即可，避免高溫環境，如爐具旁。若想長期保存未開封的咖啡豆，可考慮冷凍，但務必使用真空密封包裝，且取出後一次用完，避免重複解凍。</li>
                             <li><strong>研磨後儘快沖泡：</strong>咖啡豆一旦研磨成粉，接觸空氣的面積會大幅增加，風味流失速度加快。建議喝多少磨多少，享受最新鮮的風味。</li>
@@ -1198,13 +1194,13 @@
                         <ul class="list-disc list-inside ml-4 space-y-2">
                             <li><strong>情緒引導：</strong>輕柔、舒緩的音樂，如古典樂或輕爵士，能營造放鬆的氛圍，讓您更能細細品味咖啡的細膩層次。</li>
                             <li><strong>風味聯想：</strong>某些音樂的節奏、音高和音色，可能與咖啡的特定風味特徵產生聯想。例如，高音調的音樂可能讓您感覺到咖啡的酸質更明亮，而低沉的音符則可能增強其醇厚度。</li>
-                            <li><strong>分散注意力：</strong>適當的背景音樂可以分散對環境噪音的注意力，讓您的味覺和嗅覺感官更專注於咖啡本身。</li>
+                            <li><strong>分散注意力：：</strong>適當的背景音樂可以分散對環境噪音的注意力，讓您的味覺和嗅覺感官更專注於咖啡本身。</li>
                         </ul>
                         <h4 class="font-semibold mt-4 mb-2">推薦搭配：</h4>
                         <ul class="list-disc list-inside ml-4 space-y-2">
                             <li><strong>濃郁醇厚型咖啡（如曼特寧、義式濃縮）：</strong>搭配藍調、爵士樂或靈魂樂，讓其豐富的層次感更加突出。</li>
                             <li><strong>清新明亮型咖啡（如耶加雪菲、肯亞）：</strong>搭配輕快、高頻的音樂，如古典小品、Chill-hop 或輕柔的流行音樂，襯托其花果香氣。</li>
-                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
+                            <li><strong>平衡感佳的咖啡（如哥倫比亞、巴西）：：</strong>各種音樂類型都能適配，您可以根據心情自由選擇。</li>
                         </ul>
                         <p class="mt-4">下次品嚐咖啡時，不妨打開您的專屬歌單，讓音樂與咖啡共同為您帶來一場難忘的感官體驗吧！</p>
                     `
@@ -1271,7 +1267,7 @@
             let activeParticles = []; // Store active particle meshes for removal
 
             // Particle System Configuration
-            const MUSICAL_NOTES_EMOJI = '🎶';
+            const MUSICAL_NOTES_EMOJI = '�';
             const PARTICLE_LIFESPAN = 3000; // milliseconds for DOM particles
 
             // Function to create and animate a 3D particle (THREE.Mesh based)
@@ -1369,7 +1365,7 @@
                 particleDiv.style.setProperty('--duration', duration);
                 particleDiv.style.setProperty('--rotate-duration', rotationDuration);
                 particleDiv.style.setProperty('--animation-name', 'floatAndFadeNote'); 
-
+                
                 document.body.appendChild(particleDiv);
                 
                 setTimeout(() => {
@@ -2232,13 +2228,13 @@
                 // window.loadAndRenderAllData(); // This will be called by onAuthStateChanged
 
 
-                // Coffee Grounds Flip Card functionality
-                document.querySelectorAll('.flip-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        card.classList.toggle('flipped');
-                    });
-                });
-                console.log('[DEBUG] Coffee grounds flip card functionality set up.');
+                // Coffee Grounds Flip Card functionality - REMOVED for video integration
+                // document.querySelectorAll('.flip-card').forEach(card => {
+                //     card.addEventListener('click', () => {
+                //         card.classList.toggle('flipped');
+                //     });
+                // });
+                console.log('[DEBUG] Coffee grounds flip card functionality removed.');
 
                 // Coffee Fact Toast (Initial random display)
                 setInterval(showRandomCoffeeFact, Math.random() * 30000 + 30000); // Between 30 and 60 seconds
@@ -2296,3 +2292,4 @@
     </script>
 </body>
 </html>
+�
