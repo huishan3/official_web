@@ -772,7 +772,7 @@
                                 <p><span class="font-semibold">重量:</span> <span id="detail-weight"></span></p>
                                 <p><span class="font-semibold">期限:</span> <span id="detail-expiry"></span></p>
                                 <p class="col-span-2"><span class="font-semibold">風味:</span> <span id="detail-flavor"></span></p>
-                                <p class="col-span-2"><span class="font-semibold">庫存:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p>
+                                <p class="col-span-2"><span class="font-semibold">供應狀態:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p>
                                 <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
                             </div>
                             <div id="detail-intro-block" class="mt-4 p-4 bg-white rounded-lg border border-blue-100">
@@ -1431,6 +1431,10 @@
                         <p class="text-xl font-bold text-primary">${formatCurrency(price)}</p>
                         <p class="text-xs text-gray-500">庫存 ${stock} 包</p>
                     `;
+                    priceBlock.innerHTML = `
+                        <p class="text-xl font-bold text-primary">${formatCurrency(price)}</p>
+                        <p class="text-xs text-gray-500">${stock > 0 ? '可下單' : '暫停供應'}</p>
+                    `;
                     footer.appendChild(priceBlock);
 
                     const button = document.createElement('button');
@@ -1439,6 +1443,7 @@
                     button.dataset.shopAdd = product.id;
                     button.disabled = stock <= 0;
                     button.textContent = stock > 0 ? '加入購物車' : '已售罄';
+                    button.textContent = stock > 0 ? '加入購物車' : '暫停供應';
                     footer.appendChild(button);
 
                     body.appendChild(footer);
@@ -1551,8 +1556,35 @@
 
             function buildOrderEmailBody(order) {
                 const itemLines = order.items.map((item, index) => {
-                    return `${index + 1}. ${item.name} x ${item.qty} - ${formatCurrency(item.price * item.qty)}`;
+                    return [
+                        `ITEM ${index + 1}`,
+                        `ProductID: ${item.id}`,
+                        `ProductName: ${item.name}`,
+                        `QtySold: ${item.qty}`,
+                        `StockAtOrder: ${item.stock}`,
+                        `UnitPrice: ${item.price}`,
+                        `LineTotal: ${item.price * item.qty}`
+                    ].join('\n');
                 }).join('\n');
+
+                return [
+                    'Melody Bean Order',
+                    `OrderID: ${order.orderId}`,
+                    `CreatedAt: ${order.createdAt}`,
+                    `CustomerName: ${order.customerName}`,
+                    `CustomerPhone: ${order.customerPhone}`,
+                    `CustomerAddress: ${order.customerAddress}`,
+                    `PaymentMethod: COD`,
+                    `ShippingFee: ${order.shippingFee}`,
+                    `Subtotal: ${order.subtotal}`,
+                    `Total: ${order.total}`,
+                    `Note: ${order.note || ''}`,
+                    '',
+                    'ITEMS',
+                    itemLines,
+                    '',
+                    '請在 Google Sheet 將 ShippingStatus 改為 Shipped 後再扣庫存。'
+                ].join('\n');
 
                 return [
                     'Melody Bean 咖啡豆訂單',
@@ -1584,8 +1616,9 @@
             function openGmailOrderDraft(order) {
                 const subject = encodeURIComponent(`[Melody Bean 咖啡豆訂單] ${order.orderId}`);
                 const body = encodeURIComponent(buildOrderEmailBody(order));
+                const stableSubject = encodeURIComponent(`[Melody Bean 訂單] ${order.orderId}`);
                 const to = encodeURIComponent(ORDER_RECIPIENT_EMAIL);
-                const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+                const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${stableSubject}&body=${body}`;
                 window.open(gmailComposeUrl, '_blank', 'noopener');
             }
 
@@ -2349,7 +2382,7 @@
                 }
                 renderProductVideo(bean);
                 document.getElementById('detail-price').textContent = bean.price !== undefined ? bean.price : 'N/A';
-                document.getElementById('detail-stock').textContent = (bean.stock !== undefined ? bean.stock : 'N/A') + ' 包';
+                document.getElementById('detail-stock').textContent = getAvailableStock(bean) > 0 ? '可訂購' : '暫停供應';
 
                 const stockStatusElement = document.getElementById('stock-status');
                 stockStatusElement.className = 'stock-indicator'; // Reset classes
@@ -2364,6 +2397,7 @@
                     stockStatusElement.textContent = '已售罄';
                     stockStatusElement.classList.add('stock-out-of-stock');
                 }
+                stockStatusElement.textContent = getAvailableStock(bean) > 0 ? '可訂購' : '暫停供應';
 
                 document.getElementById('lifestyle-suggestion').innerHTML = `
                     <h4 class="font-bold font-serif text-lg text-accent mb-2">生活提案</h4>
