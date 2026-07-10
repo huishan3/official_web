@@ -1177,31 +1177,18 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-        // Firebase Configuration (from Canvas environment)
-        let firebaseConfig = {};
-        try {
-            // Check if __firebase_config is defined and not empty
-            if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
-                firebaseConfig = JSON.parse(__firebase_config);
-                // Basic validation for essential keys
-                if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
-                    console.error("[Firebase Init Error] __firebase_config is provided but seems incomplete. Please check your Firebase project configuration.");
-                    // Fallback to dummy config to prevent crash, but functionality will be limited
-                    firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-                }
-            } else {
-                console.error("[Firebase Init Error] __firebase_config environment variable is not set or is empty. Firebase will not function correctly.");
-                // Fallback to dummy config to prevent crash
-                firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-            }
-        } catch (e) {
-            console.error("[Firebase Init Error] Failed to parse __firebase_config. Ensure it is valid JSON.", e);
-            // Fallback to dummy config to prevent crash
-            firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
-        }
+        // Firebase Configuration - must match the admin site for real-time product sync.
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMO_9eufgKuEoJ5Kob5W4SuDikaX-Drqg",
+            authDomain: "product-display-system.firebaseapp.com",
+            projectId: "product-display-system",
+            storageBucket: "product-display-system.firebasestorage.app",
+            messagingSenderId: "253942464889",
+            appId: "1:253942464889:web:1cd581c08faf962ea4efa8",
+            measurementId: "G-NTG56CZC9N"
+        };
 
-        // Get the app ID from environment variable, fallback to default if not set
-        const appId = typeof __app_id !== 'undefined' && __app_id !== '' ? __app_id : 'default-app-id';
+        const appId = "1:253942464889:web:1cd581c08faf962ea4efa8";
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
