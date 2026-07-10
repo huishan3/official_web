@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -674,8 +675,8 @@
 </head>
 <body>
     <!-- Loading overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[1000] transition-opacity duration-500 ease-in-out">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
         <p class="text-xl text-secondary">正在為您準備香醇的咖啡體驗...</p>
     </div>
 
@@ -683,7 +684,8 @@
         <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
             <a href="#home" class="text-3xl font-serif text-secondary">Melody Bean</a>
             <div class="hidden md:flex items-center space-x-6 text-lg">
-                <a href="#flavor-guide" class="hover:text-primary transition-colors nav-link">風味探索</a>
+                <a href="#flavor-guide" class="hover:text-primary transition-colors nav-link">展示區</a>
+                <a href="#shop" class="hover:text-primary transition-colors nav-link">購買區</a>
                 <a href="#our-beans" class="hover:text-primary transition-colors nav-link">精選咖啡豆</a>
                 <a href="#coffee-grounds-magic" class="hover:text-primary transition-colors nav-link">咖啡渣魔法</a>
                 <a href="#story" class="hover:text-primary transition-colors nav-link">我們的故事</a>
@@ -692,21 +694,7 @@
                 <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
                 <!-- Removed backend link as requested -->
             </div>
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden text-secondary text-2xl focus:outline-none">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="md:hidden bg-white/90 backdrop-blur-md hidden flex-col items-center py-4 space-y-4">
-            <a href="#flavor-guide" class="hover:text-primary transition-colors nav-link">風味探索</a>
-            <a href="#our-beans" class="hover:text-primary transition-colors nav-link">精選咖啡豆</a>
-            <a href="#coffee-grounds-magic" class="hover:text-primary transition-colors nav-link">咖啡渣魔法</a>
-            <a href="#story" class="hover:text-primary transition-colors nav-link">我們的故事</a>
-            <a href="#knowledge" class="hover:text-primary transition-colors nav-link">咖啡知識</a>
-            <a href="#image-gallery" class="hover:text-primary transition-colors nav-link">咖啡藝廊</a>
-            <a href="#faq" class="hover:text-primary transition-colors nav-link">常見問題</a>
-        </div>
+            </div>
     </nav>
 
     <main>
@@ -752,8 +740,8 @@
         <section id="flavor-guide" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <div class="fade-in-up">
-                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">風味探索指南</h2>
-                    <p class="mt-4 text-lg text-gray-600 mb-8">不知道如何選擇？讓我們為您視覺化每一款咖啡的獨特個性。</p>
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">展示區：風味與商品資訊</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">後台更新商品資料與圖片後，這裡會即時顯示最新的咖啡豆資訊。</p>
                 </div>
                 <div class="flex flex-col md:flex-row items-center gap-8 fade-in-up">
                     <div class="w-full">
@@ -774,6 +762,7 @@
                             </div>
                             <!-- 實際的詳細資訊內容 -->
                             <h4 class="font-bold font-serif text-lg text-blue-700 mb-2">品項詳細資訊</h4>
+                            <img id="detail-image" src="image/image_1.png" alt="咖啡豆商品圖片" class="w-full h-56 object-cover rounded-lg mb-4 bg-white border border-blue-100">
                             <div class="grid grid-cols-2 gap-2 text-sm">
                                 <p><span class="font-semibold">名稱:</span> <span id="detail-name"></span></p>
                                 <p><span class="font-semibold">國家:</span> <span id="detail-country"></span></p>
@@ -831,6 +820,68 @@
                         <h3 class="text-xl font-serif mb-2">哥倫比亞 薇拉</h3>
                         <p class="text-gray-600 text-sm">風味：核桃、可可、焦糖</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="shop" class="py-20 bg-white/70 relative overflow-hidden">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="fade-in-up text-center">
+                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">購買區：咖啡豆下單</h2>
+                    <p class="mt-4 text-lg text-gray-600 mb-8">選好喜歡的咖啡豆後，送出訂單會開啟 Gmail 草稿，商品與貨到付款資訊都會自動填好，請確認內容後再寄出。</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+                    <div>
+                        <div id="shop-products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">正在載入可購買品項...</div>
+                        </div>
+                    </div>
+
+                    <aside class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-serif text-secondary">購物車</h3>
+                            <span id="shop-cart-count" class="text-sm text-gray-500">0 件商品</span>
+                        </div>
+                        <div id="shop-cart-items" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                            <p class="text-gray-500 text-sm">購物車目前是空的。</p>
+                        </div>
+                        <div class="border-t border-gray-200 mt-4 pt-4 space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>小計</span>
+                                <strong id="shop-subtotal">NT$0</strong>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>運費</span>
+                                <span id="shop-shipping">NT$60</span>
+                            </div>
+                            <div class="flex justify-between text-lg text-primary">
+                                <span class="font-bold">總金額</span>
+                                <strong id="shop-total">NT$60</strong>
+                            </div>
+                            <p class="text-xs text-gray-500">付款方式：貨到付款，實際訂單請以 Gmail 草稿確認內容為準。</p>
+                        </div>
+
+                        <form id="shop-order-form" class="mt-6 space-y-4">
+                            <div>
+                                <label for="shop-customer-name" class="block text-sm font-medium text-gray-700 mb-1">收件人姓名</label>
+                                <input type="text" id="shop-customer-name" class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" required>
+                            </div>
+                            <div>
+                                <label for="shop-customer-phone" class="block text-sm font-medium text-gray-700 mb-1">聯絡電話</label>
+                                <input type="tel" id="shop-customer-phone" class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" required>
+                            </div>
+                            <div>
+                                <label for="shop-customer-address" class="block text-sm font-medium text-gray-700 mb-1">收件地址</label>
+                                <textarea id="shop-customer-address" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" required></textarea>
+                            </div>
+                            <div>
+                                <label for="shop-order-note" class="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                                <textarea id="shop-order-note" rows="2" class="w-full p-3 border border-gray-300 rounded-md focus:ring-primary focus:border-primary" placeholder="例如：希望配送前先來電"></textarea>
+                            </div>
+                            <button type="submit" id="shop-submit-order" class="btn-primary w-full py-3 rounded-md text-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>開啟 Gmail 下單信</button>
+                        </form>
+                    </aside>
                 </div>
             </div>
         </section>
@@ -1126,20 +1177,31 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-        // Firebase Configuration (從使用者提供)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCMO_9eufgKuEoJ5Kob5W4SuDikaX-Drqg",
-            authDomain: "product-display-system.firebaseapp.com",
-            projectId: "product-display-system",
-            storageBucket: "product-display-system.firebasestorage.app",
-            messagingSenderId: "253942464889",
-            appId: "1:253942464889:web:1cd581c08faf962ea4efa8",
-            measurementId: "G-NTG56CZC9N"
-        };
+        // Firebase Configuration (from Canvas environment)
+        let firebaseConfig = {};
+        try {
+            // Check if __firebase_config is defined and not empty
+            if (typeof __firebase_config !== 'undefined' && __firebase_config !== '') {
+                firebaseConfig = JSON.parse(__firebase_config);
+                // Basic validation for essential keys
+                if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+                    console.error("[Firebase Init Error] __firebase_config is provided but seems incomplete. Please check your Firebase project configuration.");
+                    // Fallback to dummy config to prevent crash, but functionality will be limited
+                    firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+                }
+            } else {
+                console.error("[Firebase Init Error] __firebase_config environment variable is not set or is empty. Firebase will not function correctly.");
+                // Fallback to dummy config to prevent crash
+                firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+            }
+        } catch (e) {
+            console.error("[Firebase Init Error] Failed to parse __firebase_config. Ensure it is valid JSON.", e);
+            // Fallback to dummy config to prevent crash
+            firebaseConfig = {"apiKey": "dummy-api-key", "authDomain": "dummy-auth-domain", "projectId": "dummy-project-id", "storageBucket": "dummy-storage-bucket", "messagingSenderId": "dummy-messaging-sender-id", "appId": "dummy-app-id"};
+        }
 
         // Get the app ID from environment variable, fallback to default if not set
-        // 使用者提供的 appId 已經是完整的，直接使用
-        const appId = "1:253942464889:web:1cd581c08faf962ea4efa8";
+        const appId = typeof __app_id !== 'undefined' && __app_id !== '' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -1220,6 +1282,283 @@
                 "image/image_7.png",
                 "image/image_8.png"
             ];
+
+            const ORDER_RECIPIENT_EMAIL = 'melodybean33427@gmail.com';
+            const SHOP_SHIPPING_FEE = 60;
+            let shopCart = {};
+
+            function formatCurrency(amount) {
+                const safeAmount = Number(amount) || 0;
+                return `NT$${safeAmount.toLocaleString('zh-TW')}`;
+            }
+
+            function escapeHTML(value) {
+                return String(value).replace(/[&<>"']/g, (char) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+            }
+
+            function getProductImage(product, index) {
+                return product.imageUrl || product.image_url || product.image || galleryImages[index % galleryImages.length];
+            }
+
+            function getAvailableStock(product) {
+                const stock = Number(product.stock);
+                return Number.isFinite(stock) ? stock : 0;
+            }
+
+            function renderShopProducts() {
+                const grid = document.getElementById('shop-products-grid');
+                if (!grid) return;
+
+                grid.innerHTML = '';
+
+                if (globalFlavorData.length === 0) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'bg-white rounded-lg shadow p-6 text-center text-gray-500 sm:col-span-2';
+                    emptyState.textContent = '目前尚無可購買品項，請稍後再回來看看。';
+                    grid.appendChild(emptyState);
+                    renderShopCart();
+                    return;
+                }
+
+                const sortedProducts = [...globalFlavorData].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+                sortedProducts.forEach((product, index) => {
+                    const stock = getAvailableStock(product);
+                    const price = Number(product.price) || 0;
+                    const card = document.createElement('article');
+                    card.className = 'bg-white rounded-lg shadow card overflow-hidden flex flex-col';
+
+                    const image = document.createElement('img');
+                    image.src = getProductImage(product, index);
+                    image.alt = product.name || 'Melody Bean 咖啡豆';
+                    image.className = 'w-full h-52 object-cover';
+                    card.appendChild(image);
+
+                    const body = document.createElement('div');
+                    body.className = 'p-5 flex flex-col flex-1';
+
+                    const title = document.createElement('h3');
+                    title.className = 'text-xl font-serif text-secondary mb-2';
+                    title.textContent = product.name || '未命名咖啡豆';
+                    body.appendChild(title);
+
+                    const meta = document.createElement('p');
+                    meta.className = 'text-sm text-gray-600 mb-3';
+                    meta.textContent = [product.country, product.roast, product.weight].filter(Boolean).join(' / ') || '精品咖啡豆';
+                    body.appendChild(meta);
+
+                    const flavor = document.createElement('p');
+                    flavor.className = 'text-sm text-gray-700 mb-4 flex-1';
+                    flavor.textContent = product.flavor ? `風味：${product.flavor}` : '風味資訊更新中';
+                    body.appendChild(flavor);
+
+                    const footer = document.createElement('div');
+                    footer.className = 'flex items-center justify-between gap-3';
+
+                    const priceBlock = document.createElement('div');
+                    priceBlock.innerHTML = `
+                        <p class="text-xl font-bold text-primary">${formatCurrency(price)}</p>
+                        <p class="text-xs text-gray-500">庫存 ${stock} 包</p>
+                    `;
+                    footer.appendChild(priceBlock);
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = stock > 0 ? 'btn-primary px-4 py-2 rounded-md text-sm whitespace-nowrap' : 'px-4 py-2 rounded-md text-sm bg-gray-300 text-gray-600 cursor-not-allowed whitespace-nowrap';
+                    button.dataset.shopAdd = product.id;
+                    button.disabled = stock <= 0;
+                    button.textContent = stock > 0 ? '加入購物車' : '已售罄';
+                    footer.appendChild(button);
+
+                    body.appendChild(footer);
+                    card.appendChild(body);
+                    grid.appendChild(card);
+                });
+
+                renderShopCart();
+            }
+
+            function calculateShopSubtotal() {
+                return Object.values(shopCart).reduce((total, item) => total + item.price * item.qty, 0);
+            }
+
+            function renderShopCart() {
+                const cartItems = document.getElementById('shop-cart-items');
+                const cartCount = document.getElementById('shop-cart-count');
+                const subtotalEl = document.getElementById('shop-subtotal');
+                const shippingEl = document.getElementById('shop-shipping');
+                const totalEl = document.getElementById('shop-total');
+                const submitButton = document.getElementById('shop-submit-order');
+                if (!cartItems || !cartCount || !subtotalEl || !shippingEl || !totalEl || !submitButton) return;
+
+                cartItems.innerHTML = '';
+                const items = Object.values(shopCart);
+                const itemCount = items.reduce((total, item) => total + item.qty, 0);
+                const subtotal = calculateShopSubtotal();
+                const shipping = itemCount > 0 ? SHOP_SHIPPING_FEE : 0;
+
+                cartCount.textContent = `${itemCount} 件商品`;
+                subtotalEl.textContent = formatCurrency(subtotal);
+                shippingEl.textContent = formatCurrency(shipping);
+                totalEl.textContent = formatCurrency(subtotal + shipping);
+                submitButton.disabled = itemCount === 0;
+
+                if (itemCount === 0) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-gray-500 text-sm';
+                    empty.textContent = '購物車目前是空的。';
+                    cartItems.appendChild(empty);
+                    return;
+                }
+
+                items.forEach((item) => {
+                    const row = document.createElement('div');
+                    row.className = 'border border-gray-200 rounded-md p-3';
+                    row.innerHTML = `
+                        <div class="flex justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-secondary">${escapeHTML(item.name)}</p>
+                                <p class="text-xs text-gray-500">${formatCurrency(item.price)} / 包</p>
+                            </div>
+                            <button type="button" class="text-gray-400 hover:text-red-500" data-shop-remove="${item.id}" aria-label="移除 ${escapeHTML(item.name)}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <div class="flex items-center border rounded-md overflow-hidden">
+                                <button type="button" class="px-3 py-1 bg-gray-100 hover:bg-gray-200" data-shop-qty="${item.id}" data-delta="-1">-</button>
+                                <span class="px-3 py-1 min-w-[2.5rem] text-center">${item.qty}</span>
+                                <button type="button" class="px-3 py-1 bg-gray-100 hover:bg-gray-200" data-shop-qty="${item.id}" data-delta="1">+</button>
+                            </div>
+                            <strong class="text-primary">${formatCurrency(item.price * item.qty)}</strong>
+                        </div>
+                    `;
+                    cartItems.appendChild(row);
+                });
+            }
+
+            function addProductToShopCart(productId) {
+                const product = globalFlavorData.find(item => item.id === productId);
+                if (!product) return;
+
+                const stock = getAvailableStock(product);
+                const currentQty = shopCart[productId]?.qty || 0;
+                if (stock <= currentQty) {
+                    showFrontMessageModal('庫存不足', '此商品已達目前可購買數量。', 'info');
+                    return;
+                }
+
+                shopCart[productId] = {
+                    id: productId,
+                    name: product.name || '未命名咖啡豆',
+                    price: Number(product.price) || 0,
+                    qty: currentQty + 1,
+                    stock
+                };
+                renderShopCart();
+                showCoffeeFactToast(`已加入購物車：${shopCart[productId].name}`, 2200);
+            }
+
+            function updateShopCartQuantity(productId, delta) {
+                if (!shopCart[productId]) return;
+                const nextQty = shopCart[productId].qty + delta;
+                if (nextQty <= 0) {
+                    delete shopCart[productId];
+                } else if (nextQty <= shopCart[productId].stock) {
+                    shopCart[productId].qty = nextQty;
+                } else {
+                    showFrontMessageModal('庫存不足', '此商品已達目前可購買數量。', 'info');
+                }
+                renderShopCart();
+            }
+
+            function generateShopOrderId() {
+                const now = new Date();
+                return `MB-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+            }
+
+            function buildOrderEmailBody(order) {
+                const itemLines = order.items.map((item, index) => {
+                    return `${index + 1}. ${item.name} x ${item.qty} - ${formatCurrency(item.price * item.qty)}`;
+                }).join('\n');
+
+                return [
+                    'Melody Bean 咖啡豆訂單',
+                    '',
+                    `訂單編號：${order.orderId}`,
+                    `下單時間：${order.createdAt}`,
+                    '',
+                    '收件資訊',
+                    `姓名：${order.customerName}`,
+                    `電話：${order.customerPhone}`,
+                    `地址：${order.customerAddress}`,
+                    '',
+                    '付款與配送',
+                    '付款方式：貨到付款',
+                    '付款說明：請於收到商品時付款給配送人員。',
+                    order.note ? `備註：${order.note}` : '備註：無',
+                    '',
+                    '商品明細',
+                    itemLines,
+                    '',
+                    `小計：${formatCurrency(order.subtotal)}`,
+                    `運費：${formatCurrency(order.shippingFee)}`,
+                    `總金額：${formatCurrency(order.total)}`,
+                    '',
+                    '我已確認以上訂單內容，請協助安排出貨，謝謝。'
+                ].join('\n');
+            }
+
+            function openGmailOrderDraft(order) {
+                const subject = encodeURIComponent(`[Melody Bean 咖啡豆訂單] ${order.orderId}`);
+                const body = encodeURIComponent(buildOrderEmailBody(order));
+                const to = encodeURIComponent(ORDER_RECIPIENT_EMAIL);
+                const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+                window.open(gmailComposeUrl, '_blank', 'noopener');
+            }
+
+            function handleShopOrderSubmit(event) {
+                event.preventDefault();
+
+                const items = Object.values(shopCart);
+                if (items.length === 0) {
+                    showFrontMessageModal('購物車是空的', '請先選擇想購買的咖啡豆。', 'info');
+                    return;
+                }
+
+                const customerName = document.getElementById('shop-customer-name').value.trim();
+                const customerPhone = document.getElementById('shop-customer-phone').value.trim();
+                const customerAddress = document.getElementById('shop-customer-address').value.trim();
+                const note = document.getElementById('shop-order-note').value.trim();
+
+                if (!customerName || !customerPhone || !customerAddress) {
+                    showFrontMessageModal('資料未填完整', '請填寫收件人姓名、聯絡電話與收件地址。', 'error');
+                    return;
+                }
+
+                const subtotal = calculateShopSubtotal();
+                const order = {
+                    orderId: generateShopOrderId(),
+                    createdAt: new Date().toLocaleString('zh-TW'),
+                    customerName,
+                    customerPhone,
+                    customerAddress,
+                    note,
+                    items: items.map(item => ({ ...item })),
+                    subtotal,
+                    shippingFee: SHOP_SHIPPING_FEE,
+                    total: subtotal + SHOP_SHIPPING_FEE
+                };
+
+                openGmailOrderDraft(order);
+                showFrontMessageModal('已開啟 Gmail 草稿', '訂單內容、商品明細與貨到付款資訊已填入 Gmail 撰寫畫面。請確認內容後手動寄出。', 'success');
+            }
             
             // Function to show custom front-end modal messages
             window.showFrontMessageModal = function(title, message, type = 'info') {
@@ -1270,7 +1609,7 @@
             let activeParticles = []; // Store active particle meshes for removal
 
             // Particle System Configuration
-            const MUSICAL_NOTES_EMOJI = '🎵';
+            const MUSICAL_NOTES_EMOJI = '�';
             const PARTICLE_LIFESPAN = 3000; // milliseconds for DOM particles
 
             // Function to create and animate a 3D particle (THREE.Mesh based)
@@ -1926,6 +2265,11 @@
 
             // Function to render coffee bean details
             function renderBeanDetails(bean) {
+                const detailImage = document.getElementById('detail-image');
+                if (detailImage) {
+                    detailImage.src = getProductImage(bean, 0);
+                    detailImage.alt = `${bean.name || 'Melody Bean'} 商品圖片`;
+                }
                 document.getElementById('detail-name').textContent = bean.name || 'N/A';
                 document.getElementById('detail-country').textContent = bean.country || 'N/A';
                 document.getElementById('detail-variety').textContent = bean.variety || 'N/A';
@@ -1977,6 +2321,7 @@
                 // This function will now be primarily triggered by Firestore snapshot listener
                 // and will re-render UI based on `globalFlavorData`
                 populateFlavorSelect();
+                renderShopProducts();
                 // Set initial selection or default display if data exists
                 if (globalFlavorData.length > 0) {
                     const defaultBean = globalFlavorData[0]; // Use the first item as default
@@ -2047,6 +2392,44 @@
                 document.getElementById('btn-start-grinding').addEventListener('click', startGrinding);
                 document.getElementById('btn-start-brewing').addEventListener('click', startBrewing);
                 document.getElementById('btn-reset-machine').addEventListener('click', resetMachine);
+
+                const shopProductsGrid = document.getElementById('shop-products-grid');
+                if (shopProductsGrid) {
+                    shopProductsGrid.addEventListener('click', (event) => {
+                        const addButton = event.target.closest('[data-shop-add]');
+                        if (!addButton) return;
+                        addProductToShopCart(addButton.dataset.shopAdd);
+                    });
+                }
+
+                const shopCartItems = document.getElementById('shop-cart-items');
+                if (shopCartItems) {
+                    shopCartItems.addEventListener('click', (event) => {
+                        const qtyButton = event.target.closest('[data-shop-qty]');
+                        if (qtyButton) {
+                            updateShopCartQuantity(qtyButton.dataset.shopQty, Number(qtyButton.dataset.delta));
+                            return;
+                        }
+
+                        const removeButton = event.target.closest('[data-shop-remove]');
+                        if (removeButton) {
+                            delete shopCart[removeButton.dataset.shopRemove];
+                            renderShopCart();
+                        }
+                    });
+                }
+
+                const shopOrderForm = document.getElementById('shop-order-form');
+                if (shopOrderForm) {
+                    shopOrderForm.addEventListener('submit', handleShopOrderSubmit);
+                }
+                renderShopCart();
+                setTimeout(() => {
+                    const grid = document.getElementById('shop-products-grid');
+                    if (grid && grid.innerText.includes('正在載入可購買品項')) {
+                        renderShopProducts();
+                    }
+                }, 6000);
 
 
                 // Flavor Select Change Listener
@@ -2272,7 +2655,6 @@
                     } else {
                         console.log("[Firebase Auth] No user signed in. Signing in anonymously...");
                         let initialAuthToken = null;
-                        // 這裡使用 __initial_auth_token 環境變數，如果沒有則嘗試匿名登入
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token !== '') {
                             initialAuthToken = __initial_auth_token;
                         } else {
@@ -2296,3 +2678,4 @@
     </script>
 </body>
 </html>
+�
