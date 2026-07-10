@@ -775,6 +775,15 @@
                                 <p class="col-span-2"><span class="font-semibold">庫存:</span> <span id="detail-stock"></span> <span id="stock-status" class="stock-indicator"></span></p>
                                 <p class="col-span-2 text-lg font-bold text-primary">售價: NT$<span id="detail-price"></span></p>
                             </div>
+                            <div id="detail-intro-block" class="mt-4 p-4 bg-white rounded-lg border border-blue-100">
+                                <h5 class="font-bold text-blue-700 mb-2">商品介紹</h5>
+                                <p id="detail-intro" class="text-sm leading-7"></p>
+                            </div>
+                            <div id="detail-video-block" class="mt-4 p-4 bg-white rounded-lg border border-blue-100 hidden">
+                                <h5 id="detail-video-title" class="font-bold text-blue-700 mb-2">影片介紹</h5>
+                                <div id="detail-video-embed" class="rounded-lg overflow-hidden bg-gray-100"></div>
+                                <p id="detail-video-description" class="text-sm leading-7 mt-3 text-gray-600"></p>
+                            </div>
                         </div>
                         <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
                             <button id="refresh-coffee-btn" class="px-8 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors inline-block">
@@ -1294,6 +1303,49 @@
                 return product.imageUrl || product.image_url || product.image || galleryImages[index % galleryImages.length];
             }
 
+            function getProductIntro(product) {
+                return product.productIntro || product.intro || product.description || product.flavor || product.lifestyle || '';
+            }
+
+            function getProductVideoUrl(product) {
+                return (product.videoUrl || product.video || product.productVideoUrl || '').trim();
+            }
+
+            function getYouTubeEmbedUrl(url) {
+                const match = String(url).match(/(?:youtube\.com\/watch\?v=|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+                return match ? `https://www.youtube.com/embed/${match[1]}` : '';
+            }
+
+            function renderProductVideo(product) {
+                const block = document.getElementById('detail-video-block');
+                const title = document.getElementById('detail-video-title');
+                const embed = document.getElementById('detail-video-embed');
+                const description = document.getElementById('detail-video-description');
+                if (!block || !title || !embed || !description) return;
+
+                const videoUrl = getProductVideoUrl(product);
+                if (!videoUrl) {
+                    block.classList.add('hidden');
+                    embed.innerHTML = '';
+                    description.textContent = '';
+                    return;
+                }
+
+                const safeTitle = product.videoTitle || '影片介紹';
+                const youtubeEmbed = getYouTubeEmbedUrl(videoUrl);
+                title.textContent = safeTitle;
+                description.textContent = product.videoDescription || '';
+                block.classList.remove('hidden');
+
+                if (youtubeEmbed) {
+                    embed.innerHTML = `<iframe class="w-full aspect-video" src="${youtubeEmbed}" title="${escapeHTML(safeTitle)}" allowfullscreen loading="lazy"></iframe>`;
+                } else if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(videoUrl)) {
+                    embed.innerHTML = `<video class="w-full" src="${escapeHTML(videoUrl)}" controls playsinline preload="metadata"></video>`;
+                } else {
+                    embed.innerHTML = `<a class="block p-4 text-primary underline" href="${escapeHTML(videoUrl)}" target="_blank" rel="noopener">開啟影片連結</a>`;
+                }
+            }
+
             function getAvailableStock(product) {
                 const stock = Number(product.stock);
                 return Number.isFinite(stock) ? Math.max(0, Math.floor(stock)) : 0;
@@ -1368,6 +1420,7 @@
                     const flavor = document.createElement('p');
                     flavor.className = 'text-sm text-gray-700 mb-4 flex-1';
                     flavor.textContent = product.flavor ? `風味：${product.flavor}` : '風味資訊更新中';
+                    flavor.textContent = getProductIntro(product) || flavor.textContent || '商品介紹更新中';
                     body.appendChild(flavor);
 
                     const footer = document.createElement('div');
@@ -2290,6 +2343,11 @@
                 document.getElementById('detail-weight').textContent = bean.weight || 'N/A';
                 document.getElementById('detail-expiry').textContent = bean.expiry || 'N/A';
                 document.getElementById('detail-flavor').textContent = bean.flavor || 'N/A';
+                const detailIntro = document.getElementById('detail-intro');
+                if (detailIntro) {
+                    detailIntro.textContent = getProductIntro(bean) || '商品介紹更新中';
+                }
+                renderProductVideo(bean);
                 document.getElementById('detail-price').textContent = bean.price !== undefined ? bean.price : 'N/A';
                 document.getElementById('detail-stock').textContent = (bean.stock !== undefined ? bean.stock : 'N/A') + ' 包';
 
