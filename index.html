@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!-- Melody Bean frontend sync fix: Firebase + stock realtime sync v2026-07-10-2 -->
 <html lang="zh-TW">
@@ -898,19 +897,19 @@
         <section id="story" class="py-20 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">我們的故事</h2>
+                    <h2 id="editorial-story-title-front" class="text-4xl font-serif section-title animate-pulse-on-scroll">我們的故事</h2>
                 </div>
                 <div class="bg-white p-8 rounded-lg shadow-lg fade-in-up">
-                    <h3 class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
-                    <div class="text-gray-700 leading-relaxed">
+                    <h3 id="editorial-story-headline-front" class="text-2xl font-serif text-secondary mb-4">從樂音到咖啡香，始於一份純粹的熱愛</h3>
+                    <div id="editorial-story-body-front" class="text-gray-700 leading-relaxed">
                         <div class="mb-4"> 23 年前的今天，樂海樂器正式開幕，那是我們對聲音藝術的初心。一路走來，我們陪伴無數樂友選琴、修琴，更一起分享著對美好樂音的熱愛與執著。</div>
                         <div class="mb-4">☕ 2021 年，一場突如其來的疫情三級警戒，讓我心中湧現了不安。就在那段幾乎與世隔絕的日子裡，我卻意外地一頭栽進了咖啡烘焙的奇妙世界。咖啡的醇厚香氣，彷彿成了另一種心靈的安定劑與創意的泉源。</div>
                         <div class="mb-4">2024 年，我榮幸地參加烘豆比賽並獲得獎項，這份肯定更加堅定了我走上「雙品牌職人之路」的決心。從揚琴工坊的精湛細膩手工，到精品咖啡豆的精準火候掌控，我始終堅信——聲音與風味，都是值得我們傾注心血、用心雕琢的藝術。</div>
                     </div>
                     <!-- START: Local Video Integration (Updated from YouTube Embed) -->
-                    <div class="mt-8 text-center">
-                        <h4 class="text-2xl font-serif text-secondary mb-4">我們的品牌故事影片</h4>
-                        <div class="relative w-full overflow-hidden rounded-lg shadow-xl" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio for responsive video -->
+                    <div id="editorial-story-video-block-front" class="mt-8 text-center">
+                        <h4 id="editorial-story-video-title-front" class="text-2xl font-serif text-secondary mb-4">我們的品牌故事影片</h4>
+                        <div id="editorial-story-video-frame-front" class="relative w-full overflow-hidden rounded-lg shadow-xl" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio for responsive video -->
                             <video
                                 class="absolute top-0 left-0 w-full h-full rounded-lg"
                                 controls
@@ -926,15 +925,14 @@
                     <!-- END: Local Video Integration -->
                 </div>
                 <div class="mt-16 text-center fade-in-up">
-                    <h3 class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
+                    <h3 id="editorial-artisan-title-front" class="text-3xl font-serif section-title animate-pulse-on-scroll mb-8">幕後職人</h3>
                     <div class="card p-8 flex flex-col md:flex-row items-center gap-8">
                         <!-- Updated image path for "咖啡職人" -->
-                        <img src="image/image_3.jpg" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
+                        <img id="editorial-artisan-image-front" src="image/image_3.jpg" alt="咖啡職人" class="w-36 h-36 rounded-full object-cover">
                         <div class="text-left">
-                            <h4 class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
-                            <p class="text-lg text-primary mt-1">陳師傅</p>
-                            <p class="mt-4 text-gray-600">擁有超過20年的樂器製作工藝背景，將對精準與和諧的追求，完美轉化為對咖啡烘焙的熱情。對他而言，每一條烘焙曲線，都像是在譜寫一首動人的樂曲。</p>
-                            <p class="mt-2 text-gray-700">由陳師傅親自烘培，確保每一顆豆子都能展現其最佳風味。</p>
+                            <h4 id="editorial-artisan-role-front" class="text-2xl font-serif text-secondary">創辦人 / 首席烘豆師</h4>
+                            <p id="editorial-artisan-name-front" class="text-lg text-primary mt-1">陳師傅</p>
+                            <div id="editorial-artisan-bio-front"><p class="mt-4 text-gray-600">擁有超過20年的樂器製作工藝背景，將對精準與和諧的追求，完美轉化為對咖啡烘焙的熱情。對他而言，每一條烘焙曲線，都像是在譜寫一首動人的樂曲。</p><p class="mt-2 text-gray-700">由陳師傅親自烘培，確保每一顆豆子都能展現其最佳風味。</p></div>
                         </div>
                     </div>
                 </div>
@@ -944,23 +942,23 @@
         <section id="knowledge" class="py-20 bg-white/50 relative overflow-hidden">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">線上咖啡小學堂</h2>
-                    <p class="mt-4 text-lg text-gray-600 mb-8">一些關於咖啡的趣聞與知識，希望能豐富您的咖啡生活。</p>
+                    <h2 id="editorial-academy-title-front" class="text-4xl font-serif section-title animate-pulse-on-scroll">線上咖啡小學堂</h2>
+                    <p id="editorial-academy-intro-front" class="mt-4 text-lg text-gray-600 mb-8">一些關於咖啡的趣聞與知識，希望能豐富您的咖啡生活。</p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="card p-6 fade-in-up group">
-                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">手沖咖啡新手入門</h3>
-                        <p class="text-gray-600">想在家享受一杯完美的手沖咖啡嗎？從磨豆、水溫到注水技巧，我們為您整理了幾個關鍵步驟，讓您輕鬆上手。</p>
+                        <h3 id="editorial-knowledge-1-title-front" class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">手沖咖啡新手入門</h3>
+                        <p id="editorial-knowledge-1-summary-front" class="text-gray-600">想在家享受一杯完美的手沖咖啡嗎？從磨豆、水溫到注水技巧，我們為您整理了幾個關鍵步驟，讓您輕鬆上手。</p>
                         <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="1">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 100ms;">
-                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">如何保存咖啡豆？</h3>
-                        <p class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。根據不同的烘焙程度，咖啡豆可以保存數週到數月。</p>
+                        <h3 id="editorial-knowledge-2-title-front" class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">如何保存咖啡豆？</h3>
+                        <p id="editorial-knowledge-2-summary-front" class="text-gray-600">咖啡豆是嬌貴的農產品。避免光線、空氣、濕氣和高溫是保持其新鮮風味的不二法門。建議使用密封罐存放在陰涼處。根據不同的烘焙程度，咖啡豆可以保存數週到數月。</p>
                         <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="2">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                     <div class="card p-6 fade-in-up group" style="transition-delay: 200ms;">
-                        <h3 class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">音樂與咖啡的完美結合</h3>
-                        <p class="text-gray-600">您知道嗎？聆聽不同類型的音樂，可能會影響您對咖啡風味的感受。下次品嚐時，不妨試著搭配一首古典樂或爵士樂吧！</p>
+                        <h3 id="editorial-knowledge-3-title-front" class="text-xl font-serif mb-2 group-hover:text-primary transition-colors">音樂與咖啡的完美結合</h3>
+                        <p id="editorial-knowledge-3-summary-front" class="text-gray-600">您知道嗎？聆聽不同類型的音樂，可能會影響您對咖啡風味的感受。下次品嚐時，不妨試著搭配一首古典樂或爵士樂吧！</p>
                         <a href="javascript:void(0);" class="text-primary hover:underline mt-4 inline-block more-info-link" data-knowledge-id="3">閱讀更多 <i class="fas fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
@@ -1031,38 +1029,38 @@
         <section id="faq" class="py-20 relative overflow-hidden">
             <div class="max-w-4xl mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-serif section-title animate-pulse-on-scroll">常見問題</h2>
+                    <h2 id="editorial-faq-title-front" class="text-4xl font-serif section-title animate-pulse-on-scroll">常見問題</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="card p-6 fade-in-up">
                         <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
-                            <span class="mr-2">Melody Bean 的咖啡豆來源為何？</span>
+                            <span id="editorial-faq-1-question-front" class="mr-2">Melody Bean 的咖啡豆來源為何？</span>
                         </button>
-                        <div class="accordion-content mt-4 text-gray-700">
+                        <div id="editorial-faq-1-answer-front" class="accordion-content mt-4 text-gray-700">
                             我們的咖啡豆均來自全球知名的咖啡產區，並與當地優質莊園直接合作，確保每一顆豆子的品質與風味都達到最佳水準。
                         </div>
                     </div>
                     <div class="card p-6 fade-in-up" style="transition-delay: 100ms;">
                         <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
-                            <span class="mr-2">如何確保咖啡豆的新鮮度？</span>
+                            <span id="editorial-faq-2-question-front" class="mr-2">如何確保咖啡豆的新鮮度？</span>
                         </button>
-                        <div class="accordion-content mt-4 text-gray-700">
+                        <div id="editorial-faq-2-answer-front" class="accordion-content mt-4 text-gray-700">
                             Melody Bean 採小批量新鮮烘焙，並在烘焙完成後立即使用單向排氣閥包裝，最大限度地保留咖啡豆的香氣與新鮮度。我們建議您在收到咖啡豆後的兩週內享用，以體驗最佳風味。
                         </div>
                     </div>
                     <div class="card p-6 fade-in-up" style="transition-delay: 200ms;">
                         <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
-                            <span class="mr-2">咖啡渣還有什麼其他用途？</span>
+                            <span id="editorial-faq-3-question-front" class="mr-2">咖啡渣還有什麼其他用途？</span>
                         </button>
-                        <div class="accordion-content mt-4 text-gray-700">
+                        <div id="editorial-faq-3-answer-front" class="accordion-content mt-4 text-gray-700">
                             咖啡渣是天然的除臭劑，可用於冰箱、鞋櫃。它也是優良的植物肥料，富含氮，能幫助植物生長。此外，乾燥的咖啡渣也可以用於製作身體去角質磨砂膏。
                         </div>
                     </div>
                     <div class="card p-6 fade-in-up" style="transition-delay: 300ms;">
                         <button class="accordion-button flex justify-between items-center w-full text-left font-semibold text-xl text-secondary" aria-expanded="false">
-                            <span class="mr-2">是否提供客製化烘焙服務？</span>
+                            <span id="editorial-faq-4-question-front" class="mr-2">是否提供客製化烘焙服務？</span>
                         </button>
-                        <div class="accordion-content mt-4 text-gray-700">
+                        <div id="editorial-faq-4-answer-front" class="accordion-content mt-4 text-gray-700">
                             目前我們主要提供精選烘焙度的咖啡豆。若您有特殊需求或大宗採購，歡迎透過聯絡我們頁面與我們聯繫，我們將樂意為您提供客製化諮詢服務。
                         </div>
                     </div>
@@ -1145,7 +1143,7 @@
         // Firebase SDK imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // Firebase Configuration - must match the admin site for real-time product sync.
         const firebaseConfig = {
@@ -1171,6 +1169,7 @@
 
         // Reference to the Firestore collection
         const productsCollectionRef = collection(db, `artifacts/${appId}/public/data/coffeeProducts`);
+        const editorialContentRef = doc(db, `artifacts/${appId}/public/data/siteContent/editorial`);
 
         // IIFE for encapsulation
         (function() {
@@ -1257,6 +1256,85 @@
                     '"': '&quot;',
                     "'": '&#39;'
                 }[char]));
+            }
+
+            function safeMediaUrl(value, fallback = '') {
+                const url = String(value || '').trim();
+                return /^(https?:\/\/|\.\/|image\/|video\/)/i.test(url) ? url : fallback;
+            }
+
+            function plainTextToHTML(value) {
+                return String(value || '').split(/\n\s*\n/).filter(Boolean).map((paragraph) => `<p class="mb-4">${escapeHTML(paragraph).replace(/\n/g, '<br>')}</p>`).join('');
+            }
+
+            function setEditorialText(id, value) {
+                const element = document.getElementById(id);
+                if (element && typeof value === 'string' && value.trim()) element.textContent = value.trim();
+            }
+
+            function renderEditorialParagraphs(id, value, firstClass, restClass = firstClass) {
+                const container = document.getElementById(id);
+                const paragraphs = String(value || '').split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
+                if (!container || !paragraphs.length) return;
+                container.replaceChildren(...paragraphs.map((paragraph, index) => {
+                    const item = document.createElement('p');
+                    item.className = index === 0 ? firstClass : restClass;
+                    item.textContent = paragraph;
+                    return item;
+                }));
+            }
+
+            function renderEditorialContent(content) {
+                if (!content || typeof content !== 'object') return;
+                const story = content.story || {};
+                setEditorialText('editorial-story-title-front', story.title);
+                setEditorialText('editorial-story-headline-front', story.headline);
+                renderEditorialParagraphs('editorial-story-body-front', story.body, 'mb-4');
+                setEditorialText('editorial-story-video-title-front', story.videoTitle);
+                const videoBlock = document.getElementById('editorial-story-video-block-front');
+                const videoFrame = document.getElementById('editorial-story-video-frame-front');
+                const videoUrl = safeMediaUrl(story.videoUrl);
+                if (videoBlock && videoFrame && videoUrl) {
+                    videoFrame.replaceChildren();
+                    const youtubeUrl = getYouTubeEmbedUrl(videoUrl);
+                    if (youtubeUrl) {
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'absolute top-0 left-0 w-full h-full rounded-lg';
+                        iframe.src = youtubeUrl; iframe.title = story.videoTitle || '品牌故事影片'; iframe.loading = 'lazy'; iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'; iframe.allowFullscreen = true;
+                        videoFrame.appendChild(iframe);
+                    } else {
+                        const video = document.createElement('video');
+                        video.className = 'absolute top-0 left-0 w-full h-full rounded-lg'; video.controls = true; video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'metadata';
+                        const source = document.createElement('source'); source.src = videoUrl; source.type = /\.webm(?:$|\?)/i.test(videoUrl) ? 'video/webm' : 'video/mp4'; video.appendChild(source); videoFrame.appendChild(video);
+                    }
+                    videoBlock.classList.remove('hidden');
+                } else if (videoBlock && !videoUrl) videoBlock.classList.add('hidden');
+
+                const artisan = content.artisan || {};
+                setEditorialText('editorial-artisan-title-front', artisan.title);
+                setEditorialText('editorial-artisan-role-front', artisan.role);
+                setEditorialText('editorial-artisan-name-front', artisan.name);
+                renderEditorialParagraphs('editorial-artisan-bio-front', artisan.bio, 'mt-4 text-gray-600', 'mt-2 text-gray-700');
+                const artisanImage = document.getElementById('editorial-artisan-image-front');
+                const artisanImageUrl = safeMediaUrl(artisan.imageUrl);
+                if (artisanImage && artisanImageUrl) { artisanImage.src = artisanImageUrl; artisanImage.alt = `${artisan.name || '咖啡'}職人`; }
+
+                const academy = content.academy || {};
+                setEditorialText('editorial-academy-title-front', academy.title);
+                setEditorialText('editorial-academy-intro-front', academy.intro);
+                if (Array.isArray(academy.articles)) academy.articles.slice(0, 3).forEach((article, index) => {
+                    const number = index + 1;
+                    setEditorialText(`editorial-knowledge-${number}-title-front`, article.title);
+                    setEditorialText(`editorial-knowledge-${number}-summary-front`, article.summary);
+                    knowledgeArticles[number] = { title: article.title || knowledgeArticles[number]?.title || '咖啡知識', content: article.detail ? plainTextToHTML(article.detail) : knowledgeArticles[number]?.content || '' };
+                });
+
+                const faq = content.faq || {};
+                setEditorialText('editorial-faq-title-front', faq.title);
+                if (Array.isArray(faq.items)) faq.items.slice(0, 4).forEach((item, index) => {
+                    setEditorialText(`editorial-faq-${index + 1}-question-front`, item.question);
+                    setEditorialText(`editorial-faq-${index + 1}-answer-front`, item.answer);
+                });
             }
 
             function getProductImage(product, index) {
@@ -2718,6 +2796,14 @@
                         }, (error) => {
                             console.error("Error fetching real-time products from Firestore:", error);
                             showFrontMessageModal('資料載入失敗', `無法從資料庫載入咖啡豆資訊：${error.message}`, 'error');
+                        });
+                        onSnapshot(editorialContentRef, (snapshot) => {
+                            if (snapshot.exists()) {
+                                renderEditorialContent(snapshot.data());
+                                console.log('[Firestore] Editorial content updated in real time.');
+                            }
+                        }, (error) => {
+                            console.error('Error fetching editorial content from Firestore:', error);
                         });
                     } else {
                         console.log("[Firebase Auth] No user signed in. Signing in anonymously...");
