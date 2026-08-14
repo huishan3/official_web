@@ -2782,29 +2782,30 @@
                     document.body.style.overflow = '';
                 }, 1500); 
 
-                // Firebase Authentication State Change Listener
+                // Public product and editorial reads do not depend on an auth round trip.
+                const q = query(productsCollectionRef);
+                onSnapshot(q, (snapshot) => {
+                    globalFlavorData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log("[Firestore] Products loaded/updated in real-time:", globalFlavorData.length);
+                    window.loadAndRenderAllData();
+                }, (error) => {
+                    console.error("Error fetching real-time products from Firestore:", error);
+                    showFrontMessageModal('資料載入失敗', `無法從資料庫載入咖啡豆資訊：${error.message}`, 'error');
+                });
+                onSnapshot(editorialContentRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        renderEditorialContent(snapshot.data());
+                        console.log('[Firestore] Editorial content updated in real time.');
+                    }
+                }, (error) => {
+                    console.error('Error fetching editorial content from Firestore:', error);
+                });
+
+                // Anonymous auth is used only for CRM-related calls and must not block shopping.
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         console.log("[Firebase Auth] User is signed in:", user.uid);
                         isAuthReady = true;
-                        // Start listening to products collection after authentication is ready
-                        const q = query(productsCollectionRef);
-                        onSnapshot(q, (snapshot) => {
-                            globalFlavorData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            console.log("[Firestore] Products loaded/updated in real-time:", globalFlavorData.length);
-                            window.loadAndRenderAllData(); // Re-render UI on any change
-                        }, (error) => {
-                            console.error("Error fetching real-time products from Firestore:", error);
-                            showFrontMessageModal('資料載入失敗', `無法從資料庫載入咖啡豆資訊：${error.message}`, 'error');
-                        });
-                        onSnapshot(editorialContentRef, (snapshot) => {
-                            if (snapshot.exists()) {
-                                renderEditorialContent(snapshot.data());
-                                console.log('[Firestore] Editorial content updated in real time.');
-                            }
-                        }, (error) => {
-                            console.error('Error fetching editorial content from Firestore:', error);
-                        });
                     } else {
                         console.log("[Firebase Auth] No user signed in. Signing in anonymously...");
                         let initialAuthToken = null;
@@ -2820,8 +2821,8 @@
                                 await signInAnonymously(auth);
                             }
                         } catch (error) {
-                            console.error("[Firebase Auth] Anonymous sign-in failed:", error);
-                            showFrontMessageModal('認證錯誤', `無法匿名登入 Firebase：${error.message}`, 'error');
+                            isAuthReady = true;
+                            console.warn("[Firebase Auth] Anonymous sign-in unavailable; public shopping remains active:", error);
                         }
                     }
                 });
@@ -2831,4 +2832,3 @@
     </script>
 </body>
 </html>
-�
